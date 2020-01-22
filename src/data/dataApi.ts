@@ -12,6 +12,7 @@ const speakersUrl = '/assets/data/speakers.json';
 const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
 const USERNAME = 'username';
+const TOKEN = 'token';
 
 export const getConfData = async () => {
   const response = await Promise.all([
@@ -39,14 +40,17 @@ export const getUserData = async () => {
   const response = await Promise.all([
     Storage.get({ key: HAS_LOGGED_IN }),
     Storage.get({ key: HAS_SEEN_TUTORIAL }),
-    Storage.get({ key: USERNAME })]);
+    Storage.get({ key: USERNAME }),
+    Storage.get({ key: TOKEN })]);
   const isLoggedin = await response[0].value === 'true';
   const hasSeenTutorial = await response[1].value === 'true';
   const username = await response[2].value || undefined;
+  const token = await response[3].value || undefined;
   const data = {
     isLoggedin,
     hasSeenTutorial,
-    username
+    username,
+    token
   }
   return data;
 }
@@ -64,5 +68,13 @@ export const setUsernameData = async (username?: string) => {
     await Storage.remove({ key: USERNAME });
   } else {
     await Storage.set({ key: USERNAME, value: username });
+  }
+}
+
+export const setTokenData = async (token?: string) => {
+  if (!token) {
+    await Storage.remove({ key: TOKEN });
+  } else {
+    await Storage.set({ key: TOKEN, value: token });
   }
 }

@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonInput, IonText } from '@ionic/react';
 import './Login.scss';
-import { setIsLoggedIn, setUsername } from '../data/user/user.actions';
+import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions';
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
+import axios from 'axios';
 
 interface OwnProps extends RouteComponentProps {}
 
 interface DispatchProps {
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
+  setToken: typeof setToken;
 }
 
 interface LoginProps extends OwnProps,  DispatchProps { }
 
-const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUsernameAction}) => {
+const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUsernameAction, setToken: setTokenAction}) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +27,8 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [tokenError, setTokenError] = useState(false);
+  const apiURL = 'https://doctornelson.herokuapp.com';
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +41,38 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
     }
 
     if(username && password) {
-      await setIsLoggedIn(true);
-      await setUsernameAction(username);
-      history.push('/tabs/schedule', {direction: 'none'});
+      try {
+        const response = await axios.request({
+          url: `${apiURL}/public/signup`,
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            username: username, 
+            password: password,
+            dob: dob.toString(),
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+          }
+        });
+        const { data } = await response;
+        console.log(data);
+        if (!data.token)
+        {
+          setTokenError(true);
+          throw "No Token data!";
+        }
+
+        await setIsLoggedIn(true);
+        await setTokenAction(data.token);
+        await setUsernameAction(username);
+        history.push('/tabs/schedule', {direction: 'none'});
+      } catch (e) {
+        console.log(`Error signing up: ${e}`);
+      }
     }
   };
 
@@ -125,6 +158,12 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
                 required>
               </IonInput>
             </IonItem>
+
+            {formSubmitted && tokenError && <IonText color="danger">
+              <p className="ion-padding-start">
+                Issue getting token.
+              </p>
+            </IonText>}
           </IonList>
 
           <IonRow>
@@ -143,7 +182,8 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
 export default connect<OwnProps, {}, DispatchProps>({
   mapDispatchToProps: {
     setIsLoggedIn,
-    setUsername
+    setUsername,
+    setToken,
   },
   component: Login
 })

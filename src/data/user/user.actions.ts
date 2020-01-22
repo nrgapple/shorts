@@ -67,5 +67,6 @@ export type UserActions =
   | ActionType<typeof setData>
   | ActionType<typeof setIsLoggedIn>
   | ActionType<typeof setUsername>
+  | ActionType<typeof setToken>
   | ActionType<typeof setHasSeenTutorial>
   | ActionType<typeof setDarkMode>
