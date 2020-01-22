@@ -9,6 +9,8 @@ export const getSpeakers = (state: AppState) => state.data.speakers;
 const getFilteredTracks = (state: AppState) => state.data.filteredTracks;
 const getFavoriteIds = (state: AppState) => state.data.favorites;
 const getSearchText = (state: AppState) => state.data.searchText;
+const getNearMe = (state: AppState) => state.data.nearMe;
+const getCurrentProfileIndex = (state: AppState) => state.data.currentProfileIndex;
 
 export const getFilteredSessions = createSelector(
   getSessions, getFilteredTracks,
@@ -90,6 +92,11 @@ function groupSessions(sessions: Session[]) {
 export const getSpeaker = createSelector(
   getSpeakers, getIdParam,
   (speakers, id) => speakers.find(x => x.id === id)
+);
+
+export const getCurrentProfile = createSelector(
+  getNearMe, getCurrentProfileIndex,
+  (nearMe, index) => nearMe && nearMe.length > 0?nearMe[index]:undefined
 );
 
 export const getSpeakerSessions = createSelector(

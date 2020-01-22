@@ -69,7 +69,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
         await setIsLoggedIn(true);
         await setTokenAction(data.token);
         await setUsernameAction(username);
-        history.push('/tabs/schedule', {direction: 'none'});
+        history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         console.log(`Error signing up: ${e}`);
       }

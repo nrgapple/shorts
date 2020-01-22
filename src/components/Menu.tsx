@@ -12,7 +12,7 @@ import {
   IonToolbar,
   IonToggle
 } from '@ionic/react';
-import { calendar, contacts, hammer, help, informationCircle, logIn, logOut, map, person, personAdd } from 'ionicons/icons';
+import { home, calendar, contacts, hammer, help, informationCircle, logIn, logOut, map, person, personAdd } from 'ionicons/icons';
 import React, { useState } from 'react';
 import { connect } from '../data/connect';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -20,10 +20,10 @@ import { setDarkMode } from '../data/user/user.actions';
 
 const routes = {
   appPages: [
-    { title: 'Schedule', path: '/tabs/schedule', icon: calendar },
+    { title: 'Home', path: '/tabs/home', icon: home },
     { title: 'Speakers', path: '/tabs/speakers', icon: contacts },
     { title: 'Map', path: '/tabs/map', icon: map },
-    { title: 'About', path: '/tabs/about', icon: informationCircle }
+    { title: 'Profile', path: '/tabs/about', icon: informationCircle }
   ],
   loggedInPages: [
     { title: 'Account', path: '/account', icon: person },

@@ -49,7 +49,8 @@ interface StateProps {
   darkMode: boolean,
   sessions: Session[],
   token?: string,
-  userProfile?: Profile
+  userProfile?: Profile,
+  nearMe?: Profile[],
 }
 
 interface DispatchProps {
@@ -62,7 +63,7 @@ interface DispatchProps {
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData }) => {
 
   useEffect(() => {
     loadUserData();
@@ -78,6 +79,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
   useEffect(() => {
     console.log(token);
     console.log(userProfile);
+    console.log(nearMe);
   }, [userProfile])
 
   return (
@@ -117,7 +119,8 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     darkMode: state.user.darkMode,
     sessions: state.data.sessions,
     token: state.user.token,
-    userProfile: state.data.userProfile
+    userProfile: state.data.userProfile,
+    nearMe: state.data.nearMe,
   }),
   mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken },
   component: IonicApp

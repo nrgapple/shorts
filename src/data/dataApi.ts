@@ -23,7 +23,9 @@ export const getConfData = async (token?: string) => {
     fetch(sessionsUrl),
     fetch(locationsUrl),
     fetch(speakersUrl)]);
-  var userProfile = undefined
+  var userProfile = undefined;
+  var nearMe = undefined;
+  const currentProfile = 0;
   if (token)
   {
     try {
@@ -45,14 +47,44 @@ export const getConfData = async (token?: string) => {
         about: userProfileData.about as string,
         height: userProfileData.height as number,
         dob: userProfileData.dob as Date,
+        username: userProfileData.username as string,
         images: userProfileData.images.map((image: any) : Image => {
           return {
             imageId: image.imageId,
-            imageUrl: image.url,
+            imageUrl: image.imageUrl,
           }
         }),
-        username: userProfileData.username as string
       } as Profile;
+      
+      const nearMeResponse = await Axios.request({
+        url: `${apiURL}/secure/profiles`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      const { data: nearMeData } = nearMeResponse;
+      console.log(nearMeResponse);
+      nearMe = nearMeData.map((Profile: any) : Profile => {
+        return {
+          userId: Profile.userId as number, 
+          firstName: Profile.firstName as string,
+          lastName: Profile.lastName as string,
+          about: Profile.about as string,
+          height: Profile.height as number,
+          dob: Profile.dob as Date,
+          username: userProfileData.username as string,
+          images: Profile.images.map((image: any) : Image => {
+            return {
+              imageId: image.imageId,
+              imageUrl: image.imageUrl,
+            }
+          }),
+        }
+      }) as Profile[];
+
     } catch (e) {
       console.log(e);
     }
@@ -60,9 +92,6 @@ export const getConfData = async (token?: string) => {
   const sessions = await response[0].json() as Session[];
   const locations = await response[1].json() as Location[];
   const speakers = await response[2].json() as Speaker[];
-  
-  
-  
   const allTracks = sessions
     .reduce((all, session) => all.concat(session.tracks), [] as string[])
     .filter((trackName, index, array) => array.indexOf(trackName) === index)
@@ -74,6 +103,8 @@ export const getConfData = async (token?: string) => {
     allTracks,
     filteredTracks: [...allTracks],
     userProfile,
+    nearMe,
+    currentProfile,
   }
   return data;
 }

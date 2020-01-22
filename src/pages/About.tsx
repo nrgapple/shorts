@@ -55,7 +55,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile }) => {
       <IonContent>
 
         <div className="about-header">
-          <img src="assets/img/ionic-logo-white.svg" alt="ionic logo" />
+          <img src={userProfile && userProfile.images && userProfile.images.length > 0 && userProfile.images[0]? userProfile.images[0].imageUrl:"assets/img/ionic-logo-white.svg"} alt="ionic logo" />
         </div>
         <div className="about-info">
           <h4 className="ion-padding-start">
