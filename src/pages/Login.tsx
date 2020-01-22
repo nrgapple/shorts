@@ -59,6 +59,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
         }
 
         await setIsLoggedIn(true);
+        await setTokenAction(data.token);
         await setUsernameAction(username);
         history.push('/tabs/schedule', {direction: 'none'});
       } catch (e) {
