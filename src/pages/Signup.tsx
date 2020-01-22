@@ -18,6 +18,10 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dob, setDob] = useState('');
+  const [email, setEmail] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -87,6 +91,40 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
                 Password is required
               </p>
             </IonText>}
+
+            <IonItem>
+              <IonLabel position="stacked" color="primary">Date of Birth</IonLabel>
+              <IonInput name="dob" type="date" value={dob} spellCheck={false} autocapitalize="off" onIonChange={e => {
+                setDob(e.detail.value!);
+              }}
+                required>
+              </IonInput>
+            </IonItem>
+
+            <IonItem>
+              <IonLabel position="stacked" color="primary">First Name</IonLabel>
+              <IonInput name="firstName" type="text" value={firstName} spellCheck={false} autocapitalize="on" onIonChange={e => {
+                setFirstName(e.detail.value!);
+              }}
+                required>
+              </IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked" color="primary">Last Name</IonLabel>
+              <IonInput name="lastName" type="text" value={lastName} spellCheck={false} autocapitalize="on" onIonChange={e => {
+                setLastName(e.detail.value!);
+              }}
+                required>
+              </IonInput>
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked" color="primary">Email</IonLabel>
+              <IonInput name="email" type="email" value={email} spellCheck={false} autocapitalize="off" onIonChange={e => {
+                setEmail(e.detail.value!);
+              }}
+                required>
+              </IonInput>
+            </IonItem>
           </IonList>
 
           <IonRow>

@@ -1,4 +1,4 @@
-import { getUserData, setIsLoggedInData, setUsernameData, setHasSeenTutorialData } from '../dataApi';
+import { getUserData, setIsLoggedInData, setUsernameData, setHasSeenTutorialData, setTokenData } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { UserState } from './user.state';
 
@@ -38,6 +38,14 @@ export const setUsername = (username?: string) => async (dispatch: React.Dispatc
   return ({
     type: 'set-username',
     username
+  } as const);
+};
+
+export const setToken = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+  await setTokenData(token);
+  return ({
+    type: 'set-token',
+    token
   } as const);
 };
 

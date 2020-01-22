@@ -4,10 +4,9 @@ export interface Profile {
     userId: number;
     firstName: string;
     lastName: string;
-    about: string;
+    about?: string;
     username: string;
-    height: number;
+    height?: number;
     dob: Date;
-    token: string;
     images: Image[];
 }

@@ -3,5 +3,6 @@ export interface UserState {
   username?: string;
   darkMode: boolean;
   hasSeenTutorial: boolean;
+  token: string;
   loading: boolean;
 };
