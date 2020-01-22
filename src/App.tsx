@@ -35,6 +35,7 @@ import Support from './pages/Support';
 import Tutorial from './pages/Tutorial';
 import HomeOrTutorial from './components/HomeOrTutorial';
 import { Session } from "./models/Session";
+import { Profile } from './models/Profile';
 
 const App: React.FC = () => {
   return (
@@ -47,6 +48,8 @@ const App: React.FC = () => {
 interface StateProps {
   darkMode: boolean,
   sessions: Session[],
+  token?: string,
+  userProfile?: Profile
 }
 
 interface DispatchProps {
@@ -59,13 +62,23 @@ interface DispatchProps {
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData }) => {
 
   useEffect(() => {
     loadUserData();
-    loadConfData();
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    console.log(token);
+    loadConfData(token);
+    console.log(userProfile);
+  }, [token])
+  
+  useEffect(() => {
+    console.log(token);
+    console.log(userProfile);
+  }, [userProfile])
 
   return (
     sessions.length === 0 ? (
@@ -102,7 +115,9 @@ export default App;
 const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     darkMode: state.user.darkMode,
-    sessions: state.data.sessions
+    sessions: state.data.sessions,
+    token: state.user.token,
+    userProfile: state.data.userProfile
   }),
   mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken },
   component: IonicApp

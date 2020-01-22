@@ -2,26 +2,67 @@ import { Plugins } from '@capacitor/core';
 import { Session } from '../models/Session';
 import { Speaker } from '../models/Speaker';
 import { Location } from '../models/Location';
+import Axios from 'axios';
+import { Profile } from '../models/Profile';
+import { Image } from '../models/Image';
 
 const { Storage } = Plugins;
 
 const locationsUrl = '/assets/data/locations.json';
 const sessionsUrl = '/assets/data/sessions.json';
 const speakersUrl = '/assets/data/speakers.json';
+const apiURL = 'https://doctornelson.herokuapp.com';
 
 const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
 const USERNAME = 'username';
 const TOKEN = 'token';
 
-export const getConfData = async () => {
+export const getConfData = async (token?: string) => {
   const response = await Promise.all([
     fetch(sessionsUrl),
     fetch(locationsUrl),
     fetch(speakersUrl)]);
+  var userProfile = undefined
+  if (token)
+  {
+    try {
+      const userProfileResponse = await Axios.request({
+        url: `${apiURL}/secure/profile`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      const { data: userProfileData } = userProfileResponse;
+      console.log(userProfileData);
+      userProfile = {
+        userId: userProfileData.userId as number, 
+        firstName: userProfileData.firstName as string,
+        lastName: userProfileData.lastName as string,
+        about: userProfileData.about as string,
+        height: userProfileData.height as number,
+        dob: userProfileData.dob as Date,
+        images: userProfileData.images.map((image: any) : Image => {
+          return {
+            imageId: image.imageId,
+            imageUrl: image.url,
+          }
+        }),
+        username: userProfileData.username as string
+      } as Profile;
+    } catch (e) {
+      console.log(e);
+    }
+  }
   const sessions = await response[0].json() as Session[];
   const locations = await response[1].json() as Location[];
   const speakers = await response[2].json() as Speaker[];
+  
+  
+  
   const allTracks = sessions
     .reduce((all, session) => all.concat(session.tracks), [] as string[])
     .filter((trackName, index, array) => array.indexOf(trackName) === index)
@@ -31,7 +72,8 @@ export const getConfData = async () => {
     locations,
     speakers,
     allTracks,
-    filteredTracks: [...allTracks]
+    filteredTracks: [...allTracks],
+    userProfile,
   }
   return data;
 }

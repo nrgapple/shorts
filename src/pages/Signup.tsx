@@ -58,7 +58,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
             email: email,
           }
         });
-        const { data } = await response;
+        const { data } = response;
         console.log(data);
         if (!data.token)
         {

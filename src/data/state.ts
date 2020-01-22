@@ -11,7 +11,9 @@ export const initialState: AppState = {
     allTracks: [],
     filteredTracks: [],
     mapCenterId: 0,
-    loading: false
+    loading: false,
+
+    userProfile: undefined,
   },
   user: {
     hasSeenTutorial: false,
