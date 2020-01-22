@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover } from '@ionic/react';
 import './About.scss';
-import { calendar, pin, more } from 'ionicons/icons';
+import { calendar, pin, more, body } from 'ionicons/icons';
 import AboutPopover from '../components/AboutPopover';
+import { Profile } from '../models/Profile';
+import { connect } from '../data/connect';
 
-interface AboutProps { }
+interface OwnProps { 
+  userProfile?: Profile;
+};
 
-const About: React.FC<AboutProps> = () => {
+interface StateProps {};
+
+interface DispatchProps { };
+
+interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
+
+const About: React.FC<UserProfileProps> = ({ userProfile }) => {
 
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
@@ -15,7 +25,17 @@ const About: React.FC<AboutProps> = () => {
     setPopoverEvent(e.nativeEvent);
     setShowPopover(true);
   };
-  const conferenceDate = '2047-05-17';
+
+  const calculateAge = (dob: Date) => {
+    var today = new Date();
+    var birthDate = new Date(dob);
+    var age = today.getFullYear() - birthDate.getFullYear();
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age = age - 1;
+    }
+    return age;
+  }
 
   return (
     <IonPage id="about-page">
@@ -24,7 +44,7 @@ const About: React.FC<AboutProps> = () => {
           <IonButtons slot="start">
             <IonMenuButton></IonMenuButton>
           </IonButtons>
-          <IonTitle>About</IonTitle>
+          <IonTitle>Profile</IonTitle>
           <IonButtons slot="end">
             <IonButton icon-only onClick={presentPopover}>
               <IonIcon slot="icon-only" icon={more}></IonIcon>
@@ -38,13 +58,25 @@ const About: React.FC<AboutProps> = () => {
           <img src="assets/img/ionic-logo-white.svg" alt="ionic logo" />
         </div>
         <div className="about-info">
-          <h4 className="ion-padding-start">Ionic Conference</h4>
+          <h4 className="ion-padding-start">
+            {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
+          </h4>
 
           <IonList lines="none">
             <IonItem>
               <IonIcon icon={calendar} slot="start"></IonIcon>
-              <IonLabel position="stacked">Date</IonLabel>
-              <IonDatetime displayFormat="MMM DD, YYYY" max="2056" value={conferenceDate}></IonDatetime>
+              <IonLabel position="stacked">Age</IonLabel>
+              <IonLabel position="stacked">
+                {userProfile? calculateAge(userProfile.dob) : 'N/A'}
+              </IonLabel> 
+            </IonItem>
+
+            <IonItem>
+              <IonIcon icon={body} slot="start"></IonIcon>
+              <IonLabel position="stacked">Height</IonLabel>
+              <IonLabel position="stacked">
+                {userProfile && userProfile.height? userProfile.height : 'N/A'}
+              </IonLabel> 
             </IonItem>
 
             <IonItem>
@@ -60,10 +92,7 @@ const About: React.FC<AboutProps> = () => {
           </IonList>
 
           <p className="ion-padding-start ion-padding-end">
-            The Ionic Conference is a one-day conference featuring talks from the Ionic team. It is focused on Ionic applications being
-            built with Ionic 2. This includes migrating apps from Ionic 1 to Ionic 2, Angular concepts, Webpack, Sass, and many
-            other technologies used in Ionic 2. Tickets are completely sold out, and we’re expecting more than 1000 developers
-            – making this the largest Ionic conference ever!
+            {userProfile && userProfile.about? userProfile.about : ''}
           </p>
         </div>
       </IonContent>
@@ -78,4 +107,9 @@ const About: React.FC<AboutProps> = () => {
   );
 };
 
-export default React.memo(About);
+export default connect<OwnProps, StateProps, DispatchProps>({
+  mapStateToProps: (state) => ({
+    userProfile: state.data.userProfile
+  }),
+  component: About
+});

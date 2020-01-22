@@ -14,6 +14,6 @@ export interface SessionsState {
   allTracks: string[];
 
   userProfile?: Profile;
-  //nearMe: Profile[];
-  //matches: Profile[];
+  nearMe?: Profile[];
+  matches?: Profile[];
 }

@@ -14,6 +14,8 @@ export const initialState: AppState = {
     loading: false,
 
     userProfile: undefined,
+    nearMe: undefined,
+    matches: undefined,
   },
   user: {
     hasSeenTutorial: false,
