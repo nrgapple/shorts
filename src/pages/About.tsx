@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar } from '@ionic/react';
+import React, { useState, useEffect } from 'react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea } from '@ionic/react';
 import './About.scss';
-import { calendar, pin, more, body } from 'ionicons/icons';
-import AboutPopover from '../components/AboutPopover';
+import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { connect } from '../data/connect';
+import EditPopover from '../components/EditPopover';
 
 interface OwnProps { 
   userProfile?: Profile;
@@ -19,9 +19,13 @@ interface DispatchProps { };
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
 const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
-
+  const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
+  const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
+  const [update, setHeightUpdated] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -39,6 +43,10 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
     return age;
   }
 
+  const updateProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+  }
+
   return (
     <IonPage id="about-page">
       <IonHeader>
@@ -48,9 +56,14 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
           </IonButtons>
           <IonTitle>Profile</IonTitle>
           <IonButtons slot="end">
-            <IonButton icon-only onClick={presentPopover}>
-              <IonIcon slot="icon-only" icon={more}></IonIcon>
-            </IonButton>
+            {
+              !isEditing?
+              <IonButton icon-only onClick={presentPopover}>
+                <IonIcon slot="icon-only" icon={more}></IonIcon>
+              </IonButton>
+              :
+              <></>
+            }
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -67,22 +80,28 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
             <h4 className="ion-padding-start">
               {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
             </h4>
-
+            <form noValidate onSubmit={updateProfile}>
             <IonList lines="none">
               <IonItem>
                 <IonIcon icon={calendar} slot="start"></IonIcon>
                 <IonLabel position="stacked">Age</IonLabel>
-                <IonLabel position="stacked">
+                <IonText>
                   {userProfile? calculateAge(userProfile.dob) : 'N/A'}
-                </IonLabel> 
+                </IonText> 
               </IonItem>
 
               <IonItem>
                 <IonIcon icon={body} slot="start"></IonIcon>
                 <IonLabel position="stacked">Height</IonLabel>
-                <IonLabel position="stacked">
-                  {userProfile && userProfile.height? userProfile.height : 'N/A'}
-                </IonLabel> 
+                {
+                  isEditing ?
+                  <IonInput type="number" value={height.toString()} onIonChange={e => setHeight(Number.parseInt(e.detail.value? e.detail.value : '0'))}>
+                  </IonInput>
+                  :
+                  <IonText>
+                    {userProfile && userProfile.height? userProfile.height : 'N/A'}
+                  </IonText> 
+                }
               </IonItem>
 
               <IonItem>
@@ -95,12 +114,37 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
                   <IonSelectOption value="seattle">Seattle, WA</IonSelectOption>
                 </IonSelect>
               </IonItem>
-            </IonList>
 
-            <p className="ion-padding-start ion-padding-end">
-              {userProfile && userProfile.about? userProfile.about : ''}
-            </p>
+              <IonItem>
+                <IonLabel position="stacked">About</IonLabel>
+                {
+                  isEditing ?
+                  <IonTextarea value={about} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
+                  :
+                  <p>
+                    {userProfile && userProfile.about? userProfile.about: ''}
+                  </p>
+                }
+               
+              </IonItem>
+            </IonList>
+            
+            
+            </form>
           </div>
+          {
+            isEditing ?
+            <IonRow>
+              <IonCol>
+                <IonButton type="submit" expand="block">Update</IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton onClick={() => {setIsEditing(false); setAbout(userProfile && userProfile.about? userProfile.about: '')}} color="light" expand="block">Cancel</IonButton>
+              </IonCol>
+            </IonRow>
+            :
+            <></>
+          }
           </>
         }
       </IonContent>
@@ -109,7 +153,12 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
         event={popoverEvent}
         onDidDismiss={() => setShowPopover(false)}
       >
-        <AboutPopover dismiss={() => setShowPopover(false)} /> 
+        <EditPopover edit={() => {
+              setIsEditing(true); 
+              setShowPopover(false);
+            }
+          }
+        /> 
       </IonPopover>
     </IonPage>
   );
