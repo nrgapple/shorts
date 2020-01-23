@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar } from '@ionic/react';
 import './About.scss';
 import { calendar, pin, more, body } from 'ionicons/icons';
 import AboutPopover from '../components/AboutPopover';
@@ -10,13 +10,15 @@ interface OwnProps {
   userProfile?: Profile;
 };
 
-interface StateProps {};
+interface StateProps {
+  loading?: boolean
+};
 
 interface DispatchProps { };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile }) => {
+const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
 
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
@@ -53,48 +55,54 @@ const About: React.FC<UserProfileProps> = ({ userProfile }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        {
+          loading ? 
+          <IonProgressBar type="indeterminate"></IonProgressBar>
+          :
+          <>
+          <div className="about-header">
+            <img src={userProfile && userProfile.images && userProfile.images.length > 0 && userProfile.images[0]? userProfile.images[0].imageUrl:"assets/img/ionic-logo-white.svg"} alt="ionic logo" />
+          </div>
+          <div className="about-info">
+            <h4 className="ion-padding-start">
+              {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
+            </h4>
 
-        <div className="about-header">
-          <img src={userProfile && userProfile.images && userProfile.images.length > 0 && userProfile.images[0]? userProfile.images[0].imageUrl:"assets/img/ionic-logo-white.svg"} alt="ionic logo" />
-        </div>
-        <div className="about-info">
-          <h4 className="ion-padding-start">
-            {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
-          </h4>
+            <IonList lines="none">
+              <IonItem>
+                <IonIcon icon={calendar} slot="start"></IonIcon>
+                <IonLabel position="stacked">Age</IonLabel>
+                <IonLabel position="stacked">
+                  {userProfile? calculateAge(userProfile.dob) : 'N/A'}
+                </IonLabel> 
+              </IonItem>
 
-          <IonList lines="none">
-            <IonItem>
-              <IonIcon icon={calendar} slot="start"></IonIcon>
-              <IonLabel position="stacked">Age</IonLabel>
-              <IonLabel position="stacked">
-                {userProfile? calculateAge(userProfile.dob) : 'N/A'}
-              </IonLabel> 
-            </IonItem>
+              <IonItem>
+                <IonIcon icon={body} slot="start"></IonIcon>
+                <IonLabel position="stacked">Height</IonLabel>
+                <IonLabel position="stacked">
+                  {userProfile && userProfile.height? userProfile.height : 'N/A'}
+                </IonLabel> 
+              </IonItem>
 
-            <IonItem>
-              <IonIcon icon={body} slot="start"></IonIcon>
-              <IonLabel position="stacked">Height</IonLabel>
-              <IonLabel position="stacked">
-                {userProfile && userProfile.height? userProfile.height : 'N/A'}
-              </IonLabel> 
-            </IonItem>
+              <IonItem>
+                <IonIcon icon={pin} slot="start"></IonIcon>
+                <IonLabel position="stacked">Location</IonLabel>
+                <IonSelect>
+                  <IonSelectOption value="madison" selected>Madison, WI</IonSelectOption>
+                  <IonSelectOption value="austin">Austin, TX</IonSelectOption>
+                  <IonSelectOption value="chicago">Chicago, IL</IonSelectOption>
+                  <IonSelectOption value="seattle">Seattle, WA</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+            </IonList>
 
-            <IonItem>
-              <IonIcon icon={pin} slot="start"></IonIcon>
-              <IonLabel position="stacked">Location</IonLabel>
-              <IonSelect>
-                <IonSelectOption value="madison" selected>Madison, WI</IonSelectOption>
-                <IonSelectOption value="austin">Austin, TX</IonSelectOption>
-                <IonSelectOption value="chicago">Chicago, IL</IonSelectOption>
-                <IonSelectOption value="seattle">Seattle, WA</IonSelectOption>
-              </IonSelect>
-            </IonItem>
-          </IonList>
-
-          <p className="ion-padding-start ion-padding-end">
-            {userProfile && userProfile.about? userProfile.about : ''}
-          </p>
-        </div>
+            <p className="ion-padding-start ion-padding-end">
+              {userProfile && userProfile.about? userProfile.about : ''}
+            </p>
+          </div>
+          </>
+        }
       </IonContent>
       <IonPopover
         isOpen={showPopover}
@@ -109,7 +117,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile }) => {
 
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
-    userProfile: state.data.userProfile
+    userProfile: state.data.userProfile,
+    loading: state.data.loading
   }),
   component: About
 });
