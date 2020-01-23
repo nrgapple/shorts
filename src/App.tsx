@@ -33,6 +33,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Support from './pages/Support';
 import Tutorial from './pages/Tutorial';
+import About from './pages/About';
 import HomeOrTutorial from './components/HomeOrTutorial';
 import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
@@ -96,6 +97,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
                 <Route path="/support" component={Support} />
+                <Route path="/profile" component={About} />
                 <Route path="/tutorial" component={Tutorial} />
                 <Route path="/logout" render={() => {
                   setIsLoggedIn(false);
