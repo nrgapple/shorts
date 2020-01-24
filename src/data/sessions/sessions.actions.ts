@@ -1,6 +1,7 @@
 import { getConfData } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
+import { Profile } from '../../models/Profile';
 
 export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
@@ -8,6 +9,10 @@ export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<
   dispatch(setData(data));
   dispatch(setLoading(false));
 }
+
+export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setData({userProfile: profile}));
+};
 
 export const setLoading = (isLoading: boolean) => ({
   type: 'set-conf-loading',
