@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton } from '@ionic/react';
 import './About.scss';
 import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
@@ -8,6 +8,8 @@ import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
 import { setUserProfile } from '../data/sessions/sessions.actions';
+import { Camera, CameraResultType } from '@capacitor/core';
+import { defineCustomElements } from '@ionic/pwa-elements/loader'
 const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
@@ -33,6 +35,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastText, setToastText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [images, setImages] = useState(userProfile && userProfile.images?userProfile.images.map(i => i.imageUrl): [])
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -104,6 +107,21 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     }
   }
 
+  const takePicture = async () => {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+
+    var imageUrl = image.webPath;
+    if (imageUrl ) {
+      setImages([...images, imageUrl]);
+    } else {
+      console.log(`No image uploaded`);
+    }
+  }
+
   useEffect(() => {
     console.log('currentUserProfile');
     console.log(userProfile);
@@ -111,6 +129,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     setHeight(userProfile && userProfile.height? userProfile.height: 0);
     setGenderPref(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
     setGender(userProfile && userProfile.gender? userProfile.gender: 'male');
+    setImages(userProfile && userProfile.images?userProfile.images.map(i => i.imageUrl): []);
+    defineCustomElements(window);
   }, [userProfile])
 
   return (
@@ -204,13 +224,18 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
                 </IonCol>
               </IonRow>
               :
-              <></>
+            <></>
             }
             </form>
           </div>
           
           </>
         }
+        <IonFab vertical="top" horizontal="end" slot="fixed">
+          <IonFabButton onClick={() => takePicture()} >
+            <IonIcon color="secondary" name="add"></IonIcon>
+          </IonFabButton>
+        </IonFab>
       </IonContent>
       <IonPopover
         isOpen={showPopover}
@@ -229,6 +254,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
         duration={3000}
         message={toastText}
         onDidDismiss={() => setShowToast(false)} />
+      
     </IonPage>
   );
 };
