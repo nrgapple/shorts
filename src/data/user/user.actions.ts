@@ -13,8 +13,10 @@ export const loadUserData = () => async (dispatch: React.Dispatch<any>) => {
 
 export const loadCurrentLocation = () => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
-  const point = await getCurrentLocation();
-  dispatch(setCurrentLocation({lat: point?point.coords.latitude:0, lng: point?point.coords.longitude:0}));
+  const position = await getCurrentLocation();
+  const point = {lat: position?position.coords.latitude:0, lng: position?position.coords.longitude:0};
+  dispatch(setCurrentLocation(point));
+  await setLocationData(point);
   dispatch(setLoading(false));
 }
 
@@ -49,8 +51,10 @@ export const setUsername = (username?: string) => async (dispatch: React.Dispatc
   } as const);
 };
 
-export const setCurrentLocation = (point?: GeoPoint) => async (dispatch: React.Dispatch<any>) => {
-  await setLocationData(point);
+export const setCurrentLocation = (point?: GeoPoint) => {
+  console.log(`setting the current location in starage`);
+  console.log(point);
+  
   return ({
     type: 'set-current-location',
     point

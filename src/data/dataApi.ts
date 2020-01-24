@@ -141,11 +141,44 @@ export const getUserData = async () => {
 
 export const getCurrentLocation = async () => {
   try {
+    console.log("getting current location");
     const geoPostion = Geolocation.getCurrentPosition();
+    console.log(geoPostion);
     return geoPostion;
   } catch (e) {
     console.error(e);
   }  
+}
+
+export const postUserLocation = async (point: GeoPoint, token?: string) =>
+{
+  console.log(`Posting current location`);
+  if (token)
+  {
+    try {
+      const sendLocationResponse = await Axios.request({
+        url: `${apiURL}/secure/location`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          longitude: point.lng,
+          latitude: point.lat, 
+        }
+      });
+      const { data } = sendLocationResponse;
+      if (data.status === 200) {
+        console.log(`Success posting location`);
+      }
+      console.log(data);
+    } catch (e) {
+      const {data} = e;
+      console.log(e);
+    }
+  }
 }
 
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
@@ -165,7 +198,12 @@ export const setUsernameData = async (username?: string) => {
 }
 
 export const setLocationData = async (point?: GeoPoint) => {
-  await Storage.set({ key: LOCATION, value: JSON.stringify(point) });
+  console.log("setting location data");
+  if (!point) {
+    await Storage.remove({ key: LOCATION});
+  } else {
+    await Storage.set({ key: LOCATION, value: JSON.stringify(point)});
+  }
 }
 
 export const setDarkModeData = async (darkMode: boolean) => {
@@ -179,9 +217,3 @@ export const setTokenData = async (token?: string) => {
     await Storage.set({ key: TOKEN, value: token });
   }
 }
-
-const getPostion = () => {
-  return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition((position) => resolve(position.coords), reject);
-  });
-};

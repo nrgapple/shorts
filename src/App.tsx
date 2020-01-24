@@ -37,6 +37,8 @@ import About from './pages/About';
 import HomeOrTutorial from './components/HomeOrTutorial';
 import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
+import { postUserLocation } from './data/dataApi';
+import { GeoPoint } from './models/GeoPoint';
 
 const App: React.FC = () => {
   return (
@@ -52,6 +54,7 @@ interface StateProps {
   token?: string,
   userProfile?: Profile,
   nearMe?: Profile[],
+  location?: GeoPoint,
 }
 
 interface DispatchProps {
@@ -65,10 +68,11 @@ interface DispatchProps {
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, location, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
 
   useEffect(() => {
     loadUserData();
+    console.log("here");
     loadCurrentLocation();
     // eslint-disable-next-line
   }, []);
@@ -84,6 +88,12 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
     console.log(userProfile);
     console.log(nearMe);
   }, [userProfile])
+
+  useEffect(() => {
+    console.log(`About post location: token: ${token} -- ${location?location.lat:null}`);
+    if (location)
+      postUserLocation(location, token);
+  }, [location])
 
   return (
     sessions.length === 0 ? (
@@ -125,6 +135,7 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     token: state.user.token,
     userProfile: state.data.userProfile,
     nearMe: state.data.nearMe,
+    location: state.user.location
   }),
   mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation },
   component: IonicApp
