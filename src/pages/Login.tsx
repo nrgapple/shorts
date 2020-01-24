@@ -55,7 +55,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
         console.log(data);
         if (!data.token) {
           setTokenError(true);
-          throw "No Token data!";
+          throw Error("No Token data!");
         }
 
         await setIsLoggedIn(true);

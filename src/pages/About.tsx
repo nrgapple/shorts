@@ -3,24 +3,31 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMe
 import './About.scss';
 import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
+import { Image } from "../models/Image";
 import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
+import Axios from 'axios';
+import { setUserProfile } from '../data/sessions/sessions.actions';
+const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
   userProfile?: Profile;
+  token?: string;
 };
 
 interface StateProps {
-  loading?: boolean
+  loading?: boolean;
 };
 
 interface DispatchProps { };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
+const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
+  const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
+  const [genderPref, setGenderPref] = useState(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
   const [update, setHeightUpdated] = useState(false);
@@ -43,8 +50,52 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
     return age;
   }
 
-  const updateProfile = (e: React.FormEvent) => {
+  const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!token)
+    return;
+    try {
+      const response = await Axios.request({
+        url: `${apiURL}/secure/profile`,
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          data: {
+            about: about,
+            gender: gender.toUpperCase(),
+            genderPref: genderPref.toUpperCase(),
+            height: height,
+          }
+      });
+      const {data} = response;
+      console.log(data);
+      const updatedProfile = {
+        userId: data.userId as number, 
+        firstName: data.firstName as string,
+        lastName: data.lastName as string,
+        about: data.about as string,
+        height: data.height as number,
+        dob: data.dob as Date,
+        username: data.username as string,
+        gender: data.gender.toLowerCase() as string,
+        genderPref: data.genderPref.toLowerCase() as string,
+        images: data.images.map((image: any) : Image => {
+          return {
+            imageId: image.imageId,
+            imageUrl: image.imageUrl,
+          }
+        }),
+      } as Profile;
+
+      await setUserProfile(updatedProfile);
+    } catch (e) {
+      const { data } = await e.response;
+      console.log(`Error updating profile: ${data? data: e}`);
+    }
   }
 
   return (
@@ -167,7 +218,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading }) => {
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     userProfile: state.data.userProfile,
-    loading: state.data.loading
+    loading: state.data.loading,
+    token: state.user.token
   }),
   component: About
 });

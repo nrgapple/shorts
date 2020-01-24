@@ -50,6 +50,8 @@ export const getConfData = async (token?: string) => {
         height: userProfileData.height as number,
         dob: userProfileData.dob as Date,
         username: userProfileData.username as string,
+        gender: userProfileData.gender?userProfileData.gender.toLowerCase(): undefined,
+        genderPref: userProfileData.gender?userProfileData.genderPref.toLowerCase(): undefined,
         images: userProfileData.images.map((image: any) : Image => {
           return {
             imageId: image.imageId,
@@ -84,7 +86,8 @@ export const getConfData = async (token?: string) => {
               imageUrl: image.imageUrl,
             }
           }),
-          gender: Profile.gender? Profile.gender: undefined,
+          gender: Profile.gender? Profile.gender.toLowerCase(): undefined,
+          genderPref: Profile.genderPref? Profile.genderPref.toLowerCase(): undefined,
         }
       }) as Profile[];
 
