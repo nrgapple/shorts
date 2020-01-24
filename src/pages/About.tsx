@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonSlides, IonSlide, IonImg } from '@ionic/react';
 import './About.scss';
 import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
@@ -160,9 +160,13 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
           <IonProgressBar type="indeterminate"></IonProgressBar>
           :
           <>
-          <div className="about-header">
-            <img src={userProfile && userProfile.images && userProfile.images.length > 0 && userProfile.images[0]? userProfile.images[0].imageUrl:"assets/img/ionic-logo-white.svg"} alt="ionic logo" />
-          </div>
+          <IonSlides options={{slidesPerView: 1}}>
+            { images.map((img, i) => (
+              <IonSlide key={i}>
+                <IonImg src={img} alt="ionic logo" className="slide-image" />
+              </IonSlide>
+            )) }
+          </IonSlides>
           <div className="about-info">
             <h4 className="ion-padding-start">
               {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
