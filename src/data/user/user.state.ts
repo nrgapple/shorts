@@ -1,3 +1,5 @@
+import { GeoPoint } from "../../models/GeoPoint";
+
 export interface UserState {
   isLoggedin: boolean;
   username?: string;
@@ -5,4 +7,5 @@ export interface UserState {
   hasSeenTutorial: boolean;
   token?: string;
   loading: boolean;
+  location?: GeoPoint;
 };

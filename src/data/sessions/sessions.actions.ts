@@ -11,7 +11,9 @@ export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<
 }
 
 export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setLoading(true));
   dispatch(setData({userProfile: profile}));
+  dispatch(setLoading(false));
 };
 
 export const setLoading = (isLoading: boolean) => ({

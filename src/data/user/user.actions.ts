@@ -1,12 +1,20 @@
-import { getUserData, setIsLoggedInData, setUsernameData, setHasSeenTutorialData, setTokenData, setDarkModeData } from '../dataApi';
+import { getUserData, setIsLoggedInData, setUsernameData, setHasSeenTutorialData, setTokenData, setDarkModeData, getCurrentLocation, setLocationData } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { UserState } from './user.state';
+import { GeoPoint } from '../../models/GeoPoint';
 
 
 export const loadUserData = () => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
   const data = await getUserData();
   dispatch(setData(data));
+  dispatch(setLoading(false));
+}
+
+export const loadCurrentLocation = () => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setLoading(true));
+  const point = await getCurrentLocation();
+  dispatch(setCurrentLocation({lat: point?point.coords.latitude:0, lng: point?point.coords.longitude:0}));
   dispatch(setLoading(false));
 }
 
@@ -38,6 +46,14 @@ export const setUsername = (username?: string) => async (dispatch: React.Dispatc
   return ({
     type: 'set-username',
     username
+  } as const);
+};
+
+export const setCurrentLocation = (point?: GeoPoint) => async (dispatch: React.Dispatch<any>) => {
+  await setLocationData(point);
+  return ({
+    type: 'set-current-location',
+    point
   } as const);
 };
 
@@ -74,3 +90,4 @@ export type UserActions =
   | ActionType<typeof setToken>
   | ActionType<typeof setHasSeenTutorial>
   | ActionType<typeof setDarkMode>
+  | ActionType<typeof setCurrentLocation>

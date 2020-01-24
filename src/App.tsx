@@ -27,7 +27,7 @@ import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
 import { loadConfData } from './data/sessions/sessions.actions';
-import { setIsLoggedIn, setUsername, loadUserData, setToken } from './data/user/user.actions';
+import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -57,6 +57,7 @@ interface StateProps {
 interface DispatchProps {
   loadConfData: typeof loadConfData;
   loadUserData: typeof loadUserData;
+  loadCurrentLocation: typeof loadCurrentLocation
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
   setToken: typeof setToken;
@@ -68,6 +69,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
 
   useEffect(() => {
     loadUserData();
+    loadCurrentLocation();
     // eslint-disable-next-line
   }, []);
 
@@ -124,6 +126,6 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     userProfile: state.data.userProfile,
     nearMe: state.data.nearMe,
   }),
-  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken },
+  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation },
   component: IonicApp
 });

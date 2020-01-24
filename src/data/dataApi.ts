@@ -1,4 +1,4 @@
-import { Plugins } from '@capacitor/core';
+import { Plugins, Geolocation } from '@capacitor/core';
 import { Session } from '../models/Session';
 import { Speaker } from '../models/Speaker';
 import { Location } from '../models/Location';
@@ -6,6 +6,7 @@ import Axios from 'axios';
 import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
 import { male } from 'ionicons/icons';
+import { GeoPoint } from '../models/GeoPoint';
 
 const { Storage } = Plugins;
 
@@ -19,6 +20,7 @@ const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
 const USERNAME = 'username';
 const TOKEN = 'token';
 const DARK_MODE = 'darkMode';
+const LOCATION = 'location';
 
 export const getConfData = async (token?: string) => {
   const response = await Promise.all([
@@ -137,15 +139,13 @@ export const getUserData = async () => {
   return data;
 }
 
-export const setCurrentLocation = async () => {
-  navigator.geolocation.getCurrentPosition(
-    position => setState({ 
-      latitude: position.coords.latitude, 
-      longitude: position.coords.longitude
-    }), 
-    err => console.log(err)
-  );
-  await Storage.set({ })
+export const getCurrentLocation = async () => {
+  try {
+    const geoPostion = Geolocation.getCurrentPosition();
+    return geoPostion;
+  } catch (e) {
+    console.error(e);
+  }  
 }
 
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
@@ -164,6 +164,10 @@ export const setUsernameData = async (username?: string) => {
   }
 }
 
+export const setLocationData = async (point?: GeoPoint) => {
+  await Storage.set({ key: LOCATION, value: JSON.stringify(point) });
+}
+
 export const setDarkModeData = async (darkMode: boolean) => {
   await Storage.set({ key: DARK_MODE, value: JSON.stringify(darkMode) })
 }
@@ -175,3 +179,9 @@ export const setTokenData = async (token?: string) => {
     await Storage.set({ key: TOKEN, value: token });
   }
 }
+
+const getPostion = () => {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition((position) => resolve(position.coords), reject);
+  });
+};
