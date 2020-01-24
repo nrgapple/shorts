@@ -137,6 +137,17 @@ export const getUserData = async () => {
   return data;
 }
 
+export const setCurrentLocation = async () => {
+  navigator.geolocation.getCurrentPosition(
+    position => setState({ 
+      latitude: position.coords.latitude, 
+      longitude: position.coords.longitude
+    }), 
+    err => console.log(err)
+  );
+  await Storage.set({ })
+}
+
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
 }
