@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast } from '@ionic/react';
 import './About.scss';
 import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
@@ -30,8 +30,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [genderPref, setGenderPref] = useState(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
-  const [update, setHeightUpdated] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastText, setToastText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
   const presentPopover = (e: React.MouseEvent) => {
@@ -52,7 +52,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.trace('updating profile submit');
     if (!token)
     return;
     try {
@@ -92,11 +92,26 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
       } as Profile;
 
       await setUserProfile(updatedProfile);
+      setIsEditing(false);
+      setToastText('Profile Updated Successfully');
+      setShowToast(true);
     } catch (e) {
       const { data } = await e.response;
-      console.log(`Error updating profile: ${data? data: e}`);
+      console.error(`Error updating profile`);
+      console.error(data);
+      setToastText('Error Updating Profile');
+      setShowToast(true);
     }
   }
+
+  useEffect(() => {
+    console.log('currentUserProfile');
+    console.log(userProfile);
+    setAbout(userProfile && userProfile.about? userProfile.about: 'empty');
+    setHeight(userProfile && userProfile.height? userProfile.height: 0);
+    setGenderPref(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
+    setGender(userProfile && userProfile.gender? userProfile.gender: 'male');
+  }, [userProfile])
 
   return (
     <IonPage id="about-page">
@@ -144,58 +159,56 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
               <IonItem>
                 <IonIcon icon={body} slot="start"></IonIcon>
                 <IonLabel position="stacked">Height</IonLabel>
-                {
-                  isEditing ?
-                  <IonInput type="number" value={height.toString()} onIonChange={e => setHeight(Number.parseInt(e.detail.value? e.detail.value : '0'))}>
-                  </IonInput>
-                  :
-                  <IonText>
-                    {userProfile && userProfile.height? userProfile.height : 'N/A'}
-                  </IonText> 
-                }
+                <IonInput disabled={!isEditing} type="number" value={height.toString()} onIonChange={e => setHeight(Number.parseInt(e.detail.value? e.detail.value : '0'))}>
+                </IonInput>
               </IonItem>
-
+              
+              <IonItem>
+                <IonIcon icon={body} slot="start"></IonIcon>
+                <IonLabel position="stacked">Gender</IonLabel>
+                <IonSelect value={gender} onIonChange={e => setGender(e.detail.value)} disabled={!isEditing}>
+                  <IonSelectOption value="female">Female</IonSelectOption>
+                  <IonSelectOption value="male">Male</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+              
+              <IonItem>
+                <IonIcon icon={body} slot="start"></IonIcon>
+                <IonLabel position="stacked">Gender Preference</IonLabel>
+                <IonSelect value={genderPref} onIonChange={e => setGender(e.detail.value)} disabled={!isEditing}>
+                  <IonSelectOption value="female">Female</IonSelectOption>
+                  <IonSelectOption value="male">Male</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+                
               <IonItem>
                 <IonIcon icon={pin} slot="start"></IonIcon>
                 <IonLabel position="stacked">Location</IonLabel>
-                <IonSelect>
-                  <IonSelectOption value="madison" selected>Madison, WI</IonSelectOption>
-                  <IonSelectOption value="austin">Austin, TX</IonSelectOption>
-                  <IonSelectOption value="chicago">Chicago, IL</IonSelectOption>
-                  <IonSelectOption value="seattle">Seattle, WA</IonSelectOption>
-                </IonSelect>
+                <IonText>Placeholder</IonText>
               </IonItem>
 
               <IonItem>
                 <IonLabel position="stacked">About</IonLabel>
-                {
-                  isEditing ?
-                  <IonTextarea value={about} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
-                  :
-                  <p>
-                    {userProfile && userProfile.about? userProfile.about: ''}
-                  </p>
-                }
-               
+                  <IonTextarea value={about} disabled={!isEditing} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
               </IonItem>
             </IonList>
             
-            
+            {
+              isEditing ?
+              <IonRow>
+                <IonCol>
+                  <IonButton type="submit" expand="block">Update</IonButton>
+                </IonCol>
+                <IonCol>
+                  <IonButton onClick={() => {setIsEditing(false);}} color="light" expand="block">Cancel</IonButton>
+                </IonCol>
+              </IonRow>
+              :
+              <></>
+            }
             </form>
           </div>
-          {
-            isEditing ?
-            <IonRow>
-              <IonCol>
-                <IonButton type="submit" expand="block">Update</IonButton>
-              </IonCol>
-              <IonCol>
-                <IonButton onClick={() => {setIsEditing(false); setAbout(userProfile && userProfile.about? userProfile.about: '')}} color="light" expand="block">Cancel</IonButton>
-              </IonCol>
-            </IonRow>
-            :
-            <></>
-          }
+          
           </>
         }
       </IonContent>
@@ -211,6 +224,11 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
           }
         /> 
       </IonPopover>
+      <IonToast
+        isOpen={showToast}
+        duration={3000}
+        message={toastText}
+        onDidDismiss={() => setShowToast(false)} />
     </IonPage>
   );
 };
