@@ -161,7 +161,6 @@ export const postUserLocation = async (point: GeoPoint, token?: string) =>
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         data: {
@@ -175,8 +174,34 @@ export const postUserLocation = async (point: GeoPoint, token?: string) =>
       }
       console.log(data);
     } catch (e) {
-      const {data} = e;
       console.log(e);
+    }
+  }
+} 
+
+export const postSwipe = async (userId: number, liked: boolean, token?: string) => {
+  if (token) {
+    try {
+      const swipeResponse = await Axios.request({
+        url: `${apiURL}/secure/swipe`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        data: {
+          userId: userId,
+          liked: liked, 
+        } 
+      });
+      const { data } = swipeResponse;
+      console.log(data);
+      return data.wasMatched as boolean
+    } catch (e) {
+      console.log(`Error posting swipe: ${e}`);
+      const {data} = e.response;
+      throw data;
     }
   }
 }

@@ -46,6 +46,10 @@ export const setSearchText = (searchText?: string) => ({
   searchText 
 } as const);
 
+export const incrementProfileIndex = () => ({
+  type: 'increment-profile-index',
+} as const)
+
 export type SessionsActions =
   | ActionType<typeof setLoading>
   | ActionType<typeof setData>
@@ -53,3 +57,4 @@ export type SessionsActions =
   | ActionType<typeof removeFavorite>
   | ActionType<typeof updateFilteredTracks>
   | ActionType<typeof setSearchText>
+  | ActionType<typeof incrementProfileIndex>

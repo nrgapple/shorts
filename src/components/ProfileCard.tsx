@@ -5,12 +5,14 @@ import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, Io
 import { logoTwitter, shareAlt, chatboxes, calendar, body, pin, close, heart } from 'ionicons/icons';
 import { ActionSheetButton } from '@ionic/core';
 import { Profile } from '../models/Profile';
+import { postSwipe } from '../data/dataApi';
 
 interface ProfileCardProps {
   profile: Profile;
+  swiped: (liked: boolean) => void
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
   const calculateAge = (dob: Date) => {
     var today = new Date();
     var birthDate = new Date(dob);
@@ -78,6 +80,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
                 fill="clear"
                 size="small"
                 color="primary"
+                onClick={() => swiped(false)}
               >
                 <IonIcon slot="start" icon={close} />
                 Pass
@@ -87,7 +90,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
               <IonButton 
                 fill="clear" 
                 size="small" 
-                color="primary">
+                color="primary"
+                onClick={() => swiped(true)}>
                 <IonIcon slot="start" icon={heart} />
                 Like
             </IonButton>

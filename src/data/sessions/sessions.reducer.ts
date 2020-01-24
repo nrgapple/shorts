@@ -21,5 +21,8 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
     case 'set-search-text': {
       return { ...state, searchText: action.searchText };
     }
+    case 'increment-profile-index': {
+      return { ...state, currentProfileIndex: state.currentProfileIndex + 1};
+    }
   }
 }
