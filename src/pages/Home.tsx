@@ -25,7 +25,7 @@ const Home: React.FC<HomeProps> = ({ profile }) => {
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
-          <IonTitle>Home</IonTitle>
+          <IonTitle><span><img src="/assets/icon/shorts-24.ico" alt="Logo"></img></span></IonTitle>
         </IonToolbar>
       </IonHeader>
       {profile?

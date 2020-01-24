@@ -18,6 +18,7 @@ const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
 const USERNAME = 'username';
 const TOKEN = 'token';
+const DARK_MODE = 'darkMode';
 
 export const getConfData = async (token?: string) => {
   const response = await Promise.all([
@@ -116,16 +117,19 @@ export const getUserData = async () => {
     Storage.get({ key: HAS_LOGGED_IN }),
     Storage.get({ key: HAS_SEEN_TUTORIAL }),
     Storage.get({ key: USERNAME }),
-    Storage.get({ key: TOKEN })]);
+    Storage.get({ key: TOKEN }),
+    Storage.get({ key: DARK_MODE })]);
   const isLoggedin = await response[0].value === 'true';
   const hasSeenTutorial = await response[1].value === 'true';
   const username = await response[2].value || undefined;
   const token = await response[3].value || undefined;
+  const darkMode = await response[4].value === 'true';
   const data = {
     isLoggedin,
     hasSeenTutorial,
     username,
-    token
+    token,
+    darkMode
   }
   return data;
 }
@@ -144,6 +148,10 @@ export const setUsernameData = async (username?: string) => {
   } else {
     await Storage.set({ key: USERNAME, value: username });
   }
+}
+
+export const setDarkModeData = async (darkMode: boolean) => {
+  await Storage.set({ key: DARK_MODE, value: JSON.stringify(darkMode) })
 }
 
 export const setTokenData = async (token?: string) => {
