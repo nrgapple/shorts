@@ -5,6 +5,7 @@ import { Location } from '../models/Location';
 import Axios from 'axios';
 import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
+import { male } from 'ionicons/icons';
 
 const { Storage } = Plugins;
 
@@ -82,6 +83,7 @@ export const getConfData = async (token?: string) => {
               imageUrl: image.imageUrl,
             }
           }),
+          gender: Profile.gender? Profile.gender: undefined,
         }
       }) as Profile[];
 

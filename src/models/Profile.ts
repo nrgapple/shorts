@@ -9,4 +9,5 @@ export interface Profile {
     height?: number;
     dob: Date;
     images: Image[];
+    gender?: string;
 }
