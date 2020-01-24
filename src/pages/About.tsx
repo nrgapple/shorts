@@ -8,7 +8,7 @@ import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
 import { setUserProfile } from '../data/sessions/sessions.actions';
-import { Camera, CameraResultType } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 const apiURL = 'https://doctornelson.herokuapp.com';
 
@@ -111,7 +111,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     const image = await Camera.getPhoto({
       quality: 90,
       allowEditing: false,
-      resultType: CameraResultType.Uri
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Photos,
     });
 
     var imageUrl = image.webPath;
