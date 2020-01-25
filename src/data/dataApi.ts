@@ -82,7 +82,7 @@ export const getConfData = async (token?: string) => {
           about: Profile.about as string,
           height: Profile.height as number,
           dob: Profile.dob as Date,
-          username: userProfileData.username as string,
+          username: Profile.username as string,
           images: Profile.images.map((image: any) : Image => {
             return {
               imageId: image.imageId,
@@ -138,6 +138,88 @@ export const getUserData = async () => {
     darkMode
   }
   return data;
+}
+
+export const getNearMe = async (token?: string) => {
+  if (token) {
+    try {
+      const nearMeResponse = await Axios.request({
+        url: `${apiURL}/secure/profiles`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      const { data: nearMeData } = nearMeResponse;
+      console.log(nearMeResponse);
+      const nearMe = nearMeData.map((Profile: any) : Profile => {
+        return {
+          userId: Profile.userId as number, 
+          firstName: Profile.firstName as string,
+          lastName: Profile.lastName as string,
+          about: Profile.about as string,
+          height: Profile.height as number,
+          dob: Profile.dob as Date,
+          username: Profile.username as string,
+          images: Profile.images.map((image: any) : Image => {
+            return {
+              imageId: image.imageId,
+              imageUrl: image.imageUrl,
+            }
+          }),
+          gender: Profile.gender? Profile.gender.toLowerCase(): undefined,
+          genderPref: Profile.genderPref? Profile.genderPref.toLowerCase(): undefined,
+        }
+      }) as Profile[];
+      return nearMe;
+    } catch (e) {
+      const { data } = e;
+      console.log(data);
+      throw data;
+    }
+  } 
+}
+
+export const getUserProfile = async (token?: string) => {
+  if (token) {
+    try {
+      const userProfileResponse = await Axios.request({
+        url: `${apiURL}/secure/profile`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      });
+      const { data: userProfileData } = userProfileResponse;
+      console.log(userProfileData);
+      const userProfile = {
+        userId: userProfileData.userId as number, 
+        firstName: userProfileData.firstName as string,
+        lastName: userProfileData.lastName as string,
+        about: userProfileData.about as string,
+        height: userProfileData.height as number,
+        dob: userProfileData.dob as Date,
+        username: userProfileData.username as string,
+        gender: userProfileData.gender?userProfileData.gender.toLowerCase(): undefined,
+        genderPref: userProfileData.gender?userProfileData.genderPref.toLowerCase(): undefined,
+        displayAddress: userProfileData.displayAddress?userProfileData.displayAddress: undefined,
+        images: userProfileData.images.map((image: any) : Image => {
+          return {
+            imageId: image.imageId,
+            imageUrl: image.imageUrl,
+          }
+        }),
+      } as Profile;
+      return userProfile;
+    } catch (e) {
+      const {data} = e;
+      return data;
+    }
+  }
 }
 
 export const getCurrentLocation = async () => {

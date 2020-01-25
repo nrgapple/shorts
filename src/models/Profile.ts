@@ -14,4 +14,5 @@ export interface Profile {
     genderPref?: 'male' | 'female';
     location?: GeoPoint;
     displayAddress?: string;
+    searchMiles?: number;
 }
