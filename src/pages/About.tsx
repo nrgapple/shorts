@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonSlides, IonSlide, IonImg } from '@ionic/react';
 import './About.scss';
-import { calendar, pin, more, body, fastforward } from 'ionicons/icons';
+import { calendar, pin, more, body, fastforward, add } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
@@ -238,7 +238,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
         }
         <IonFab vertical="top" horizontal="end" slot="fixed">
           <IonFabButton onClick={() => takePicture()} >
-            <IonIcon color="secondary" name="add"></IonIcon>
+            <IonIcon icon={add}></IonIcon>
           </IonFabButton>
         </IonFab>
       </IonContent>
