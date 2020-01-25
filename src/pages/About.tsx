@@ -160,13 +160,17 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
           <IonProgressBar type="indeterminate"></IonProgressBar>
           :
           <>
-          <IonSlides options={{slidesPerView: 1}}>
-            { images.map((img, i) => (
-              <IonSlide key={i}>
-                <IonImg src={img} alt="ionic logo" className="slide-image" />
-              </IonSlide>
-            )) }
-          </IonSlides>
+          <div className="about-header" >
+            <IonItem>
+              <IonSlides options={{slidesPerView: 1}} >
+                { images.map((img, i) => (
+                  <IonSlide key={i}>
+                    <IonImg src={img} alt="ionic logo" className="slide-image" />
+                  </IonSlide>
+                )) }
+              </IonSlides>
+            </IonItem>
+          </div>
           <div className="about-info">
             <h4 className="ion-padding-start">
               {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
@@ -200,7 +204,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
               <IonItem>
                 <IonIcon icon={body} slot="start"></IonIcon>
                 <IonLabel position="stacked">Gender Preference</IonLabel>
-                <IonSelect value={genderPref} onIonChange={e => setGender(e.detail.value)} disabled={!isEditing}>
+                <IonSelect value={genderPref} onIonChange={e => setGenderPref(e.detail.value)} disabled={!isEditing}>
                   <IonSelectOption value="female">Female</IonSelectOption>
                   <IonSelectOption value="male">Male</IonSelectOption>
                 </IonSelect>
