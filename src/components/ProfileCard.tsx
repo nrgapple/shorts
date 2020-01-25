@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Session } from '../models/Session';
 import { Speaker } from '../models/Speaker';
-import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonActionSheet, IonLabel } from '@ionic/react';
+import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonActionSheet, IonLabel, IonSkeletonText } from '@ionic/react';
 import { logoTwitter, shareAlt, chatboxes, calendar, body, pin, close, heart } from 'ionicons/icons';
 import { ActionSheetButton } from '@ionic/core';
 import { Profile } from '../models/Profile';
 import { postSwipe } from '../data/dataApi';
 
 interface ProfileCardProps {
-  profile: Profile;
-  swiped: (liked: boolean) => void
+  profile?: Profile;
+  swiped: (liked: boolean) => void;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
@@ -100,7 +100,44 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
         </IonCard>
         </>
         :
-        <></>
+        <IonCard className="speaker-card">
+          <IonCardHeader>
+            <IonItem detail={false} lines="none">
+              <IonAvatar slot="start">
+              <IonSkeletonText animated style={{ width: '20%' }}/>
+              </IonAvatar>
+              <IonSkeletonText animated style={{ width: '80%' }}/>
+            </IonItem>
+          </IonCardHeader>
+  
+          <IonCardContent class="outer-content">
+            <IonList lines="none">
+              <IonItem>
+                <IonSkeletonText animated />
+              </IonItem>
+
+              <IonItem>
+                <IonSkeletonText animated />
+              </IonItem>
+
+              <IonItem>
+                <IonSkeletonText animated />
+              </IonItem>
+            </IonList>
+          </IonCardContent>
+  
+          <IonRow justify-content-center>
+            <IonCol>
+              <IonSkeletonText animated />
+            </IonCol>
+          </IonRow>
+          <IonRow justify-content-center>
+            <IonCol text-center size="6">
+              <IonSkeletonText animated style={{ width: '50%' }}/>
+              <IonSkeletonText animated style={{ width: '50%' }} />
+            </IonCol>
+          </IonRow>
+        </IonCard>
       }
     </>
   );

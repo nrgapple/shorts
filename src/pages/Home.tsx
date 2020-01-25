@@ -68,23 +68,17 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
           <IonTitle><span><img src="/assets/icon/shorts-24.ico" alt="Logo"></img></span></IonTitle>
         </IonToolbar>
       </IonHeader>
-      {profile?
-        <>
-        <IonContent className="">
-          <IonList>
-            <IonGrid fixed>
-              <IonRow justify-content-center align-items-center>
-                <IonCol>
-                  <ProfileCard profile={profile} swiped={swipe}/>
-                </IonCol>
-              </IonRow>
-            </IonGrid>
-          </IonList>
-        </IonContent>
-        </>
-        :
-        <></>
-      }
+      <IonContent className="">
+        <IonList>
+          <IonGrid fixed>
+            <IonRow justify-content-center align-items-center>
+              <IonCol>
+                <ProfileCard profile={profile} swiped={swipe}/>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonList>
+      </IonContent>
   </IonPage>
   );
 };
