@@ -229,7 +229,7 @@ export const getMatches = async (token?: string) => {
   }
 }
 
-export const postImage = async (image:string, token?:string) => {
+export const postImage = async (image:File, token?:string) => {
   if (token) {
     try {
       var formData = new FormData();
@@ -244,7 +244,7 @@ export const postImage = async (image:string, token?:string) => {
         data: formData
       });
       const {data} = imageResponse;
-      return data as Profile;
+      return data as Image;
     } catch (e) {
       const {data} = e;
       throw e;

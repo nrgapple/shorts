@@ -37,6 +37,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [toastText, setToastText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [images, setImages] = useState(userProfile && userProfile.images?userProfile.images: [])
+  const [inputImage, setInputImage] = useState<File | undefined>(undefined);
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -108,20 +109,13 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     }
   }
 
-  const takePicture = async () => {
-    const image = await Camera.getPhoto({
-      quality: 90,
-      allowEditing: false,
-      resultType: CameraResultType.Uri,
-      source: CameraSource.Photos,
-    });
-    
-    if (image.base64String) {
+  const uploadImage = async () => {
+    if (inputImage) {
       try {
-        const profile = await postImage(image.base64String, token);
-        if (profile)
+        const imageInfo = await postImage(inputImage, token);
+        if (imageInfo)
         {
-          await setUserProfile(profile)
+          setImages([...images, imageInfo]);
           setToastText('Image Uploaded Successfully');
           setShowToast(true);
         }
@@ -129,12 +123,17 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
         console.log(`Error uploading image: ${e}`);
       }
     } else {
-      console.log(`No image uploaded`);
+      console.log(`No image to upload`);
     }
   }
 
   const removeImage = async (imageId: number) => {
     console.log(`Remove image: ${imageId}`);
+  }
+
+  const handeChange = (event: any) => {
+    const file = event.target.files[0] as File;
+    setInputImage(file);
   }
 
   useEffect(() => {
@@ -180,7 +179,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
                 <IonCol size="4" size-md="2" key={img.imageId}>
                   <IonFab vertical="top" horizontal="end">
                     { isEditing?
-                      <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '2vw', height: '5vh'}} >
+                      <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '3vw', height: '5vh'}} >
                         <IonIcon  icon={close}></IonIcon>
                       </IonFabButton>
                       :
@@ -188,10 +187,28 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
                     }
                   </IonFab>
                   <IonCard>
-                    <img src={img.imageUrl}></img>
+                    <img src={img.imageUrl} width="100%" height="100%"></img>
                   </IonCard>
                 </IonCol>
               ))
+            }
+            {
+              isEditing && (
+                <>
+                <IonCol size="12" size-md="6">
+                  <IonCard>
+                    <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
+                    {
+                      inputImage && (
+                        <IonButton onClick={uploadImage}>
+                          Upload
+                        </IonButton>
+                      )
+                    }
+                  </IonCard>
+                </IonCol>
+                </>
+              )
             }
           </IonRow>
           <div className="about-info">
@@ -263,11 +280,6 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
           
           </>
         }
-        <IonFab vertical="top" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => takePicture()} >
-            <IonIcon icon={add}></IonIcon>
-          </IonFabButton>
-        </IonFab>
       </IonContent>
       <IonPopover
         isOpen={showPopover}
