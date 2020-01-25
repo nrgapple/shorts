@@ -54,6 +54,7 @@ export const getConfData = async (token?: string) => {
         username: userProfileData.username as string,
         gender: userProfileData.gender?userProfileData.gender.toLowerCase(): undefined,
         genderPref: userProfileData.gender?userProfileData.genderPref.toLowerCase(): undefined,
+        displayAddress: userProfileData.displayAddress?userProfileData.displayAddress: undefined,
         images: userProfileData.images.map((image: any) : Image => {
           return {
             imageId: image.imageId,
@@ -169,10 +170,8 @@ export const postUserLocation = async (point: GeoPoint, token?: string) =>
         }
       });
       const { data } = sendLocationResponse;
-      if (data.status === 200) {
-        console.log(`Success posting location`);
-      }
       console.log(data);
+      return data as Profile;
     } catch (e) {
       console.log(e);
     }

@@ -262,7 +262,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
               <IonItem>
                 <IonIcon icon={pin} slot="start"></IonIcon>
                 <IonLabel position="stacked">Location</IonLabel>
-                <IonText>Placeholder</IonText>
+                <IonText>{userProfile&&userProfile.displayAddress?userProfile.displayAddress: "No Location Data"}</IonText>
               </IonItem>
 
               <IonItem>
