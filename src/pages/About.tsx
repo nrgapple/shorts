@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonSlides, IonSlide, IonImg } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonSlides, IonSlide, IonImg, IonCard } from '@ionic/react';
 import './About.scss';
-import { calendar, pin, more, body, fastforward, add } from 'ionicons/icons';
+import { calendar, pin, more, body, fastforward, add, close, image } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
@@ -10,6 +10,7 @@ import Axios from 'axios';
 import { setUserProfile } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
+import { postImage } from '../data/dataApi';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
@@ -35,7 +36,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastText, setToastText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [images, setImages] = useState(userProfile && userProfile.images?userProfile.images.map(i => i.imageUrl): [])
+  const [images, setImages] = useState(userProfile && userProfile.images?userProfile.images: [])
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -114,13 +115,26 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
       resultType: CameraResultType.Uri,
       source: CameraSource.Photos,
     });
-
-    var imageUrl = image.webPath;
-    if (imageUrl ) {
-      setImages([...images, imageUrl]);
+    
+    if (image.base64String) {
+      try {
+        const profile = await postImage(image.base64String, token);
+        if (profile)
+        {
+          await setUserProfile(profile)
+          setToastText('Image Uploaded Successfully');
+          setShowToast(true);
+        }
+      } catch (e) {
+        console.log(`Error uploading image: ${e}`);
+      }
     } else {
       console.log(`No image uploaded`);
     }
+  }
+
+  const removeImage = async (imageId: number) => {
+    console.log(`Remove image: ${imageId}`);
   }
 
   useEffect(() => {
@@ -130,7 +144,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     setHeight(userProfile && userProfile.height? userProfile.height: 0);
     setGenderPref(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
     setGender(userProfile && userProfile.gender? userProfile.gender: 'male');
-    setImages(userProfile && userProfile.images?userProfile.images.map(i => i.imageUrl): []);
+    setImages(userProfile && userProfile.images?userProfile.images: []);
     defineCustomElements(window);
   }, [userProfile])
 
@@ -160,17 +174,26 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
           <IonProgressBar type="indeterminate"></IonProgressBar>
           :
           <>
-          <div className="about-header" >
-            <IonItem>
-              <IonSlides options={{slidesPerView: 1}} >
-                { images.map((img, i) => (
-                  <IonSlide key={i}>
-                    <IonImg src={img} alt="ionic logo" className="slide-image" />
-                  </IonSlide>
-                )) }
-              </IonSlides>
-            </IonItem>
-          </div>
+          <IonRow>
+            {
+              images.map((img) => (
+                <IonCol size="4" size-md="2" key={img.imageId}>
+                  <IonFab vertical="top" horizontal="end">
+                    { isEditing?
+                      <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '2vw', height: '5vh'}} >
+                        <IonIcon  icon={close}></IonIcon>
+                      </IonFabButton>
+                      :
+                      <></>
+                    }
+                  </IonFab>
+                  <IonCard>
+                    <img src={img.imageUrl}></img>
+                  </IonCard>
+                </IonCol>
+              ))
+            }
+          </IonRow>
           <div className="about-info">
             <h4 className="ion-padding-start">
               {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}

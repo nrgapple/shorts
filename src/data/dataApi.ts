@@ -229,6 +229,29 @@ export const getMatches = async (token?: string) => {
   }
 }
 
+export const postImage = async (image:string, token?:string) => {
+  if (token) {
+    try {
+      var formData = new FormData();
+      formData.append("image", image);
+      const imageResponse = await Axios.request({
+        url: `${apiURL}/secure/image`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+        data: formData
+      });
+      const {data} = imageResponse;
+      return data as Profile;
+    } catch (e) {
+      const {data} = e;
+      throw e;
+    }
+  }
+}
+
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
 }
