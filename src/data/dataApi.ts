@@ -252,6 +252,26 @@ export const postImage = async (image:File, token?:string) => {
   }
 }
 
+export const deleteImage = async (imageId: number, token?: string) => {
+  if (token) {
+    try {
+      const deleteResponse = await Axios.request({
+        url: `${apiURL}/secure/image/${imageId}`,
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+      });
+      const {data} = deleteResponse;
+      return data;
+    } catch (e) {
+      const {data} = e;
+      throw e;
+    }
+  }
+}
+
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
 }

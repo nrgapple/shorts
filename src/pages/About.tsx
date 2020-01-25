@@ -10,7 +10,7 @@ import Axios from 'axios';
 import { setUserProfile } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage } from '../data/dataApi';
+import { postImage, deleteImage } from '../data/dataApi';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
@@ -129,6 +129,15 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
 
   const removeImage = async (imageId: number) => {
     console.log(`Remove image: ${imageId}`);
+    try {
+      const deleteInfo = await deleteImage(imageId, token);
+      const index = images.findIndex(x => x.imageId === imageId);
+      setImages([...images.slice(0, index),...images.slice(index + 1)]);
+      setToastText('Image removed successfully');
+      setShowToast(true);
+    } catch (e) {
+      console.log(`There was an issue deleting the image`);
+    }
   }
 
   const handeChange = (event: any) => {
