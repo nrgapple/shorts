@@ -1,4 +1,4 @@
-import { getConfData } from '../dataApi';
+import { getConfData, getMatches } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
@@ -6,7 +6,8 @@ import { Profile } from '../../models/Profile';
 export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
   const data = await getConfData(token);
-  dispatch(setData(data));
+  const matches = await getMatches(token);
+  dispatch(setData({...data, matches: matches}));
   dispatch(setLoading(false));
 }
 

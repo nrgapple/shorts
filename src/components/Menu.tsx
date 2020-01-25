@@ -21,7 +21,7 @@ import { setDarkMode } from '../data/user/user.actions';
 const routes = {
   appPages: [
     { title: 'Home', path: '/tabs/home', icon: home },
-    { title: 'Matches', path: '/tabs/speakers', icon: heart },
+    { title: 'Matches', path: '/tabs/matches', icon: heart },
   ],
   loggedInPages: [
     { title: 'Account', path: '/account', icon: person },

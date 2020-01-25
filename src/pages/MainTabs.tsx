@@ -9,6 +9,7 @@ import SessionDetail from './SessionDetail';
 import MapView from './MapView';
 import About from './About';
 import Home from './Home';
+import MatchesList from './MatchesList';
 
 interface MainTabsProps { }
 
@@ -23,7 +24,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
           Use the component prop when your component depends on the RouterComponentProps passed in automatically.        
         */}
         <Route path="/tabs/home" render={() => <Home />} exact={true} />
-        <Route path="/tabs/speakers" render={() => <SpeakerList />} exact={true} />
+        <Route path="/tabs/matches" render={() => <MatchesList />} exact={true} />
         <Route path="/tabs/speakers/:id" component={SpeakerDetail} exact={true} />
         <Route path="/tabs/schedule/:id" component={SessionDetail} />
         <Route path="/tabs/speakers/sessions/:id" component={SessionDetail} />
@@ -33,7 +34,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="speakers" href="/tabs/speakers">
+        <IonTabButton tab="matches" href="/tabs/matches">
           <IonIcon icon={heart} />
           <IonLabel>Matches</IonLabel>
         </IonTabButton>

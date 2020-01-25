@@ -206,6 +206,29 @@ export const postSwipe = async (userId: number, liked: boolean, token?: string) 
   }
 }
 
+export const getMatches = async (token?: string) => {
+  if (token) {
+    try {
+      const matchesResponse = await Axios.request({
+        url: `${apiURL}/secure/matches`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      const { data } = matchesResponse;
+      console.log(data);
+      return data.matches as Profile[];
+    } catch (e) {
+      console.log(`Error posting swipe: ${e}`);
+      const {data} = e.response;
+      throw data;
+    }
+  }
+}
+
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
 }
