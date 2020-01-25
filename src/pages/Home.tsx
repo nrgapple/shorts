@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText } from '@ionic/react';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
 import './Home.scss';
@@ -14,6 +14,7 @@ interface OwnProps {
 
 interface StateProps {
   profile?: Profile;
+  nearMeCount: number;
 };
 
 interface DispatchProps {
@@ -22,7 +23,7 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction }) => {
+const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
@@ -73,7 +74,18 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
           <IonGrid fixed>
             <IonRow justify-content-center align-items-center>
               <IonCol>
-                <ProfileCard profile={profile} swiped={swipe}/>
+                { nearMeCount !== 0 ? (
+                  <ProfileCard profile={profile} swiped={swipe}/>
+                ) : (
+                  <IonCard>
+                    <IonItem>
+                      <IonText color="danger">
+                        No Matches in your area.
+                      </IonText>
+                    </IonItem>
+                  </IonCard>
+                )
+                }
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -87,6 +99,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     profile : selectors.getCurrentProfile(state),
     token: state.user.token,
+    nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
   }),
   mapDispatchToProps: {
     incrementProfileIndex
