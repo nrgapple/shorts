@@ -97,6 +97,17 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
             </IonButton>
             </IonCol>
           </IonRow>
+          <IonRow>
+            {
+              profile.images.map((img) => (
+                <IonCol size="4" size-md="2" key={img.imageId}>
+                  <IonCard>
+                    <img src={img.imageUrl} width="100%" height="100%"></img>
+                  </IonCard>
+                </IonCol>
+              ))
+            }
+          </IonRow>
         </IonCard>
         </>
         :
