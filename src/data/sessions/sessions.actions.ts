@@ -1,4 +1,4 @@
-import { getConfData, getMatches } from '../dataApi';
+import { getConfData, getMatches, getUserProfile, getNearMe } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
@@ -16,6 +16,20 @@ export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispa
   dispatch(setData({userProfile: profile}));
   dispatch(setLoading(false));
 };
+
+export const loadProfile = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setLoading(true));
+  const profile = await getUserProfile(token);
+  dispatch(setData({userProfile: profile}));
+  dispatch(setLoading(false));
+}
+
+export const loadNearMe = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setLoading(true));
+  const nearMe = await getNearMe(token);
+  dispatch(setData({nearMe: nearMe}));
+  dispatch(setLoading(false));
+}
 
 export const setLoading = (isLoading: boolean) => ({
   type: 'set-conf-loading',

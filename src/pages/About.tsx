@@ -7,7 +7,7 @@ import { Image } from "../models/Image";
 import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
-import { setUserProfile } from '../data/sessions/sessions.actions';
+import { setUserProfile, loadProfile, loadNearMe } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, deleteImage } from '../data/dataApi';
@@ -23,11 +23,14 @@ interface StateProps {
   loading?: boolean;
 };
 
-interface DispatchProps { };
+interface DispatchProps {
+  loadProfile: typeof loadProfile,
+  loadNearMe: typeof loadNearMe,
+};
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
+const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNearMe, loadProfile }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
@@ -41,6 +44,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [inputImage, setInputImage] = useState<File | undefined>(undefined);
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
+  const [isProfileDirty, setIsProfileDirty] = useState(false);
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -99,7 +103,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
         }),
       } as Profile;
 
-      await setUserProfile(updatedProfile);
+      setIsProfileDirty(true);
+      setUserProfile(updatedProfile);
       setIsEditing(false);
       setToastText('Profile Updated Successfully');
       setShowToast(true);
@@ -148,7 +153,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     setInputImage(file);
   }
 
-  useEffect(() => {
+  const setValues = () => {
     console.log('currentUserProfile');
     console.log(userProfile);
     setAbout(userProfile && userProfile.about? userProfile.about: 'empty');
@@ -157,7 +162,25 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
     setGender(userProfile && userProfile.gender? userProfile.gender: 'male');
     setImages(userProfile && userProfile.images?userProfile.images: []);
     defineCustomElements(window);
+  }
+
+  useEffect(() => {
+    setValues();
   }, [userProfile])
+
+  useEffect(() => {
+    if (isProfileDirty) {
+      console.log('reloading profile and nearme');
+      setIsProfileDirty(false);
+      loadNearMe(token);
+      loadProfile(token);
+    }
+  }, [isProfileDirty])
+
+  useEffect(() => {
+    console.log('start about');
+    loadProfile();
+  }, []);
 
   return (
     <IonPage id="about-page">
@@ -330,5 +353,9 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     loading: state.data.loading,
     token: state.user.token
   }),
+  mapDispatchToProps: {
+    loadNearMe,
+    loadProfile,
+  },
   component: About
 });
