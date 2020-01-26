@@ -11,6 +11,7 @@ import { setUserProfile } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, deleteImage } from '../data/dataApi';
+import Lightbox from 'react-image-lightbox';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
@@ -38,6 +39,8 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [images, setImages] = useState(userProfile && userProfile.images?userProfile.images: [])
   const [inputImage, setInputImage] = useState<File | undefined>(undefined);
+  const [showImage, setShowImage] = useState(false);
+  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -196,7 +199,9 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
                     }
                   </IonFab>
                   <IonCard>
-                    <img src={img.imageUrl} width="100%" height="100%"></img>
+                    <button onClick={() => {setBigImage(img.imageUrl); setShowImage(true)}}>
+                      <img src={img.imageUrl} width="100%" height="100%"></img>
+                    </button>
                   </IonCard>
                 </IonCol>
               ))
@@ -307,7 +312,14 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token }) => {
         duration={3000}
         message={toastText}
         onDidDismiss={() => setShowToast(false)} />
-      
+      {
+        showImage && (
+          <Lightbox
+            mainSrc={bigImage?bigImage:''}
+            onCloseRequest={() => setShowImage(false)}
+          />
+        )
+      }
     </IonPage>
   );
 };
