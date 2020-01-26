@@ -137,6 +137,6 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     nearMe: state.data.nearMe,
     location: state.user.location
   }),
-  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation },
+  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation, },
   component: IonicApp
 });

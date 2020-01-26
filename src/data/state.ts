@@ -23,7 +23,6 @@ export const initialState: AppState = {
     darkMode: false,
     isLoggedin: false,
     loading: false,
-    hasValidProfile: false,
   }
 };
 

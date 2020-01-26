@@ -10,7 +10,7 @@ import Axios from 'axios';
 import { setUserProfile, loadProfile, loadNearMe } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage, deleteImage, setHasValidProfile } from '../data/dataApi';
+import { postImage, deleteImage } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
@@ -26,13 +26,11 @@ interface StateProps {
 
 interface DispatchProps {
   loadProfile: typeof loadProfile,
-  loadNearMe: typeof loadNearMe,
-  setHasValidProfile: typeof setHasValidProfile,
 };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNearMe, loadProfile, isloggedin, setHasValidProfile }) => {
+const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadProfile, isloggedin }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
@@ -108,8 +106,6 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNe
       setIsProfileDirty(true);
       setUserProfile(updatedProfile);
       setIsEditing(false);
-      if (checkIfValidProfile(updatedProfile))
-        await setHasValidProfile(true);
       setToastText('Profile Updated Successfully');
       setShowToast(true);
     } catch (e) {
@@ -157,17 +153,6 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNe
     setInputImage(file);
   }
 
-  const checkIfValidProfile = (profile: Profile) => {
-    return (
-      profile && 
-      profile.about &&
-      profile.height &&
-      profile.height > 0 &&
-      profile.gender &&
-      profile.genderPref
-    )
-  }
-
   const setValues = () => {
     console.log('currentUserProfile');
     console.log(userProfile);
@@ -180,21 +165,19 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNe
   }
 
   useEffect(() => {
+    console.log('userProfile updated');
     setValues();
   }, [userProfile])
 
   useEffect(() => {
-    if (isProfileDirty) {
-      console.log('reloading profile and nearme');
-      setIsProfileDirty(false);
-      loadNearMe(token);
-      loadProfile(token);
-    }
-  }, [isProfileDirty])
-
-  useEffect(() => {
     console.log('start about');
-    loadProfile();
+    try {
+      console.log(`token ${token}`)
+      loadProfile(token);
+    } catch (e) {
+      console.log(`Error loading the user profile ${e}`);
+    }
+    
   }, []);
 
   return (
@@ -388,9 +371,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     isloggedin: state.user.isLoggedin,
   }),
   mapDispatchToProps: {
-    loadNearMe,
     loadProfile,
-    setHasValidProfile
   },
   component: About
 });

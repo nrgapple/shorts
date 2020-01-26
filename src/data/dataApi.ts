@@ -28,77 +28,6 @@ export const getConfData = async (token?: string) => {
     fetch(sessionsUrl),
     fetch(locationsUrl),
     fetch(speakersUrl)]);
-  var userProfile = undefined;
-  var nearMe = undefined;
-  const currentProfile = 0;
-  if (token)
-  {
-    try {
-      const userProfileResponse = await Axios.request({
-        url: `${apiURL}/secure/profile`,
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-      });
-      const { data: userProfileData } = userProfileResponse;
-      console.log(userProfileData);
-      userProfile = {
-        userId: userProfileData.userId as number, 
-        firstName: userProfileData.firstName as string,
-        lastName: userProfileData.lastName as string,
-        about: userProfileData.about as string,
-        height: userProfileData.height as number,
-        dob: userProfileData.dob as Date,
-        username: userProfileData.username as string,
-        gender: userProfileData.gender?userProfileData.gender.toLowerCase(): undefined,
-        genderPref: userProfileData.gender?userProfileData.genderPref.toLowerCase(): undefined,
-        displayAddress: userProfileData.displayAddress?userProfileData.displayAddress: undefined,
-        images: userProfileData.images.map((image: any) : Image => {
-          return {
-            imageId: image.imageId,
-            imageUrl: image.imageUrl,
-          }
-        }),
-      } as Profile;
-      
-      const nearMeResponse = await Axios.request({
-        url: `${apiURL}/secure/profiles`,
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-      });
-      const { data: nearMeData } = nearMeResponse;
-      console.log(nearMeResponse);
-      nearMe = nearMeData.map((Profile: any) : Profile => {
-        return {
-          userId: Profile.userId as number, 
-          firstName: Profile.firstName as string,
-          lastName: Profile.lastName as string,
-          about: Profile.about as string,
-          height: Profile.height as number,
-          dob: Profile.dob as Date,
-          username: Profile.username as string,
-          images: Profile.images.map((image: any) : Image => {
-            return {
-              imageId: image.imageId,
-              imageUrl: image.imageUrl,
-            }
-          }),
-          gender: Profile.gender? Profile.gender.toLowerCase(): undefined,
-          genderPref: Profile.genderPref? Profile.genderPref.toLowerCase(): undefined,
-        }
-      }) as Profile[];
-
-    } catch (e) {
-      console.log(e);
-    }
-  }
   const sessions = await response[0].json() as Session[];
   const locations = await response[1].json() as Location[];
   const speakers = await response[2].json() as Speaker[];
@@ -112,9 +41,6 @@ export const getConfData = async (token?: string) => {
     speakers,
     allTracks,
     filteredTracks: [...allTracks],
-    userProfile,
-    nearMe,
-    currentProfile,
   }
   return data;
 }
@@ -184,6 +110,7 @@ export const getNearMe = async (token?: string) => {
 }
 
 export const getUserProfile = async (token?: string) => {
+  console.log(`trying to get the user profile, token: ${token}`);
   if (token) {
     try {
       const userProfileResponse = await Axios.request({
@@ -215,10 +142,12 @@ export const getUserProfile = async (token?: string) => {
           }
         }),
       } as Profile;
+      console.log('api call data');
+      console.log(userProfile);
       return userProfile;
     } catch (e) {
       const {data} = e;
-      return data;
+      throw data;
     }
   }
 }
@@ -356,10 +285,6 @@ export const deleteImage = async (imageId: number, token?: string) => {
 
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
-}
-
-export const setHasValidProfile = async (hasValidProfile: boolean) => {
-  await Storage.set({ key: HAS_VALID_PROFILE, value: JSON.stringify(hasValidProfile)});
 }
 
 export const setHasSeenTutorialData = async (hasSeenTutorial: boolean) => {

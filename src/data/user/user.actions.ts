@@ -61,14 +61,6 @@ export const setCurrentLocation = (point?: GeoPoint) => {
   } as const);
 };
 
-export const setHasValidProfile = (validProfile: boolean) => async (dispatch: React.Dispatch<any>) => {
-  await setHasValidProfile(validProfile);
-  return({
-    type: 'set-has-valid-profile',
-    validProfile
-  } as const)
-};
-
 export const setToken = (token?: string) => async (dispatch: React.Dispatch<any>) => {
   await setTokenData(token);
   return ({
@@ -103,4 +95,3 @@ export type UserActions =
   | ActionType<typeof setHasSeenTutorial>
   | ActionType<typeof setDarkMode>
   | ActionType<typeof setCurrentLocation>
-  | ActionType<typeof setHasValidProfile>

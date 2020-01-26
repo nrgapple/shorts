@@ -4,11 +4,16 @@ import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 
 export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<any>) => {
-  dispatch(setLoading(true));
-  const data = await getConfData(token);
-  const matches = await getMatches(token);
-  dispatch(setData({...data, matches: matches}));
-  dispatch(setLoading(false));
+  try {
+    dispatch(setLoading(true));
+    const data = await getConfData(token);
+    dispatch(setData({
+      ...data, 
+     }));
+    dispatch(setLoading(false));
+  } catch (e) {
+    throw e;
+  }
 }
 
 export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispatch<any>) => {
@@ -18,16 +23,33 @@ export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispa
 };
 
 export const loadProfile = (token?: string) => async (dispatch: React.Dispatch<any>) => {
-  dispatch(setLoading(true));
-  const profile = await getUserProfile(token);
-  dispatch(setData({userProfile: profile}));
-  dispatch(setLoading(false));
+  try {
+    dispatch(setLoading(true));
+    const profile = await getUserProfile(token);
+    console.log('setting data in load profile');
+    console.log(profile);
+    dispatch(setData({userProfile: profile}));
+    dispatch(setLoading(false));
+  } catch (e) {
+    throw e;
+  }
 }
 
 export const loadNearMe = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+  try {
+    dispatch(setLoading(true));
+    const nearMe = await getNearMe(token);
+    dispatch(setData({nearMe: nearMe}));
+    dispatch(setLoading(false));
+  } catch (e) {
+    throw e;
+  }
+}
+
+export const loadMatches = (token?: string) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
-  const nearMe = await getNearMe(token);
-  dispatch(setData({nearMe: nearMe}));
+  const matches = await getMatches(token);
+  dispatch(setData({matches: matches}));
   dispatch(setLoading(false));
 }
 
@@ -36,10 +58,15 @@ export const setLoading = (isLoading: boolean) => ({
   isLoading
 } as const);
 
-export const setData = (data: Partial<SessionsState>) => ({
-  type: 'set-conf-data',
-  data
-} as const);
+export const setData = (data: Partial<SessionsState>) => 
+{
+  console.log('setdata');
+  console.log(data);
+  return ({
+    type: 'set-conf-data',
+    data
+  } as const);
+}
 
 export const addFavorite = (sessionId: number) => ({
   type: 'add-favorite',

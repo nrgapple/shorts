@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent, IonButton } from '@ionic/react';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
@@ -16,7 +16,6 @@ interface StateProps {
   profile?: Profile;
   nearMeCount: number;
   isLoggedin: boolean;
-  hasValidProfile: boolean;
 };
 
 interface DispatchProps {
@@ -26,11 +25,30 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin, hasValidProfile }) => {
+const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
+  const [hasValidProfile, setHasValidProfile] = useState(false);
 
+  useEffect(() => {
+    console.log("loading near me of fist mount.");
+    try {
+      loadNearMe();
+      console.log('valid profile');
+      setHasValidProfile(true);
+    } catch (e) {
+      if (e.code === "400") {
+        console.log('invalid profile');
+        setHasValidProfile(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log(`hasvalidprofile changed to: ${hasValidProfile}`);
+  }, [hasValidProfile])
+  
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
     if (!profile) {
@@ -150,7 +168,6 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
     nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
     isLoggedin: state.user.isLoggedin,
-    hasValidProfile: state.user.hasValidProfile,
   }),
   mapDispatchToProps: {
     incrementProfileIndex,
