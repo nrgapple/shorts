@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent, IonButton } from '@ionic/react';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
 import './Home.scss';
@@ -15,6 +15,7 @@ interface OwnProps {
 interface StateProps {
   profile?: Profile;
   nearMeCount: number;
+  isLoggedin: boolean;
 };
 
 interface DispatchProps {
@@ -24,7 +25,7 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount }) => {
+const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
@@ -70,41 +71,59 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
           <IonTitle><span><img src="/assets/icon/shorts-24.ico" alt="Logo"></img></span></IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="">
-        <IonRefresher slot="fixed" 
-          onIonRefresh={(event: any) => {
-            setTimeout(() => {
-              profile = undefined; 
-              loadNearMe();
-              event.detail.complete();
-            }, 1000); 
-          }}
-        >
-          <IonRefresherContent>
-            <IonContent style={{width:"100%", height:"100%"}}></IonContent>
-          </IonRefresherContent>
-        </IonRefresher>
-        <IonList>
-          <IonGrid fixed>
-            <IonRow justify-content-center align-items-center>
+      {
+        isLoggedin ? (
+          <IonContent className="">
+            <IonRefresher slot="fixed" 
+              onIonRefresh={(event: any) => {
+                setTimeout(() => {
+                  profile = undefined; 
+                  loadNearMe();
+                  event.detail.complete();
+                }, 1000); 
+              }}
+            >
+              <IonRefresherContent>
+                <IonContent style={{width:"100%", height:"100%"}}></IonContent>
+              </IonRefresherContent>
+            </IonRefresher>
+            <IonList>
+              <IonGrid fixed>
+                <IonRow justify-content-center align-items-center>
+                  <IonCol>
+                    { nearMeCount !== 0 ? (
+                      <ProfileCard profile={profile} swiped={swipe}/>
+                    ) : (
+                      <IonCard>
+                        <IonItem>
+                          <IonText color="danger">
+                            No Matches in your area.
+                          </IonText>
+                        </IonItem>
+                      </IonCard>
+                    )
+                    }
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonList>
+          </IonContent>
+        ) : (
+          <IonContent>
+            <IonRow>
               <IonCol>
-                { nearMeCount !== 0 ? (
-                  <ProfileCard profile={profile} swiped={swipe}/>
-                ) : (
-                  <IonCard>
-                    <IonItem>
-                      <IonText color="danger">
-                        No Matches in your area.
-                      </IonText>
-                    </IonItem>
-                  </IonCard>
-                )
-                }
+                <IonCard>
+                  <IonButton expand="block" routerLink={"/Login"}>
+                    <IonText>
+                      Please Login
+                    </IonText>
+                  </IonButton>
+                </IonCard>
               </IonCol>
             </IonRow>
-          </IonGrid>
-        </IonList>
-      </IonContent>
+          </IonContent>
+        )
+      }
   </IonPage>
   );
 };
@@ -114,6 +133,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     profile : selectors.getCurrentProfile(state),
     token: state.user.token,
     nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
+    isLoggedin: state.user.isLoggedin,
   }),
   mapDispatchToProps: {
     incrementProfileIndex,

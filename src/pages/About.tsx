@@ -21,6 +21,7 @@ interface OwnProps {
 
 interface StateProps {
   loading?: boolean;
+  isloggedin: boolean;
 };
 
 interface DispatchProps {
@@ -30,7 +31,7 @@ interface DispatchProps {
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNearMe, loadProfile }) => {
+const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNearMe, loadProfile, isloggedin }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
@@ -202,122 +203,140 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadNe
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        {
-          loading ? 
-          <IonProgressBar type="indeterminate"></IonProgressBar>
-          :
-          <>
-          <IonRow>
+      {
+        isloggedin ? (
+          <IonContent>
             {
-              images.map((img) => (
-                <IonCol size="4" size-md="2" key={img.imageId}>
-                  <IonFab vertical="top" horizontal="end">
-                    { isEditing?
-                      <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '3vw', height: '5vh'}} >
-                        <IonIcon  icon={close}></IonIcon>
-                      </IonFabButton>
-                      :
-                      <></>
-                    }
-                  </IonFab>
-                  <IonCard>
-                    <button onClick={() => {setBigImage(img.imageUrl); setShowImage(true)}}>
-                      <img src={img.imageUrl} width="100%" height="100%"></img>
-                    </button>
-                  </IonCard>
-                </IonCol>
-              ))
-            }
-            {
-              isEditing && (
-                <>
-                <IonCol size="12" size-md="6">
-                  <IonCard>
-                    <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
-                    {
-                      inputImage && (
-                        <IonButton onClick={uploadImage}>
-                          Upload
-                        </IonButton>
-                      )
-                    }
-                  </IonCard>
-                </IonCol>
-                </>
-              )
-            }
-          </IonRow>
-          <div className="about-info">
-            <h4 className="ion-padding-start">
-              {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
-            </h4>
-            <form noValidate onSubmit={updateProfile}>
-            <IonList lines="none">
-              <IonItem>
-                <IonIcon icon={calendar} slot="start"></IonIcon>
-                <IonLabel position="stacked">Age</IonLabel>
-                <IonText>
-                  {userProfile? calculateAge(userProfile.dob) : 'N/A'}
-                </IonText> 
-              </IonItem>
-
-              <IonItem>
-                <IonIcon icon={body} slot="start"></IonIcon>
-                <IonLabel position="stacked">Height</IonLabel>
-                <IonInput disabled={!isEditing} type="number" value={height.toString()} onIonChange={e => setHeight(Number.parseInt(e.detail.value? e.detail.value : '0'))}>
-                </IonInput>
-              </IonItem>
-              
-              <IonItem>
-                <IonIcon icon={body} slot="start"></IonIcon>
-                <IonLabel position="stacked">Gender</IonLabel>
-                <IonSelect value={gender} onIonChange={e => setGender(e.detail.value)} disabled={!isEditing}>
-                  <IonSelectOption value="female">Female</IonSelectOption>
-                  <IonSelectOption value="male">Male</IonSelectOption>
-                </IonSelect>
-              </IonItem>
-              
-              <IonItem>
-                <IonIcon icon={body} slot="start"></IonIcon>
-                <IonLabel position="stacked">Gender Preference</IonLabel>
-                <IonSelect value={genderPref} onIonChange={e => setGenderPref(e.detail.value)} disabled={!isEditing}>
-                  <IonSelectOption value="female">Female</IonSelectOption>
-                  <IonSelectOption value="male">Male</IonSelectOption>
-                </IonSelect>
-              </IonItem>
-                
-              <IonItem>
-                <IonIcon icon={pin} slot="start"></IonIcon>
-                <IonLabel position="stacked">Location</IonLabel>
-                <IonText>{userProfile&&userProfile.displayAddress?userProfile.displayAddress: "No Location Data"}</IonText>
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">About</IonLabel>
-                  <IonTextarea value={about} disabled={!isEditing} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
-              </IonItem>
-            </IonList>
-            
-            {
-              isEditing ?
-              <IonRow>
-                <IonCol>
-                  <IonButton type="submit" expand="block">Update</IonButton>
-                </IonCol>
-                <IonCol>
-                  <IonButton onClick={() => {setIsEditing(false);}} color="light" expand="block">Cancel</IonButton>
-                </IonCol>
-              </IonRow>
+              loading ? 
+              <IonProgressBar type="indeterminate"></IonProgressBar>
               :
-            <></>
+              <>
+              <IonRow>
+                {
+                  images.map((img) => (
+                    <IonCol size="4" size-md="2" key={img.imageId}>
+                      <IonFab vertical="top" horizontal="end">
+                        { isEditing?
+                          <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '3vw', height: '5vh'}} >
+                            <IonIcon  icon={close}></IonIcon>
+                          </IonFabButton>
+                          :
+                          <></>
+                        }
+                      </IonFab>
+                      <IonCard>
+                        <button onClick={() => {setBigImage(img.imageUrl); setShowImage(true)}}>
+                          <img src={img.imageUrl} width="100%" height="100%"></img>
+                        </button>
+                      </IonCard>
+                    </IonCol>
+                  ))
+                }
+                {
+                  isEditing && (
+                    <>
+                    <IonCol size="12" size-md="6">
+                      <IonCard>
+                        <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
+                        {
+                          inputImage && (
+                            <IonButton onClick={uploadImage}>
+                              Upload
+                            </IonButton>
+                          )
+                        }
+                      </IonCard>
+                    </IonCol>
+                    </>
+                  )
+                }
+              </IonRow>
+              <div className="about-info">
+                <h4 className="ion-padding-start">
+                  {userProfile? `${userProfile.firstName} ${userProfile.lastName}`: 'No Profile'}
+                </h4>
+                <form noValidate onSubmit={updateProfile}>
+                <IonList lines="none">
+                  <IonItem>
+                    <IonIcon icon={calendar} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Age</IonLabel>
+                    <IonText>
+                      {userProfile? calculateAge(userProfile.dob) : 'N/A'}
+                    </IonText> 
+                  </IonItem>
+    
+                  <IonItem>
+                    <IonIcon icon={body} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Height</IonLabel>
+                    <IonInput disabled={!isEditing} type="number" value={height.toString()} onIonChange={e => setHeight(Number.parseInt(e.detail.value? e.detail.value : '0'))}>
+                    </IonInput>
+                  </IonItem>
+                  
+                  <IonItem>
+                    <IonIcon icon={body} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Gender</IonLabel>
+                    <IonSelect value={gender} onIonChange={e => setGender(e.detail.value)} disabled={!isEditing}>
+                      <IonSelectOption value="female">Female</IonSelectOption>
+                      <IonSelectOption value="male">Male</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                  
+                  <IonItem>
+                    <IonIcon icon={body} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Gender Preference</IonLabel>
+                    <IonSelect value={genderPref} onIonChange={e => setGenderPref(e.detail.value)} disabled={!isEditing}>
+                      <IonSelectOption value="female">Female</IonSelectOption>
+                      <IonSelectOption value="male">Male</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                    
+                  <IonItem>
+                    <IonIcon icon={pin} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Location</IonLabel>
+                    <IonText>{userProfile&&userProfile.displayAddress?userProfile.displayAddress: "No Location Data"}</IonText>
+                  </IonItem>
+    
+                  <IonItem>
+                    <IonLabel position="stacked">About</IonLabel>
+                      <IonTextarea value={about} disabled={!isEditing} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
+                  </IonItem>
+                </IonList>
+                
+                {
+                  isEditing ?
+                  <IonRow>
+                    <IonCol>
+                      <IonButton type="submit" expand="block">Update</IonButton>
+                    </IonCol>
+                    <IonCol>
+                      <IonButton onClick={() => {setIsEditing(false);}} color="light" expand="block">Cancel</IonButton>
+                    </IonCol>
+                  </IonRow>
+                  :
+                <></>
+                }
+                </form>
+              </div>
+              
+              </>
             }
-            </form>
-          </div>
-          
-          </>
-        }
-      </IonContent>
+          </IonContent>
+        ) : (
+          <IonContent>
+            <IonRow>
+              <IonCol>
+                <IonCard>
+                  <IonButton expand="block" routerLink={"/Login"}>
+                    <IonText>
+                      Please Login
+                    </IonText>
+                  </IonButton>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </IonContent>
+        )
+      }
       <IonPopover
         isOpen={showPopover}
         event={popoverEvent}
@@ -351,7 +370,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     userProfile: state.data.userProfile,
     loading: state.data.loading,
-    token: state.user.token
+    token: state.user.token,
+    isloggedin: state.user.isLoggedin,
   }),
   mapDispatchToProps: {
     loadNearMe,
