@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent } from '@ionic/react';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
 import './Home.scss';
 import { Profile } from '../models/Profile';
 import ProfileCard from '../components/ProfileCard';
 import { postSwipe } from '../data/dataApi';
-import { incrementProfileIndex } from '../data/sessions/sessions.actions';
+import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
 
 interface OwnProps { 
   token?: string;
@@ -19,6 +19,7 @@ interface StateProps {
 
 interface DispatchProps {
   incrementProfileIndex: typeof incrementProfileIndex;
+  loadNearMe: typeof loadNearMe;
  };
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
@@ -70,6 +71,19 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
         </IonToolbar>
       </IonHeader>
       <IonContent className="">
+        <IonRefresher slot="fixed" 
+          onIonRefresh={(event: any) => {
+            setTimeout(() => {
+              profile = undefined; 
+              loadNearMe();
+              event.detail.complete();
+            }, 1000); 
+          }}
+        >
+          <IonRefresherContent>
+            <IonContent style={{width:"100%", height:"100%"}}></IonContent>
+          </IonRefresherContent>
+        </IonRefresher>
         <IonList>
           <IonGrid fixed>
             <IonRow justify-content-center align-items-center>
@@ -102,7 +116,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
   }),
   mapDispatchToProps: {
-    incrementProfileIndex
+    incrementProfileIndex,
+    loadNearMe,
   },
   component: Home
 });
