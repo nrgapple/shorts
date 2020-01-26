@@ -6,6 +6,8 @@ import { logoTwitter, shareAlt, chatboxes, calendar, body, pin, close, heart } f
 import { ActionSheetButton } from '@ionic/core';
 import { Profile } from '../models/Profile';
 import { postSwipe } from '../data/dataApi';
+import Lightbox from 'react-image-lightbox';
+import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 
 interface ProfileCardProps {
   profile?: Profile;
@@ -23,6 +25,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
     }
     return age;
   }
+
+  const [showImage, setShowImage] = useState(false);
+  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
 
   return (
     <>
@@ -102,7 +107,9 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
               profile.images.map((img) => (
                 <IonCol size="4" size-md="2" key={img.imageId}>
                   <IonCard>
-                    <img src={img.imageUrl} width="100%" height="100%"></img>
+                    <IonButton onClick={() => {setShowImage(true); setBigImage(img.imageUrl);}}>
+                      <img src={img.imageUrl} width="100%" height="100%"></img>
+                    </IonButton>
                   </IonCard>
                 </IonCol>
               ))
@@ -149,6 +156,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
             </IonCol>
           </IonRow>
         </IonCard>
+      }
+      {
+          showImage && (
+            <Lightbox
+              mainSrc={bigImage?bigImage:''}
+              onCloseRequest={() => setShowImage(false)}
+            />
+          )
       }
     </>
   );
