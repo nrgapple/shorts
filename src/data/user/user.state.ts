@@ -8,4 +8,5 @@ export interface UserState {
   token?: string;
   loading: boolean;
   location?: GeoPoint;
+  hasValidProfile: boolean;
 };

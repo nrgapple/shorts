@@ -19,5 +19,7 @@ export function userReducer(state: UserState, action: UserActions): UserState {
       return { ...state, isLoggedin: action.loggedIn };
     case 'set-current-location':
       return { ...state, location: action.point};
+    case 'set-has-valid-profile':
+      return { ...state, hasValidProfile: action.validProfile}
   }
 }

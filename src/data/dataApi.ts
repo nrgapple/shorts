@@ -21,6 +21,7 @@ const USERNAME = 'username';
 const TOKEN = 'token';
 const DARK_MODE = 'darkMode';
 const LOCATION = 'location';
+const HAS_VALID_PROFILE = 'hasValidProfile';
 
 export const getConfData = async (token?: string) => {
   const response = await Promise.all([
@@ -355,6 +356,10 @@ export const deleteImage = async (imageId: number, token?: string) => {
 
 export const setIsLoggedInData = async (isLoggedIn: boolean) => {
   await Storage.set({ key: HAS_LOGGED_IN, value: JSON.stringify(isLoggedIn) });
+}
+
+export const setHasValidProfile = async (hasValidProfile: boolean) => {
+  await Storage.set({ key: HAS_VALID_PROFILE, value: JSON.stringify(hasValidProfile)});
 }
 
 export const setHasSeenTutorialData = async (hasSeenTutorial: boolean) => {

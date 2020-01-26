@@ -22,7 +22,8 @@ export const initialState: AppState = {
     hasSeenTutorial: false,
     darkMode: false,
     isLoggedin: false,
-    loading: false
+    loading: false,
+    hasValidProfile: false,
   }
 };
 

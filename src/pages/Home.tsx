@@ -16,6 +16,7 @@ interface StateProps {
   profile?: Profile;
   nearMeCount: number;
   isLoggedin: boolean;
+  hasValidProfile: boolean;
 };
 
 interface DispatchProps {
@@ -25,7 +26,7 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin }) => {
+const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin, hasValidProfile }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
@@ -91,23 +92,38 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
               <IonGrid fixed>
                 <IonRow justify-content-center align-items-center>
                   <IonCol>
-                    { nearMeCount !== 0 ? (
-                      <ProfileCard profile={profile} swiped={swipe}/>
-                    ) : (
-                      <IonCard>
-                        <IonItem>
-                          <IonText color="danger">
-                            No Matches in your area.
-                          </IonText>
-                        </IonItem>
-                      </IonCard>
-                    )
+                    {
+                      !hasValidProfile ? (
+                        <IonCard>
+                            <IonButton color="danger" expand="block" routerLink={"/profile"}>
+                              <IonText>
+                                Finish your profile
+                              </IonText>
+                            </IonButton>
+                          </IonCard>
+                      ) : (
+                        <>
+                        { nearMeCount !== 0 ? (
+                          <ProfileCard profile={profile} swiped={swipe}/>
+                        ) : (
+                          <IonCard>
+                            <IonItem>
+                              <IonText color="danger">
+                                No Matches in your area. Pull down to refresh or change your distance.
+                              </IonText>
+                            </IonItem>
+                          </IonCard>
+                        )
+                        }
+                        </>
+                      )
                     }
                   </IonCol>
                 </IonRow>
               </IonGrid>
             </IonList>
           </IonContent>
+
         ) : (
           <IonContent>
             <IonRow>
@@ -134,6 +150,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
     nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
     isLoggedin: state.user.isLoggedin,
+    hasValidProfile: state.user.hasValidProfile,
   }),
   mapDispatchToProps: {
     incrementProfileIndex,
