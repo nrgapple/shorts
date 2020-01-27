@@ -23,7 +23,7 @@ const DARK_MODE = 'darkMode';
 const LOCATION = 'location';
 const HAS_VALID_PROFILE = 'hasValidProfile';
 
-export const getConfData = async (token?: string) => {
+export const getConfData = async () => {
   const response = await Promise.all([
     fetch(sessionsUrl),
     fetch(locationsUrl),
@@ -67,7 +67,7 @@ export const getUserData = async () => {
   return data;
 }
 
-export const getNearMe = async (token?: string) => {
+export const getNearMe = async (token: string | undefined) => {
   if (token) {
     try {
       const nearMeResponse = await Axios.request({
@@ -109,7 +109,7 @@ export const getNearMe = async (token?: string) => {
   } 
 }
 
-export const getUserProfile = async (token?: string) => {
+export const getUserProfile = async (token: string | undefined) => {
   console.log(`trying to get the user profile, token: ${token}`);
   if (token) {
     try {
@@ -163,7 +163,7 @@ export const getCurrentLocation = async () => {
   }  
 }
 
-export const postUserLocation = async (point: GeoPoint, token?: string) =>
+export const postUserLocation = async (point: GeoPoint, token: string | undefined) =>
 {
   console.log(`Posting current location`);
   if (token)
@@ -190,7 +190,7 @@ export const postUserLocation = async (point: GeoPoint, token?: string) =>
   }
 } 
 
-export const postSwipe = async (userId: number, liked: boolean, token?: string) => {
+export const postSwipe = async (userId: number, liked: boolean, token: string | undefined) => {
   if (token) {
     try {
       const swipeResponse = await Axios.request({
@@ -217,7 +217,7 @@ export const postSwipe = async (userId: number, liked: boolean, token?: string) 
   }
 }
 
-export const getMatches = async (token?: string) => {
+export const getMatches = async (token: string | undefined) => {
   if (token) {
     try {
       const matchesResponse = await Axios.request({
@@ -240,7 +240,7 @@ export const getMatches = async (token?: string) => {
   }
 }
 
-export const postImage = async (image:File, token?:string) => {
+export const postImage = async (image:File, token:string | undefined) => {
   if (token) {
     try {
       var formData = new FormData();
@@ -263,7 +263,7 @@ export const postImage = async (image:File, token?:string) => {
   }
 }
 
-export const deleteImage = async (imageId: number, token?: string) => {
+export const deleteImage = async (imageId: number, token: string | undefined) => {
   if (token) {
     try {
       const deleteResponse = await Axios.request({
@@ -291,7 +291,7 @@ export const setHasSeenTutorialData = async (hasSeenTutorial: boolean) => {
   await Storage.set({ key: HAS_SEEN_TUTORIAL, value: JSON.stringify(hasSeenTutorial) });
 }
 
-export const setUsernameData = async (username?: string) => {
+export const setUsernameData = async (username: string | undefined) => {
   if (!username) {
     await Storage.remove({ key: USERNAME });
   } else {
@@ -299,7 +299,7 @@ export const setUsernameData = async (username?: string) => {
   }
 }
 
-export const setLocationData = async (point?: GeoPoint) => {
+export const setLocationData = async (point: GeoPoint | undefined) => {
   console.log("setting location data");
   if (!point) {
     await Storage.remove({ key: LOCATION});
@@ -312,7 +312,7 @@ export const setDarkModeData = async (darkMode: boolean) => {
   await Storage.set({ key: DARK_MODE, value: JSON.stringify(darkMode) })
 }
 
-export const setTokenData = async (token?: string) => {
+export const setTokenData = async (token: string | undefined) => {
   if (!token) {
     await Storage.remove({ key: TOKEN });
   } else {

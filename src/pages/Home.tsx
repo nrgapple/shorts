@@ -34,7 +34,7 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
   useEffect(() => {
     console.log("loading near me of fist mount.");
     try {
-      loadNearMe();
+      loadNearMe(token);
       console.log('valid profile');
       setHasValidProfile(true);
     } catch (e) {
@@ -43,12 +43,8 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
         setHasValidProfile(false);
       }
     }
-  }, []);
+  }, [token]);
 
-  useEffect(() => {
-    console.log(`hasvalidprofile changed to: ${hasValidProfile}`);
-  }, [hasValidProfile])
-  
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
     if (!profile) {
@@ -97,7 +93,7 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
               onIonRefresh={(event: any) => {
                 setTimeout(() => {
                   profile = undefined; 
-                  loadNearMe();
+                  loadNearMe(token);
                   event.detail.complete();
                 }, 1000); 
               }}

@@ -3,10 +3,10 @@ import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 
-export const loadConfData = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+export const loadConfData = () => async (dispatch: React.Dispatch<any>) => {
   try {
     dispatch(setLoading(true));
-    const data = await getConfData(token);
+    const data = await getConfData();
     dispatch(setData({
       ...data, 
      }));
@@ -22,7 +22,7 @@ export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispa
   dispatch(setLoading(false));
 };
 
-export const loadProfile = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+export const loadProfile = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   try {
     dispatch(setLoading(true));
     const profile = await getUserProfile(token);
@@ -35,7 +35,7 @@ export const loadProfile = (token?: string) => async (dispatch: React.Dispatch<a
   }
 }
 
-export const loadNearMe = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+export const loadNearMe = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   try {
     dispatch(setLoading(true));
     const nearMe = await getNearMe(token);
@@ -46,7 +46,7 @@ export const loadNearMe = (token?: string) => async (dispatch: React.Dispatch<an
   }
 }
 
-export const loadMatches = (token?: string) => async (dispatch: React.Dispatch<any>) => {
+export const loadMatches = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
   const matches = await getMatches(token);
   dispatch(setData({matches: matches}));
