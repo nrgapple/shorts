@@ -10,6 +10,7 @@ import MapView from './MapView';
 import About from './About';
 import Home from './Home';
 import MatchesList from './MatchesList';
+import Chat from './Chat';
 
 interface MainTabsProps { }
 
@@ -26,7 +27,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
         <Route path="/tabs/home" render={() => <Home />} exact={true} />
         <Route path="/tabs/matches" render={() => <MatchesList />} exact={true} />
         <Route path="/tabs/speakers/:id" component={SpeakerDetail} exact={true} />
-        <Route path="/tabs/schedule/:id" component={SessionDetail} />
+        <Route path="/tabs/chat/:id" component={Chat} />
         <Route path="/tabs/speakers/sessions/:id" component={SessionDetail} />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
