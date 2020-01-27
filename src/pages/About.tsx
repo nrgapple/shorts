@@ -7,7 +7,7 @@ import { Image } from "../models/Image";
 import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
-import { setUserProfile, loadProfile, loadNearMe } from '../data/sessions/sessions.actions';
+import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, deleteImage } from '../data/dataApi';
@@ -27,6 +27,7 @@ interface StateProps {
 interface DispatchProps {
   loadProfile: typeof loadProfile,
   loadNearMe: typeof loadNearMe,
+  setHasValidProfile: typeof setHasValidProfile,
 };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
@@ -38,6 +39,7 @@ const About: React.FC<UserProfileProps> = ({
   loadProfile, 
   isloggedin,
   loadNearMe,
+  setHasValidProfile,
 }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
@@ -111,6 +113,7 @@ const About: React.FC<UserProfileProps> = ({
       } as Profile;
 
       setUserProfile(updatedProfile);
+      setHasValidProfile(true);
       setIsEditing(false);
       setToastText('Profile Updated Successfully');
       setShowToast(true);
@@ -379,6 +382,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapDispatchToProps: {
     loadProfile,
     loadNearMe,
+    setHasValidProfile,
   },
   component: About
 });
