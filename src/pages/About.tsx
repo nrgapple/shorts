@@ -52,7 +52,6 @@ const About: React.FC<UserProfileProps> = ({
   const [inputImage, setInputImage] = useState<File | undefined>(undefined);
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
-  const [isProfileDirty, setIsProfileDirty] = useState(false);
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -111,7 +110,6 @@ const About: React.FC<UserProfileProps> = ({
         }),
       } as Profile;
 
-      setIsProfileDirty(true);
       setUserProfile(updatedProfile);
       setIsEditing(false);
       setToastText('Profile Updated Successfully');

@@ -6,6 +6,8 @@ import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
 import { loadNearMe } from '../data/sessions/sessions.actions';
+import { postUserLocation } from '../data/dataApi';
+import { GeoPoint } from '../models/GeoPoint';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -16,7 +18,11 @@ interface DispatchProps {
   loadNearMe: typeof loadNearMe;
 }
 
-interface LoginProps extends OwnProps,  DispatchProps { }
+interface StateProps {
+  point?: GeoPoint;
+}
+
+interface LoginProps extends OwnProps,  DispatchProps, StateProps { }
 
 const Login: React.FC<LoginProps> = ({
   setIsLoggedIn, 
@@ -24,6 +30,7 @@ const Login: React.FC<LoginProps> = ({
   setUsername: setUsernameAction, 
   setToken: setTokenAction,
   loadNearMe: loadNearMeAction,
+  point,
 }) => {
 
   const [username, setUsername] = useState('');
@@ -77,6 +84,8 @@ const Login: React.FC<LoginProps> = ({
         await setIsLoggedIn(true);
         await setTokenAction(data.token);
         await setUsernameAction(username);
+        if (point)
+          await postUserLocation(point, data.token);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         console.log(`Error signing up: ${e}`);
@@ -187,7 +196,10 @@ const Login: React.FC<LoginProps> = ({
   );
 };
 
-export default connect<OwnProps, {}, DispatchProps>({
+export default connect<OwnProps, StateProps, DispatchProps>({
+  mapStateToProps: (state) => ({
+    point: state.user.location,
+  }),
   mapDispatchToProps: {
     setIsLoggedIn,
     setUsername,

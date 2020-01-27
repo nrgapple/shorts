@@ -40,7 +40,7 @@ const Home: React.FC<HomeProps> = ({
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
-  const [isValidProfile, setIsValidProfile] = useState(false);
+  
   useEffect(() => {
     console.log(`loading near me.`);
     if (isLoggedin && token)
