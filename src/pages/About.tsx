@@ -45,6 +45,7 @@ const About: React.FC<UserProfileProps> = ({
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
   const [genderPref, setGenderPref] = useState(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
+  const [distance, setDistance] = useState(userProfile && userProfile.searchMiles? userProfile.searchMiles: -1);
   const [showPopover, setShowPopover] = useState(false);
   const [popoverEvent, setPopoverEvent] = useState();
   const [showToast, setShowToast] = useState(false);
@@ -75,7 +76,7 @@ const About: React.FC<UserProfileProps> = ({
     e.preventDefault();
     console.trace('updating profile submit');
     if (!token)
-    return;
+      return;
     try {
       const response = await Axios.request({
         url: `${apiURL}/secure/profile`,
@@ -90,6 +91,7 @@ const About: React.FC<UserProfileProps> = ({
             gender: gender.toUpperCase(),
             genderPref: genderPref.toUpperCase(),
             height: height,
+            miles: distance,
           }
       });
       const {data} = response;
@@ -110,6 +112,7 @@ const About: React.FC<UserProfileProps> = ({
             imageUrl: image.imageUrl,
           }
         }),
+        searchMiles: data.miles,
       } as Profile;
 
       setUserProfile(updatedProfile);
@@ -170,6 +173,7 @@ const About: React.FC<UserProfileProps> = ({
     setGenderPref(userProfile && userProfile.genderPref? userProfile.genderPref: 'male');
     setGender(userProfile && userProfile.gender? userProfile.gender: 'male');
     setImages(userProfile && userProfile.images?userProfile.images: []);
+    setDistance(userProfile && userProfile.searchMiles? userProfile.searchMiles: 10);
     defineCustomElements(window);
   }
 
@@ -301,7 +305,19 @@ const About: React.FC<UserProfileProps> = ({
                     <IonLabel position="stacked">Location</IonLabel>
                     <IonText>{userProfile&&userProfile.displayAddress?userProfile.displayAddress: "No Location Data"}</IonText>
                   </IonItem>
-    
+
+                  <IonItem>
+                    <IonIcon icon={body} slot="start"></IonIcon>
+                    <IonLabel position="stacked">Distance</IonLabel>
+                    <IonSelect value={distance} onIonChange={e => setDistance(e.detail.value)} disabled={!isEditing}>
+                      <IonSelectOption value={1} >10 miles</IonSelectOption>
+                      <IonSelectOption value={20} >20 miles</IonSelectOption>
+                      <IonSelectOption value={50} >50 miles</IonSelectOption>
+                      <IonSelectOption value={100} >100 miles</IonSelectOption>
+                      <IonSelectOption value={500} >500 miles</IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+
                   <IonItem>
                     <IonLabel position="stacked">About</IonLabel>
                       <IonTextarea value={about} disabled={!isEditing} onIonChange={e=> setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
