@@ -5,7 +5,7 @@ Shorts Dating App
 
 Shorts is a project to create a dating app using ionic and react
 
-![image](https://user-images.githubusercontent.com/10817537/72995344-bce27c80-3dc6-11ea-96ba-cf96439aef6f.png)
+![image](https://user-images.githubusercontent.com/10817537/73150891-abcf8f00-4096-11ea-9490-a620bcc4c3c3.png)
 
 ## Development
 
