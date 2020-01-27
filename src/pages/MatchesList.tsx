@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol } from '@ionic/react';
 import SpeakerItem from '../components/SpeakerItem';
 import { Speaker } from '../models/Speaker';
@@ -8,6 +8,7 @@ import * as selectors from '../data/selectors';
 import './SpeakerList.scss';
 import { Profile } from '../models/Profile';
 import MatchItem from '../components/MatchItem';
+import { loadMatches } from '../data/sessions/sessions.actions';
 
 interface OwnProps { 
   token?: string;
@@ -17,11 +18,17 @@ interface StateProps {
   matches?: Profile[]
 };
 
-interface DispatchProps { };
+interface DispatchProps {
+  loadMatches: typeof loadMatches;
+};
 
 interface MatchesListProps extends OwnProps, StateProps, DispatchProps { };
 
-const MatchesList: React.FC<MatchesListProps> = ({ matches,  }) => {
+const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }) => {
+
+  useEffect(() => {
+    loadMatches(token);
+  },[])
 
   return (
     <IonPage id="speaker-list">
@@ -62,5 +69,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     matches: state.data.matches,
     token: state.user.token,
   }),
+  mapDispatchToProps: {
+    loadMatches
+  },
   component: React.memo(MatchesList)
 });
