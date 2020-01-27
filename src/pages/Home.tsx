@@ -43,14 +43,9 @@ const Home: React.FC<HomeProps> = ({
   const [isValidProfile, setIsValidProfile] = useState(false);
   useEffect(() => {
     console.log(`loading near me.`);
-    loadNearMe(token);
-    console.log(userProfile);
-    if (userProfile && checkIfValidProfile(userProfile))
-    {
-      console.log(`profile valid`);
-      setIsValidProfile(true);
-    }
-  }, [userProfile]);
+    if (isLoggedin && token)
+      loadNearMe(token);
+  }, [userProfile, isLoggedin, token]);
 
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
@@ -126,7 +121,7 @@ const Home: React.FC<HomeProps> = ({
                 <IonRow justify-content-center align-items-center>
                   <IonCol>
                     {
-                      !isValidProfile ? (
+                      !hasValidProfile ? (
                         <IonCard>
                             <IonButton color="danger" expand="block" routerLink={"/profile"}>
                               <IonText>

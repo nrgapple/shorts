@@ -69,7 +69,6 @@ const Login: React.FC<LoginProps> = ({
         setIsLoggedIn(true);
         setTokenAction(data.token);
         setUsernameAction(username);
-        loadAllInfo(data.token);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         const { data } = await e.response;

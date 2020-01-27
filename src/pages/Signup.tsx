@@ -77,7 +77,6 @@ const Login: React.FC<LoginProps> = ({
         await setIsLoggedIn(true);
         await setTokenAction(data.token);
         await setUsernameAction(username);
-        await loadNearMe(data.token);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         console.log(`Error signing up: ${e}`);

@@ -113,7 +113,6 @@ const About: React.FC<UserProfileProps> = ({
 
       setIsProfileDirty(true);
       setUserProfile(updatedProfile);
-      loadNearMe(token);
       setIsEditing(false);
       setToastText('Profile Updated Successfully');
       setShowToast(true);

@@ -81,7 +81,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
   useEffect(() => {
     console.log(token);
     loadConfData();
-    loadAllInfo(token);
+    //loadAllInfo(token);
     console.log(userProfile);
   }, [token])
   
