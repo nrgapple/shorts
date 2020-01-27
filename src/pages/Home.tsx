@@ -25,7 +25,7 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, isLoggedin }) => {
+const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, loadNearMe, isLoggedin }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
@@ -43,7 +43,7 @@ const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incr
         setHasValidProfile(false);
       }
     }
-  }, [token]);
+  }, []);
 
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
