@@ -102,8 +102,7 @@ export const getNearMe = async (token: string | undefined) => {
       }) as Profile[];
       return nearMe;
     } catch (e) {
-      const { data } = e;
-      console.log(data);
+      const {data} = e.response
       throw data;
     }
   } 
@@ -146,7 +145,7 @@ export const getUserProfile = async (token: string | undefined) => {
       console.log(userProfile);
       return userProfile;
     } catch (e) {
-      const {data} = e;
+      const {data} = e.response;
       throw data;
     }
   }

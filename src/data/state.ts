@@ -17,6 +17,7 @@ export const initialState: AppState = {
     nearMe: undefined,
     matches: undefined,
     currentProfileIndex: 0,
+    hasValidProfile: false,
   },
   user: {
     hasSeenTutorial: false,

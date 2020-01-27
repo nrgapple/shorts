@@ -17,4 +17,5 @@ export interface SessionsState {
   nearMe?: Profile[];
   matches?: Profile[];
   currentProfileIndex: number;
+  hasValidProfile: boolean;
 }

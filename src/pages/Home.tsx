@@ -16,6 +16,8 @@ interface StateProps {
   profile?: Profile;
   nearMeCount: number;
   isLoggedin: boolean;
+  hasValidProfile: boolean;
+  userProfile?: Profile;
 };
 
 interface DispatchProps {
@@ -25,25 +27,24 @@ interface DispatchProps {
 
 interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
-const Home: React.FC<HomeProps> = ({ profile, token, incrementProfileIndex: incrementProfileIndexAction, nearMeCount, loadNearMe, isLoggedin }) => {
+const Home: React.FC<HomeProps> = ({ 
+  profile, 
+  token, 
+  incrementProfileIndex: incrementProfileIndexAction, 
+  nearMeCount, 
+  loadNearMe, 
+  isLoggedin,
+  hasValidProfile,
+  userProfile,
+}) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
-  const [hasValidProfile, setHasValidProfile] = useState(false);
 
   useEffect(() => {
-    console.log("loading near me of fist mount.");
-    try {
-      loadNearMe(token);
-      console.log('valid profile');
-      setHasValidProfile(true);
-    } catch (e) {
-      if (e.code === "400") {
-        console.log('invalid profile');
-        setHasValidProfile(false);
-      }
-    }
-  }, []);
+    console.log(`loading near me.`);
+    loadNearMe(token);
+  }, [userProfile]);
 
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
@@ -164,6 +165,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
     nearMeCount: state.data.nearMe?state.data.nearMe.length: -1,
     isLoggedin: state.user.isLoggedin,
+    hasValidProfile: state.data.hasValidProfile,
+    userProfile: state.data.userProfile,
   }),
   mapDispatchToProps: {
     incrementProfileIndex,

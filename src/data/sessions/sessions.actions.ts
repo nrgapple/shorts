@@ -37,12 +37,18 @@ export const loadProfile = (token: string | undefined) => async (dispatch: React
 
 export const loadNearMe = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   try {
+    console.log(`loading nearme`);
     dispatch(setLoading(true));
     const nearMe = await getNearMe(token);
+    dispatch(setHasValidProfile(true));
     dispatch(setData({nearMe: nearMe}));
     dispatch(setLoading(false));
   } catch (e) {
-    throw e;
+    console.log(e);
+    if (e.code === "400") {
+      console.log('invalid profile');
+      dispatch(setHasValidProfile(false))
+    }
   }
 }
 
@@ -56,6 +62,11 @@ export const loadMatches = (token: string | undefined) => async (dispatch: React
 export const setLoading = (isLoading: boolean) => ({
   type: 'set-conf-loading',
   isLoading
+} as const);
+
+export const setHasValidProfile = (isValid: boolean) => ({
+  type: 'set-has-valid-profile',
+  isValid
 } as const);
 
 export const setData = (data: Partial<SessionsState>) => 
@@ -100,3 +111,4 @@ export type SessionsActions =
   | ActionType<typeof updateFilteredTracks>
   | ActionType<typeof setSearchText>
   | ActionType<typeof incrementProfileIndex>
+  | ActionType<typeof setHasValidProfile>

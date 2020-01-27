@@ -24,5 +24,8 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
     case 'increment-profile-index': {
       return { ...state, currentProfileIndex: state.currentProfileIndex + 1};
     }
+    case 'set-has-valid-profile': {
+      return { ...state, hasValidProfile: action.isValid }
+    }
   }
 }
