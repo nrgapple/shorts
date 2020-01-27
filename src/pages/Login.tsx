@@ -5,6 +5,7 @@ import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions'
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
+import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -12,11 +13,18 @@ interface DispatchProps {
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
   setToken: typeof setToken;
+  loadAllInfo: typeof loadAllInfo;
 }
 
 interface LoginProps extends OwnProps,  DispatchProps { }
 
-const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUsernameAction, setToken: setTokenAction}) => {
+const Login: React.FC<LoginProps> = ({
+  setIsLoggedIn, 
+  history, 
+  setUsername: setUsernameAction, 
+  setToken: setTokenAction,
+  loadAllInfo: loadAllInfoAction,
+}) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -58,9 +66,10 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
           throw Error("No Token data!");
         }
 
-        await setIsLoggedIn(true);
-        await setTokenAction(data.token);
-        await setUsernameAction(username);
+        setIsLoggedIn(true);
+        setTokenAction(data.token);
+        setUsernameAction(username);
+        loadAllInfo(data.token);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         const { data } = await e.response;
@@ -143,6 +152,7 @@ export default connect<OwnProps, {}, DispatchProps>({
     setIsLoggedIn,
     setUsername,
     setToken,
+    loadAllInfo,
   },
   component: Login
 })

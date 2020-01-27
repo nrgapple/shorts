@@ -40,10 +40,16 @@ const Home: React.FC<HomeProps> = ({
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
-
+  const [isValidProfile, setIsValidProfile] = useState(false);
   useEffect(() => {
     console.log(`loading near me.`);
     loadNearMe(token);
+    console.log(userProfile);
+    if (userProfile && checkIfValidProfile(userProfile))
+    {
+      console.log(`profile valid`);
+      setIsValidProfile(true);
+    }
   }, [userProfile]);
 
   const swipe = async (liked: boolean) => {
@@ -77,6 +83,18 @@ const Home: React.FC<HomeProps> = ({
     }
   }
 
+  const checkIfValidProfile = (profile: Profile) => {
+    console.log(profile);
+    return (
+      profile && 
+      profile.about &&
+      profile.height &&
+      profile.height > 0 &&
+      profile.gender &&
+      profile.genderPref
+    )
+  }
+
   return (
     <IonPage id="home">
       <IonHeader>
@@ -108,7 +126,7 @@ const Home: React.FC<HomeProps> = ({
                 <IonRow justify-content-center align-items-center>
                   <IonCol>
                     {
-                      !hasValidProfile ? (
+                      !isValidProfile ? (
                         <IonCard>
                             <IonButton color="danger" expand="block" routerLink={"/profile"}>
                               <IonText>

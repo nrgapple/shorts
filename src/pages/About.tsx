@@ -26,11 +26,19 @@ interface StateProps {
 
 interface DispatchProps {
   loadProfile: typeof loadProfile,
+  loadNearMe: typeof loadNearMe,
 };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps {};
 
-const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadProfile, isloggedin }) => {
+const About: React.FC<UserProfileProps> = ({ 
+  userProfile, 
+  loading, 
+  token, 
+  loadProfile, 
+  isloggedin,
+  loadNearMe,
+}) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height? userProfile.height: 0);
   const [gender, setGender] = useState(userProfile && userProfile.gender? userProfile.gender: 'male');
@@ -105,6 +113,7 @@ const About: React.FC<UserProfileProps> = ({ userProfile, loading, token, loadPr
 
       setIsProfileDirty(true);
       setUserProfile(updatedProfile);
+      loadNearMe(token);
       setIsEditing(false);
       setToastText('Profile Updated Successfully');
       setShowToast(true);
@@ -372,6 +381,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   }),
   mapDispatchToProps: {
     loadProfile,
+    loadNearMe,
   },
   component: About
 });

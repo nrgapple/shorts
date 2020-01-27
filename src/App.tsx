@@ -26,7 +26,7 @@ import './theme/variables.css';
 import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
-import { loadConfData } from './data/sessions/sessions.actions';
+import { loadConfData, loadAllInfo } from './data/sessions/sessions.actions';
 import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
@@ -64,11 +64,12 @@ interface DispatchProps {
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
   setToken: typeof setToken;
+  loadAllInfo: typeof loadAllInfo;
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, location, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, location, loadAllInfo, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
 
   useEffect(() => {
     loadUserData();
@@ -80,6 +81,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
   useEffect(() => {
     console.log(token);
     loadConfData();
+    loadAllInfo(token);
     console.log(userProfile);
   }, [token])
   
@@ -137,6 +139,6 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     nearMe: state.data.nearMe,
     location: state.user.location
   }),
-  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation, },
+  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation, loadAllInfo,},
   component: IonicApp
 });

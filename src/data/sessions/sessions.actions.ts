@@ -16,6 +16,36 @@ export const loadConfData = () => async (dispatch: React.Dispatch<any>) => {
   }
 }
 
+export const loadAllInfo = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+  var profile = undefined;
+  var matches = undefined;
+  var nearMe = undefined;
+  try {
+    dispatch(setLoading(true));
+    profile = await getUserProfile(token);
+    matches = await getMatches(token);
+  } catch (e) {
+    console.log(e);
+  }
+  try {
+    nearMe = await getNearMe(token); 
+    dispatch(setHasValidProfile(true));
+  } catch (e) {
+    console.log(e);
+    if (e.code === "400") {
+      console.log('invalid profile');
+      dispatch(setHasValidProfile(false))
+    } 
+  } finally {
+    dispatch(setData({
+      userProfile: profile,
+      matches: matches,
+      nearMe: nearMe,
+    }));
+    dispatch(setLoading(false));
+  }
+}
+
 export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
   dispatch(setData({userProfile: profile}));
@@ -42,13 +72,14 @@ export const loadNearMe = (token: string | undefined) => async (dispatch: React.
     const nearMe = await getNearMe(token);
     dispatch(setHasValidProfile(true));
     dispatch(setData({nearMe: nearMe}));
-    dispatch(setLoading(false));
   } catch (e) {
     console.log(e);
     if (e.code === "400") {
       console.log('invalid profile');
       dispatch(setHasValidProfile(false))
     }
+  } finally {
+    dispatch(setLoading(false));
   }
 }
 

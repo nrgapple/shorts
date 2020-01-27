@@ -5,6 +5,7 @@ import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions'
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
+import { loadNearMe } from '../data/sessions/sessions.actions';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -12,11 +13,18 @@ interface DispatchProps {
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
   setToken: typeof setToken;
+  loadNearMe: typeof loadNearMe;
 }
 
 interface LoginProps extends OwnProps,  DispatchProps { }
 
-const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUsernameAction, setToken: setTokenAction}) => {
+const Login: React.FC<LoginProps> = ({
+  setIsLoggedIn, 
+  history, 
+  setUsername: setUsernameAction, 
+  setToken: setTokenAction,
+  loadNearMe: loadNearMeAction,
+}) => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -69,6 +77,7 @@ const Login: React.FC<LoginProps> = ({setIsLoggedIn, history, setUsername: setUs
         await setIsLoggedIn(true);
         await setTokenAction(data.token);
         await setUsernameAction(username);
+        await loadNearMe(data.token);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         console.log(`Error signing up: ${e}`);
@@ -184,6 +193,7 @@ export default connect<OwnProps, {}, DispatchProps>({
     setIsLoggedIn,
     setUsername,
     setToken,
+    loadNearMe,
   },
   component: Login
 })
