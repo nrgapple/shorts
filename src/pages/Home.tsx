@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent, IonButton } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonCard, IonItem, IonText, IonRefresher, IonRefresherContent, IonButton, IonItemSliding, IonItemOptions, IonItemOption, IonIcon } from '@ionic/react';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
 import './Home.scss';
@@ -7,6 +7,7 @@ import { Profile } from '../models/Profile';
 import ProfileCard from '../components/ProfileCard';
 import { postSwipe } from '../data/dataApi';
 import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
+import { close, heart } from 'ionicons/icons';
 
 interface OwnProps { 
   token?: string;
@@ -132,7 +133,24 @@ const Home: React.FC<HomeProps> = ({
                       ) : (
                         <>
                         { nearMeCount !== 0 ? (
-                          <ProfileCard profile={profile} swiped={swipe}/>
+                          
+                          <IonItemSliding>
+                            <IonItemOptions side="start">
+                              <IonItemOption color="danger" onClick={() => console.log('pass')}>
+                                <IonIcon icon={close}></IonIcon>
+                              </IonItemOption>
+                            </IonItemOptions>
+
+                            <IonItem>
+                              <ProfileCard profile={profile} swiped={swipe}/>
+                            </IonItem>
+
+                            <IonItemOptions side="end">
+                              <IonItemOption onClick={() => console.log('like!')}>
+                                <IonIcon icon={heart}></IonIcon>
+                              </IonItemOption>
+                            </IonItemOptions>
+                          </IonItemSliding>
                         ) : (
                           <IonCard>
                             <IonItem>
