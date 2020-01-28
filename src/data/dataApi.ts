@@ -7,6 +7,7 @@ import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
 import { male } from 'ionicons/icons';
 import { GeoPoint } from '../models/GeoPoint';
+import { Message } from '../models/Message';
 
 const { Storage } = Plugins;
 
@@ -278,6 +279,35 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
     } catch (e) {
       const {data} = e;
       throw e;
+    }
+  }
+}
+
+export const getMessages = async (chatId: number, token: string | undefined) => {
+  if (token) {
+    try {
+      const messagesResponse = await Axios.request({
+        url: `${apiURL}/secure/messages/${chatId}`,
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      const { data } = messagesResponse;
+      console.log(data);
+      return data.map((message:any) : Message => {
+        return {
+          firstName: message.firstName as string,
+          lastName: message.lastName as string,
+          content: message.message as string,
+          sentAt: message.sendAt as Date,
+        }
+      }) as Message[];
+    } catch (e) {
+      const {data} = e.response;
+      throw data
     }
   }
 }
