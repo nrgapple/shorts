@@ -313,6 +313,28 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   }
 }
 
+export const createChat = async (userId: string, token: string | undefined) => {
+  if (token) {
+    try {
+      const chatsResponse = await Axios.request({
+        url: `${apiURL}/secure/chat/${userId}`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+      const { data } = chatsResponse;
+      console.log(data);
+      return {chatId: data} as Chat;
+    } catch (e) {
+      const {data} = e.response;
+      return data;
+    }
+  }
+}
+
 export const getChats = async (token: string | undefined) => {
   if (token) {
     try {
@@ -329,7 +351,7 @@ export const getChats = async (token: string | undefined) => {
       console.log(data);
       return data.map((chat: any) : Chat => ({
         chatId: chat.chatId,
-      }));
+      } as Chat));
     } catch (e) {
       const { data } = e.response;
       throw data;
