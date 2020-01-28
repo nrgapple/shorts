@@ -15,7 +15,7 @@ const MatchItem: React.FC<MatchItemProps> = ({ profile }) => {
       <>
         <IonCard className="speaker-card">
           <IonCardHeader>
-            <IonItem button detail={false} routerLink={`/chats/[chatid]`} lines="none">
+            <IonItem button detail={false} routerLink={`/chats/`} lines="none">
                 {profile.images.length > 0? (
                   <IonAvatar slot="start">
                     <img src={profile.images[0].imageUrl} alt="Pic" />
