@@ -1,4 +1,6 @@
+import { Message } from "./Message";
+
 export interface Chat {
     chatId: number;
-    userId: number;
+    messages?: Message[];
 }
