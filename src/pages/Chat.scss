@@ -56,7 +56,7 @@
     margin-bottom: 0;
 
     &.received {
-        background: #FFF;
+        background: var(--ion-color-secondary);
         float: left;
     }
 

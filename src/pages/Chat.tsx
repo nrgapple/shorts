@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonItem, IonLabel, IonInput, IonRow, IonCol, IonFooter } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
@@ -25,20 +25,30 @@ type ChatDetailProps = OwnProps & StateProps & DispatchProps;
 
 const Chat: React.FC<ChatDetailProps> = ({ session, addFavorite, removeFavorite, favoriteSessions }) => {
 
+  const content = useRef(null);
+  const value = useRef(null);
+
+  const scrollToBottom = () => {
+    // @ts-ignore
+    content.current.scrollToBottom();
+  }
+
+  const onKeyPressed = (event: any) => {
+    // @ts-ignore
+    if (event.keyCode == 13 && value.current.value !== "") {
+      
+      scrollToBottom();
+    }
+  }
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+  
   if (!session) {
     return <div>Session not found</div>
   }
-
-  const isFavorite = favoriteSessions.indexOf(session.id) > -1;
   
-  const toggleFavorite = () => { 
-    isFavorite ? removeFavorite(session.id) : addFavorite(session.id);
-  };
-  const shareSession = () => { };
-  const sessionClick = (text: string) => { 
-    console.log(`Clicked ${text}`);
-  };
-
   return (
     <IonPage id="session-detail-page">
       <IonHeader>
@@ -48,17 +58,274 @@ const Chat: React.FC<ChatDetailProps> = ({ session, addFavorite, removeFavorite,
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        
-      </IonContent>
-      <IonFooter>
-        <IonToolbar>
-          <IonButton slot="end" fill="clear">
-            <IonIcon icon={send} />
-          </IonButton>
-          <IonInput placeholder="Send a message..."/>
-        </IonToolbar>
-      </IonFooter>
+        <IonContent scrollEvents={true} ref={content}>
+          <IonRow>
+            <IonCol size="12" style={{"--ion-grid-column-padding": 0}}>
+              <IonList>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble send">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+                <div className="chat-bubble received">
+                  <IonText>
+                    Here is some message
+                  </IonText>
+                </div>
+              </IonList>
+
+            </IonCol>
+            
+          </IonRow>
+        </IonContent>
+        <IonFooter>
+          <IonToolbar>
+            <IonButton slot="end" fill="clear">
+              <IonIcon icon={send} />
+            </IonButton>
+            <IonInput placeholder="Send a message..." ref={value} onKeyDown={onKeyPressed}/>
+          </IonToolbar>
+        </IonFooter>
     </IonPage>
   );
 };
