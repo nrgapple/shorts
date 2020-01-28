@@ -39,6 +39,7 @@ import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
 import { postUserLocation } from './data/dataApi';
 import { GeoPoint } from './models/GeoPoint';
+import Chat from './pages/Chat';
 
 const App: React.FC = () => {
   return (
@@ -119,6 +120,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
                   setToken(undefined);
                   return <Redirect to="/tabs" />
                 }} />
+                <Route path="/chat/:id" component={Chat} />
                 <Route path="/" component={HomeOrTutorial} exact />
               </IonRouterOutlet>
             </IonSplitPane>
