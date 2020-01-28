@@ -287,7 +287,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   if (token) {
     try {
       const messagesResponse = await Axios.request({
-        url: `${apiURL}/secure/matches`,
+        url: `${apiURL}/secure/messages/${chatId}`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
