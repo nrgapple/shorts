@@ -1,7 +1,8 @@
-import { getConfData, getMatches, getUserProfile, getNearMe } from '../dataApi';
+import { getConfData, getMatches, getUserProfile, getNearMe, getChats } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
+import { Chat } from '../../models/Chat';
 
 export const loadConfData = () => async (dispatch: React.Dispatch<any>) => {
   try {
@@ -90,6 +91,13 @@ export const loadMatches = (token: string | undefined) => async (dispatch: React
   dispatch(setLoading(false));
 }
 
+export const loadChats = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+  dispatch(setLoading(true));
+  const chats = await getChats(token);
+  dispatch(setData({chats: chats}));
+  dispatch(setLoading(false));
+}
+
 export const setLoading = (isLoading: boolean) => ({
   type: 'set-conf-loading',
   isLoading
@@ -120,6 +128,26 @@ export const removeFavorite = (sessionId: number) => ({
   sessionId
 } as const);
 
+export const addChat = (chat: Chat) => ({
+  type: 'add-chat',
+  chat,
+} as const);
+
+export const removeChat = (chat: Chat) => ({
+  type: 'remove-chat',
+  chat
+} as const);
+
+export const addMatch = (match: Profile) => ({
+  type: 'add-match',
+  match,
+} as const);
+
+export const removeMatch = (match: Profile) => ({
+  type: 'remove-match',
+  match
+} as const);
+
 export const updateFilteredTracks = (filteredTracks: string[]) => ({
   type: 'update-filtered-tracks', 
   filteredTracks 
@@ -139,6 +167,10 @@ export type SessionsActions =
   | ActionType<typeof setData>
   | ActionType<typeof addFavorite>
   | ActionType<typeof removeFavorite>
+  | ActionType<typeof addChat>
+  | ActionType<typeof removeChat>
+  | ActionType<typeof addMatch>
+  | ActionType<typeof removeMatch>
   | ActionType<typeof updateFilteredTracks>
   | ActionType<typeof setSearchText>
   | ActionType<typeof incrementProfileIndex>

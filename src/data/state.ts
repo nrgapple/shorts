@@ -16,6 +16,7 @@ export const initialState: AppState = {
     userProfile: undefined,
     nearMe: undefined,
     matches: undefined,
+    chats: undefined,
     currentProfileIndex: 0,
     hasValidProfile: false,
   },

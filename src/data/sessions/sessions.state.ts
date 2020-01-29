@@ -2,6 +2,7 @@ import { Location } from '../../models/Location';
 import { Speaker } from '../../models/Speaker';
 import { Session } from '../../models/Session';
 import { Profile } from '../../models/Profile';
+import { Chat } from '../../models/Chat';
 export interface SessionsState {
   sessions: Session[];
   speakers: Speaker[];
@@ -16,6 +17,7 @@ export interface SessionsState {
   userProfile?: Profile;
   nearMe?: Profile[];
   matches?: Profile[];
+  chats?: Chat[];
   currentProfileIndex: number;
   hasValidProfile: boolean;
 }

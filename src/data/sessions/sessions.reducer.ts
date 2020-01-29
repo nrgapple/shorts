@@ -15,6 +15,18 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
     case 'remove-favorite': {
       return { ...state, favorites: [...(state.favorites).filter(x => x !== action.sessionId)] };
     }
+    case 'add-chat': {
+      return { ...state, chats: [...(state.chats), action.chat] };
+    }
+    case 'remove-chat': {
+      return { ...state, chats: [...(state.chats)?.filter(x => x.chatId !== action.chat.chatId)] };
+    }
+    case 'add-match': {
+      return { ...state, matches: [...(state.matches), action.match] };
+    }
+    case 'remove-match': {
+      return { ...state, matches: [...(state.matches)?.filter(x => x.userId !== action.match.userId)] };
+    }
     case 'update-filtered-tracks': {
       return { ...state, filteredTracks: action.filteredTracks };
     }
