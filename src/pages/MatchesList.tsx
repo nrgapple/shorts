@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol } from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet } from '@ionic/react';
 import SpeakerItem from '../components/SpeakerItem';
 import { Speaker } from '../models/Speaker';
 import { Session } from '../models/Session';
@@ -25,10 +25,17 @@ interface DispatchProps {
 interface MatchesListProps extends OwnProps, StateProps, DispatchProps { };
 
 const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }) => {
+  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined)
 
   useEffect(() => {
     loadMatches(token);
   },[])
+
+  const onSelectProfile = (profile: Profile) => {
+    setSelectedProfile(profile);
+    setShowActionSheet(true);
+  }
 
   return (
     <IonPage id="speaker-list">
@@ -42,23 +49,33 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }
       </IonHeader>
 
       <IonContent className={`outer-content`}>
-        <IonList>
-          <IonGrid fixed>
-            <IonRow align-items-stretch>
-              {matches?matches.map((match, key) => (
-                <IonCol size="12" size-md="6" key={key}>
-                  <MatchItem profile={match}></MatchItem>
-                </IonCol>
-              )) : (
-                [undefined, undefined, undefined, undefined].map((match, key) => (
-                  <IonCol size="12" size-md="6" key={key}>
-                    <MatchItem profile={match}></MatchItem>
-                  </IonCol>
-                ))
-              )} 
-            </IonRow>
-          </IonGrid>
+        <IonList lines="inset" inset>
+          {matches ? (
+            matches.map((match) => (
+              <MatchItem profile={match} key={match.userId} onAction={onSelectProfile}></MatchItem>
+            ))
+          ) : (
+            [undefined, undefined, undefined, undefined].map((match, key) => (
+              <MatchItem key={key} profile={match} onAction={() => {}}></MatchItem>
+            ))
+          )} 
         </IonList>
+        <IonActionSheet
+          isOpen={showActionSheet}
+          onDidDismiss={() => setShowActionSheet(false)}
+          buttons={[{
+            text: 'Profile',
+            handler: () => {
+              console.log(`See ${selectedProfile && selectedProfile.firstName}'s profile`);
+            }, 
+          }, {
+            text: 'Chat',
+            handler: () => {
+              console.log(`Chat with ${selectedProfile && selectedProfile.firstName}`);
+            }
+          }
+        ]}
+        ></IonActionSheet>
       </IonContent>
     </IonPage>
   );

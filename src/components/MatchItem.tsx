@@ -1,46 +1,43 @@
-import React from 'react';
-import { IonCard, IonCardHeader, IonItem, IonAvatar, IonSkeletonText, IonIcon } from '@ionic/react';
+import React, { useState } from 'react';
+import { IonCard, IonCardHeader, IonItem, IonAvatar, IonSkeletonText, IonIcon, IonLabel } from '@ionic/react';
 import { Profile } from '../models/Profile';
 import { contact } from 'ionicons/icons';
 
 interface MatchItemProps {
   profile?: Profile;
+  onAction: (profile: Profile) => void;
 }
 
-const MatchItem: React.FC<MatchItemProps> = ({ profile }) => {
+const MatchItem: React.FC<MatchItemProps> = ({ profile, onAction }) => {
+  
   return (
     <>
     {
       profile? (
       <>
-        <IonCard className="speaker-card">
-          <IonCardHeader>
-            <IonItem button detail={false} routerLink={`/chats/`} lines="none">
-                {profile.images.length > 0? (
-                  <IonAvatar slot="start">
-                    <img src={profile.images[0].imageUrl} alt="Pic" />
-                  </IonAvatar>
-                ):(
-                  <IonIcon icon={contact}></IonIcon>
-                )}
-              {profile.firstName}
-            </IonItem>
-          </IonCardHeader>
-        </IonCard>
+        <IonItem button detail={false} onClick={() => onAction(profile)} lines="none">
+          {profile.images.length > 0? (
+            <IonAvatar slot="start">
+              <img src={profile.images[0].imageUrl} alt="Pic" />
+            </IonAvatar>
+          ):(
+            <IonAvatar slot="start">
+              <img src={"https://via.placeholder.com/150?text=No+Image"} alt="Pic" />
+            </IonAvatar>
+          )}
+          <IonLabel>{profile.firstName}</IonLabel> 
+        </IonItem>
       </>
       ) : (
-        <IonCard className="speaker-card">
-          <IonCardHeader>
-            <IonItem button detail={false} routerLink={`/chats/[chatid]`} lines="none">
-              <IonAvatar slot="start">
-                <IonSkeletonText animated style={{width: '30%'}}/>
-              </IonAvatar>
-              <IonSkeletonText animated style={{width: '70%'}}/>
-            </IonItem>
-          </IonCardHeader>
-        </IonCard>
+        <IonItem button detail={false} routerLink={`/chats/[chatid]`} lines="none">
+          <IonAvatar slot="start">
+            <IonSkeletonText animated style={{width: '30%'}}/>
+          </IonAvatar>
+          <IonSkeletonText animated style={{width: '70%'}}/>
+        </IonItem>
       )
     }
+    
     </>
   );
 };
