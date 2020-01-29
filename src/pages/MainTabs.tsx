@@ -25,7 +25,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
           Use the component prop when your component depends on the RouterComponentProps passed in automatically.        
         */}
         <Route path="/tabs/home" render={() => <Home />} exact={true} />
-        <Route path="/tabs/matches" render={() => <MatchesList />} exact={true} />
+        <Route path="/tabs/matches" component={MatchesList} exact />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="home" href="/tabs/home">

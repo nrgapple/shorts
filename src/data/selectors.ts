@@ -12,6 +12,7 @@ const getSearchText = (state: AppState) => state.data.searchText;
 const getNearMe = (state: AppState) => state.data.nearMe;
 const getCurrentProfileIndex = (state: AppState) => state.data.currentProfileIndex;
 const getChats = (state: AppState) => state.data.chats;
+const getMatches = (state: AppState) => state.data.matches;
 
 export const getFilteredSessions = createSelector(
   getSessions, getFilteredTracks,
@@ -103,6 +104,11 @@ export const getSpeaker = createSelector(
 export const getCurrentProfile = createSelector(
   getNearMe, getCurrentProfileIndex,
   (nearMe, index) => {console.log('getCurrentProfile'); return nearMe && nearMe.length > 0?nearMe[index]:undefined;}
+);
+
+export const getMatchesWithoutAChat = createSelector(
+  getMatches, getChats,
+  (matches, chats) => matches && chats?matches.filter(x => !chats.map(x=>x.recipient.userId).includes(x.userId)): undefined
 );
 
 export const getSpeakerSessions = createSelector(

@@ -8,9 +8,11 @@ import * as selectors from '../data/selectors';
 import './SpeakerList.scss';
 import { Profile } from '../models/Profile';
 import MatchItem from '../components/MatchItem';
-import { loadMatches } from '../data/sessions/sessions.actions';
+import { loadMatches, loadChats } from '../data/sessions/sessions.actions';
+import { createChat } from '../data/dataApi';
+import { RouteComponentProps } from 'react-router-dom';
 
-interface OwnProps { 
+interface OwnProps extends RouteComponentProps { 
   token?: string;
 };
 
@@ -20,21 +22,38 @@ interface StateProps {
 
 interface DispatchProps {
   loadMatches: typeof loadMatches;
+  loadChats: typeof loadChats;
 };
 
 interface MatchesListProps extends OwnProps, StateProps, DispatchProps { };
 
-const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }) => {
+const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, history, loadChats }) => {
   const [showActionSheet, setShowActionSheet] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined)
+  const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined);
+  const [isCreatingChat, setIsCreatingChat] = useState(false);
 
   useEffect(() => {
     loadMatches(token);
+    loadChats(token);
   },[])
 
   const onSelectProfile = (profile: Profile) => {
     setSelectedProfile(profile);
     setShowActionSheet(true);
+  }
+
+  const onCreateChat = async () => {
+    if (token && selectedProfile) {
+      try {
+        setIsCreatingChat(true);
+        const chat = await createChat(selectedProfile.userId, token);
+        history.push(`/chat/${chat.chatId}`, {direction: 'none'});
+      } catch (e) {
+        console.log(`Could not create a chat: ${e}`);
+      } finally {
+        setIsCreatingChat(false);
+      }
+    }
   }
 
   return (
@@ -84,6 +103,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }
             text: 'Chat',
             handler: () => {
               console.log(`Chat with ${selectedProfile && selectedProfile.firstName}`);
+              onCreateChat();
             }
           }
         ]}
@@ -95,11 +115,12 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }
 
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
-    matches: state.data.matches,
+    matches: selectors.getMatchesWithoutAChat(state),
     token: state.user.token,
   }),
   mapDispatchToProps: {
-    loadMatches
+    loadMatches,
+    loadChats
   },
   component: React.memo(MatchesList)
 });

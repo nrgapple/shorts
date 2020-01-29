@@ -314,7 +314,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   }
 }
 
-export const createChat = async (userId: string, token: string | undefined) => {
+export const createChat = async (userId: number, token: string | undefined) => {
   if (token) {
     try {
       const chatsResponse = await Axios.request({
@@ -328,7 +328,10 @@ export const createChat = async (userId: string, token: string | undefined) => {
       });
       const { data } = chatsResponse;
       console.log(data);
-      return {chatId: data} as Chat;
+      return {
+        chatId: data.chatId,
+        recipient: data.recipient,
+      } as Chat;
     } catch (e) {
       const {data} = e.response;
       return data;

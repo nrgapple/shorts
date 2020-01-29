@@ -9,7 +9,7 @@ import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
 import { getMessages } from '../data/dataApi';
-import { setLoading } from '../data/sessions/sessions.actions';
+import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
 
 interface OwnProps extends RouteComponentProps { };
 
@@ -20,7 +20,10 @@ interface StateProps {
   loading?: boolean,
 };
 
-interface DispatchProps {}
+interface DispatchProps {
+  loadChats: typeof loadChats;
+  loadProfile: typeof loadProfile;
+}
 
 type ChatDetailProps = OwnProps & StateProps & DispatchProps;
 
@@ -28,10 +31,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   userProfile, 
   chat, 
   token, 
-  loading
+  loading,
+  loadChats,
+  loadProfile,
 }) => {
 
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isUser, setIsUser] = useState(false);
   const content = useRef(null);
   const value = useRef(null);
 
@@ -49,11 +55,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
   
   const onKeyPressed = (event: any) => {
-    if (!userProfile || !chat)
+    if (!userProfile)
       return;
 
     // @ts-ignore
     if (event.keyCode == 13 && value.current.value !== "") {
+      setIsUser(true);
       setMessages([...messages, 
         {
           fromUserId: userProfile.userId,
@@ -64,7 +71,42 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           sentAt: new Date(Date.now()),
         }]);
       scrollToTheBottom();
-      
+    }
+  }
+  
+  const scrollToTheBottom = () => {
+    if (!content || !content.current)
+      return;
+
+    // @ts-ignore
+    content.current.scrollToBottom();
+  }
+
+  useEffect(() => {
+    if (token && chat)
+      (async () => {
+        console.log(`chat`);
+        console.log(chat);
+        console.log(userProfile);
+        setLoading(true);
+        await loadMessages(chat.chatId, token);
+        setLoading(false);
+        scrollToTheBottom();
+      })();
+  }, [token, chat]);
+
+  useEffect(() => {
+    if (token)
+    {
+      if (!userProfile) loadProfile(token);
+      loadChats(token);
+    }
+  }, [token])
+
+  useEffect(() => {
+    console.log('here');
+    if (isUser && chat) {
+      setIsUser(false);
       setTimeout(() => {
         setMessages([...messages, 
           {
@@ -77,59 +119,53 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         scrollToTheBottom();
       }, 2000);
     }
-  }
-  
-  const scrollToTheBottom = () => {
-    // @ts-ignore
-    content.current.scrollToBottom();
-  }
-
-  useEffect(() => {
-    if (token && chat)
-      (async () => {
-        setLoading(true);
-        await loadMessages(chat.chatId, token);
-        setLoading(false);
-        scrollToTheBottom();
-      })();
-  }, [token, chat]);
-  
-  if (!chat || !userProfile) {
-    return <div>Chat not found</div>
-  }
+  }, [messages])
   
   return (
     <>
-    {
-      loading ? (
-        <IonProgressBar type="indeterminate" />
-      ) : (
         <IonPage id="session-detail-page">
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
                 <IonBackButton defaultHref="/tabs/matches"></IonBackButton>
               </IonButtons>
+              <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
             </IonToolbar>
-            <IonTitle>{chat.recipient.firstName}</IonTitle>
           </IonHeader>
             <IonContent scrollEvents={true} ref={content}>
+              <>
+              {
+              loading || !chat || !userProfile ? (
+                <IonProgressBar type="indeterminate" />
+              ) : (
               <IonRow>
                 
                 <IonCol size="12" style={{"--ion-grid-column-padding": 0}}>
                   <IonList>
                     {
-                      messages.map(message => (
-                        <div className={`chat-bubble ${message.fromUserId === userProfile.userId?"sent":"recieved"}`}>
-                          <IonText>
-                            {message.content}
-                          </IonText>
-                        </div>
+                      messages.map((message, key) => (
+                        
+                        message.fromUserId === userProfile.userId? (
+                          <div key={key} className="chat-bubble send">
+                            <IonText>
+                              {message.content}
+                            </IonText>
+                          </div>
+
+                        ) : (
+                          <div key={key} className="chat-bubble received">
+                            <IonText>
+                              {message.content}
+                            </IonText>
+                          </div>
+                        )
                       ))
                     }
                   </IonList>
                 </IonCol>
               </IonRow>
+              )}
+              </>
             </IonContent>
             <IonFooter>
               <IonToolbar>
@@ -140,8 +176,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               </IonToolbar>
             </IonFooter>
         </IonPage>
-      )
-    }
     </>
   );
 };
@@ -153,5 +187,9 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
     loading: state.data.loading,
   }),
+  mapDispatchToProps: {
+    loadChats,
+    loadProfile,
+  },
   component: withRouter(ChatDetail)
 });
