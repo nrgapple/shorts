@@ -1,4 +1,4 @@
-import { getConfData, getMatches, getUserProfile, getNearMe, getChats } from '../dataApi';
+import { getConfData, getMatches, getUserProfile, getNearMe, getChats, getMessages } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';

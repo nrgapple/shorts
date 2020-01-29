@@ -11,6 +11,7 @@ const getFavoriteIds = (state: AppState) => state.data.favorites;
 const getSearchText = (state: AppState) => state.data.searchText;
 const getNearMe = (state: AppState) => state.data.nearMe;
 const getCurrentProfileIndex = (state: AppState) => state.data.currentProfileIndex;
+const getChats = (state: AppState) => state.data.chats;
 
 export const getFilteredSessions = createSelector(
   getSessions, getFilteredTracks,
@@ -64,6 +65,11 @@ const getIdParam = (_state: AppState, props: any) => {
 export const getSession = createSelector(
   getSessions, getIdParam,
   (sessions, id) => sessions.find(x => x.id === id)
+);
+
+export const getChat = createSelector(
+  getChats, getIdParam,
+  (chats, id) => chats?.find(x => x.chatId === id),
 );
 
 function groupSessions(sessions: Session[]) {
