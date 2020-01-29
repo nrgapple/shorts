@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet, IonRefresher, IonRefresherContent } from '@ionic/react';
 import SpeakerItem from '../components/SpeakerItem';
 import { Speaker } from '../models/Speaker';
 import { Session } from '../models/Session';
@@ -49,6 +49,18 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches }
       </IonHeader>
 
       <IonContent className={`outer-content`}>
+        <IonRefresher slot="fixed" 
+          onIonRefresh={(event: any) => {
+            setTimeout(() => {
+              matches = undefined; 
+              loadMatches(token);
+              event.detail.complete();
+            }, 1000); 
+          }}
+          >
+          <IonRefresherContent>
+          </IonRefresherContent>
+        </IonRefresher>
         <IonList lines="inset" inset>
           {matches ? (
             matches.map((match) => (

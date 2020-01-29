@@ -114,7 +114,6 @@ const Home: React.FC<HomeProps> = ({
               }}
             >
               <IonRefresherContent>
-                <IonContent style={{width:"100%", height:"100%"}}></IonContent>
               </IonRefresherContent>
             </IonRefresher>
             <IonList>
