@@ -133,24 +133,7 @@ const Home: React.FC<HomeProps> = ({
                       ) : (
                         <>
                         { nearMeCount !== 0 ? (
-                          
-                          <IonItemSliding>
-                            <IonItemOptions side="start">
-                              <IonItemOption color="danger" onClick={() => console.log('pass')}>
-                                <IonIcon icon={close}></IonIcon>
-                              </IonItemOption>
-                            </IonItemOptions>
-
-                            <IonItem>
-                              <ProfileCard profile={profile} swiped={swipe}/>
-                            </IonItem>
-
-                            <IonItemOptions side="end">
-                              <IonItemOption onClick={() => console.log('like!')}>
-                                <IonIcon icon={heart}></IonIcon>
-                              </IonItemOption>
-                            </IonItemOptions>
-                          </IonItemSliding>
+                          <ProfileCard profile={profile} swiped={swipe}/>
                         ) : (
                           <IonCard>
                             <IonItem>
