@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
 import { send } from 'ionicons/icons';
-import './Chat.scss';
+import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
@@ -24,7 +24,7 @@ interface DispatchProps {}
 
 type ChatDetailProps = OwnProps & StateProps & DispatchProps;
 
-const Chat: React.FC<ChatDetailProps> = ({
+const ChatDetail: React.FC<ChatDetailProps> = ({
   userProfile, 
   chat, 
   token, 
@@ -95,7 +95,7 @@ const Chat: React.FC<ChatDetailProps> = ({
   }, [token, chat]);
   
   if (!chat || !userProfile) {
-    return <div>Session not found</div>
+    return <div>Chat not found</div>
   }
   
   return (
@@ -111,6 +111,7 @@ const Chat: React.FC<ChatDetailProps> = ({
                 <IonBackButton defaultHref="/tabs/matches"></IonBackButton>
               </IonButtons>
             </IonToolbar>
+            <IonTitle>{chat.recipient.firstName}</IonTitle>
           </IonHeader>
             <IonContent scrollEvents={true} ref={content}>
               <IonRow>
@@ -152,5 +153,5 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
     loading: state.data.loading,
   }),
-  component: withRouter(Chat)
+  component: withRouter(ChatDetail)
 });

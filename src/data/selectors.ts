@@ -69,7 +69,7 @@ export const getSession = createSelector(
 
 export const getChat = createSelector(
   getChats, getIdParam,
-  (chats, id) => chats?.find(x => x.chatId === id),
+  (chats, id) => chats?chats.find(x => x.chatId === id):undefined,
 );
 
 function groupSessions(sessions: Session[]) {

@@ -10,7 +10,7 @@ import MapView from './MapView';
 import About from './About';
 import Home from './Home';
 import MatchesList from './MatchesList';
-import Chat from './Chat';
+import ChatDetail from './ChatDetail';
 
 interface MainTabsProps { }
 

@@ -19,13 +19,13 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
       return { ...state, chats: [...(state.chats), action.chat] };
     }
     case 'remove-chat': {
-      return { ...state, chats: [...(state.chats)?.filter(x => x.chatId !== action.chat.chatId)] };
+      return { ...state, chats: state.chats?[...(state.chats).filter(x => x.chatId !== action.chat.chatId)]:undefined };
     }
     case 'add-match': {
       return { ...state, matches: [...(state.matches), action.match] };
     }
     case 'remove-match': {
-      return { ...state, matches: [...(state.matches)?.filter(x => x.userId !== action.match.userId)] };
+      return { ...state, matches: state.matches?[...(state.matches).filter(x => x.userId !== action.match.userId)]:undefined};
     }
     case 'update-filtered-tracks': {
       return { ...state, filteredTracks: action.filteredTracks };

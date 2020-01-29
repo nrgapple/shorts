@@ -300,9 +300,10 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
       console.log(data);
       return data.map((message:any) : Message => {
         return {
+          fromUserId: message.fromUserId as number,
           firstName: message.firstName as string,
           lastName: message.lastName as string,
-          content: message.message as string,
+          content: message.content as string,
           sentAt: message.sendAt as Date,
         }
       }) as Message[];
