@@ -378,6 +378,8 @@ export const configureChatClient = (
   ) => {
   if (!token || !client) 
     return;
+  if (client.connected)
+    return;
   const stompHeader = new StompHeaders();
   stompHeader.Authorization = `Bearer ${token}`;
   client.configure({
@@ -385,9 +387,12 @@ export const configureChatClient = (
     connectHeaders: stompHeader,
     onConnect: () => {
       client.subscribe(`/chat/${chatId}`, response => {
-        const {data} = JSON.parse(response.body);
-        if (data.message) {
-          onMessage(data.message);
+        console.log(response);
+        const data = JSON.parse(response.body);
+        
+        if (data) {
+          console.log(data);
+          onMessage(data as Message);
         }
       });
       onConnect();

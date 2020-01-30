@@ -39,6 +39,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [client, setClient] = useState<Client | undefined>(undefined);
+  const [isClientConnected, setIsClientConnected] = useState(false);
   const content = useRef(null);
   const value = useRef(null);
 
@@ -68,7 +69,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
     //@ts-ignore
     publishMessageForClient(client, chat.chatId, value.current.value);
-    scrollToTheBottom();
       //@ts-ignore
     value.current.value = '';
   }
@@ -83,7 +83,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
 
   useEffect(() => {
-    if (token && chat && client)
+    if (token && chat && client && !isClientConnected)
       (async () => {
         console.log(`chat`);
         console.log(chat);
@@ -96,26 +96,32 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           chat.chatId,
           () => {
             console.log(`Connected to chat`);
+            setIsClientConnected(true);
             setLoading(false);
           },
           () => {
             console.log(`Disconnect to chat ${chat.chatId}`);
+            setIsClientConnected(false);
           },
           () => {
             console.log(`Websocket was closed for chat ${chat.chatId}`);
+            setIsClientConnected(false);
           },
           (msg: Message) => {
             console.log(`Go a message! msg: ${msg}`);
-            setMessages([...messages, msg]);
-            scrollToTheBottom();
+            const oldMessages = messages;
+            setMessages(oldMessages => [...oldMessages, msg]);
           },
           () => {
             setLoading(false);
           }
         );
 
-        scrollToTheBottom();
       })();
+      return () => {
+        if (client)
+          client.deactivate();
+      }
   }, [token, chat, client]);
 
   useEffect(() => {
@@ -129,6 +135,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     setClient(new Client());
   },[]);
+
+  useEffect(() => {
+    scrollToTheBottom();
+  }, [messages])
 
   return (
     <>
