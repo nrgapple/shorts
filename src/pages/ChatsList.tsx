@@ -90,15 +90,8 @@ const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats })
             text: 'Remove',
             role: 'destructive',
             handler: () => {
-              console.log(`See ${selectedChat && selectedChat.recipient.firstName}'s profile`);
-            }, 
-          }, {
-            text: 'Chat',
-            role: 'cancel',
-            handler: () => {
-              console.log(`Chat with ${selectedChat && selectedChat.recipient.firstName}`);
               onDeleteChat();
-            }
+            }, 
           }
         ]}
         ></IonActionSheet>
