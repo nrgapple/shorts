@@ -34,7 +34,7 @@ import Signup from './pages/Signup';
 import Support from './pages/Support';
 import Tutorial from './pages/Tutorial';
 import About from './pages/About';
-import HomeOrTutorial from './components/HomeOrTutorial';
+import HomeOrLogin from './components/HomeOrLogin';
 import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
 import { postUserLocation } from './data/dataApi';
@@ -51,7 +51,6 @@ const App: React.FC = () => {
 
 interface StateProps {
   darkMode: boolean,
-  sessions: Session[],
   token?: string,
   userProfile?: Profile,
   nearMe?: Profile[],
@@ -70,7 +69,7 @@ interface DispatchProps {
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProfile, nearMe, location, loadAllInfo, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ darkMode, token, userProfile, nearMe, location, loadAllInfo, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
 
   useEffect(() => {
     loadUserData();
@@ -99,34 +98,30 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, sessions, token, userProf
   }, [location])
 
   return (
-    sessions.length === 0 ? (
-      <div></div>
-    ) : (
-        <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
-          <IonReactRouter>
-            <IonSplitPane contentId="main">
-              <Menu />
-              <IonRouterOutlet id="main">
-                <Route path="/tabs" component={MainTabs} />
-                <Route path="/account" component={Account} />
-                <Route path="/login" component={Login} />
-                <Route path="/signup" component={Signup} />
-                <Route path="/support" component={Support} />
-                <Route path="/profile" component={About} />
-                <Route path="/tutorial" component={Tutorial} />
-                <Route path="/logout" render={() => {
-                  setIsLoggedIn(false);
-                  setUsername(undefined);
-                  setToken(undefined);
-                  return <Redirect to="/tabs" />
-                }} />
-                <Route path="/chat/:id" component={ChatDetail} />
-                <Route path="/" component={HomeOrTutorial} exact />
-              </IonRouterOutlet>
-            </IonSplitPane>
-          </IonReactRouter>
-        </IonApp>
-      )
+    <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
+      <IonReactRouter>
+        <IonSplitPane contentId="main">
+          <Menu />
+          <IonRouterOutlet id="main">
+            <Route path="/tabs" component={MainTabs} />
+            <Route path="/account" component={Account} />
+            <Route path="/login" component={Login} />
+            <Route path="/signup" component={Signup} />
+            <Route path="/support" component={Support} />
+            <Route path="/profile" component={About} />
+            <Route path="/tutorial" component={Tutorial} />
+            <Route path="/logout" render={() => {
+              setIsLoggedIn(false);
+              setUsername(undefined);
+              setToken(undefined);
+              return <Redirect to="/tabs" />
+            }} />
+            <Route path="/chat/:id" component={ChatDetail} />
+            <Route path="/" component={HomeOrLogin} exact />
+          </IonRouterOutlet>
+        </IonSplitPane>
+      </IonReactRouter>
+    </IonApp>
   )
 }
 

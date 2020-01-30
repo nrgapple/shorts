@@ -12,7 +12,7 @@ import {
   IonToolbar,
   IonToggle
 } from '@ionic/react';
-import { home, calendar, contacts, hammer, help, informationCircle, logIn, logOut, map, person, personAdd, heart } from 'ionicons/icons';
+import { home, hammer, help, informationCircle, logIn, logOut, person, personAdd, heart, chatboxes } from 'ionicons/icons';
 import React, { useState } from 'react';
 import { connect } from '../data/connect';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -22,6 +22,7 @@ const routes = {
   appPages: [
     { title: 'Home', path: '/tabs/home', icon: home },
     { title: 'Matches', path: '/tabs/matches', icon: heart },
+    { title: 'Chats', path: '/tabs/chats', icon: chatboxes },
   ],
   loggedInPages: [
     { title: 'Account', path: '/account', icon: person },
@@ -84,16 +85,6 @@ const Menu: React.FC<MenuProps> = ({ darkMode, history, isAuthenticated, setDark
         <IonList>
           <IonListHeader>Account</IonListHeader>
           {isAuthenticated ? renderlistItems(routes.loggedInPages) : renderlistItems(routes.loggedOutPages)}
-        </IonList>
-        <IonList>
-          <IonListHeader>Tutorial</IonListHeader>
-          <IonItem onClick={() => {
-            setDisableMenu(true);
-            history.push('/tutorial');
-          }}>
-            <IonIcon slot="start" icon={hammer} />
-            Show Tutorial
-          </IonItem>
         </IonList>
         <IonList>
           <IonItem>

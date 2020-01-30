@@ -5,7 +5,7 @@ import { Speaker } from '../models/Speaker';
 import { Session } from '../models/Session';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
-import './SpeakerList.scss';
+import './MatchesList.scss';
 import { Profile } from '../models/Profile';
 import MatchItem from '../components/MatchItem';
 import { loadMatches, loadChats } from '../data/sessions/sessions.actions';

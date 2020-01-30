@@ -7,7 +7,7 @@ interface StateProps {
   token?: string;
 }
 
-const HomeOrTutorial: React.FC<StateProps> = ({ hasSeenTutorial, token }) => {
+const HomeOrLogin: React.FC<StateProps> = ({ hasSeenTutorial, token }) => {
   return hasSeenTutorial ? 
     (token ? <Redirect to="/tabs/home" /> : <Redirect to="/login" />)
     : 
@@ -19,5 +19,5 @@ export default connect<{}, StateProps, {}>({
     hasSeenTutorial: state.user.hasSeenTutorial,
     token: state.user.token
   }),
-  component: HomeOrTutorial
+  component: HomeOrLogin
 });

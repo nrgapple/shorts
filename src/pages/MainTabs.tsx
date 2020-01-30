@@ -1,7 +1,7 @@
 import React  from 'react';
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
-import { home, calendar, contacts, map, informationCircle, heart } from 'ionicons/icons';
+import { home, calendar, contacts, map, informationCircle, heart, chatboxes } from 'ionicons/icons';
 import SchedulePage from './SchedulePage';
 import SpeakerList from './SpeakerList';
 import SpeakerDetail from './SpeakerDetail';
@@ -11,6 +11,7 @@ import About from './About';
 import Home from './Home';
 import MatchesList from './MatchesList';
 import ChatDetail from './ChatDetail';
+import ChatsList from './ChatsList';
 
 interface MainTabsProps { }
 
@@ -26,6 +27,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
         */}
         <Route path="/tabs/home" render={() => <Home />} exact={true} />
         <Route path="/tabs/matches" component={MatchesList} exact />
+        <Route path="/tabs/chats" component={ChatsList} exact />
       </IonRouterOutlet>
       <IonTabBar slot="bottom">
         <IonTabButton tab="home" href="/tabs/home">
@@ -35,6 +37,10 @@ const MainTabs: React.FC<MainTabsProps> = () => {
         <IonTabButton tab="matches" href="/tabs/matches">
           <IonIcon icon={heart} />
           <IonLabel>Matches</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="chats" href="/tabs/chats">
+          <IonIcon icon={chatboxes} />
+          <IonLabel>Chats</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>
