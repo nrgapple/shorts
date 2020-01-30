@@ -55,12 +55,17 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
   
   const onKeyPressed = (event: any) => {
-    if (!userProfile)
+    if (event.keyCode == 13) {
+      sendMessage();
+    }
+  }
+
+  const sendMessage = () => {
+    // @ts-ignore
+    if (!userProfile || value.current.value === "")
       return;
 
-    // @ts-ignore
-    if (event.keyCode == 13 && value.current.value !== "") {
-      setIsUser(true);
+    setIsUser(true);
       setMessages([...messages, 
         {
           fromUserId: userProfile.userId,
@@ -71,7 +76,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           sentAt: new Date(Date.now()),
         }]);
       scrollToTheBottom();
-    }
+      //@ts-ignore
+      value.current.value = '';
   }
   
   const scrollToTheBottom = () => {
@@ -140,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               ) : (
               <IonRow>
                 
-                <IonCol size="12" style={{"--ion-grid-column-padding": 0}}>
+                <IonCol size="12" style={{"--ion-grid-column-padding": 0, height: "100%"}}>
                   <IonList>
                     {
                       messages.map((message, key) => (
@@ -169,10 +175,19 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             </IonContent>
             <IonFooter>
               <IonToolbar>
-                <IonButton slot="end" fill="clear">
+                <IonButton slot="end" fill="clear" onClick={sendMessage}>
                   <IonIcon icon={send} />
                 </IonButton>
-                <IonInput placeholder="Send a message..." ref={value} onKeyDown={onKeyPressed}/>
+                <IonInput 
+                  spellCheck 
+                  autofocus 
+                  autocomplete="off" 
+                  autocorrect="on" 
+                  placeholder="Send a message..." 
+                  ref={value} 
+                  onKeyDown={onKeyPressed}
+                  onFocus={scrollToTheBottom}
+                />
               </IonToolbar>
             </IonFooter>
         </IonPage>

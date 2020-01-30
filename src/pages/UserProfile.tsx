@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonDatetime, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonPicker, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonSlides, IonSlide, IonImg, IonCard } from '@ionic/react';
-import './About.scss';
-import { calendar, pin, more, body, fastforward, add, close, image } from 'ionicons/icons';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard } from '@ionic/react';
+import './UserProfile.scss';
+import { calendar, pin, more, body, close } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
 import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
 import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/core';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage, deleteImage } from '../data/dataApi';
+import { postImage } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
@@ -38,7 +37,6 @@ const About: React.FC<UserProfileProps> = ({
   token, 
   loadProfile, 
   isloggedin,
-  loadNearMe,
   setHasValidProfile,
 }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about? userProfile.about: 'empty');
@@ -150,7 +148,6 @@ const About: React.FC<UserProfileProps> = ({
   const removeImage = async (imageId: number) => {
     console.log(`Remove image: ${imageId}`);
     try {
-      const deleteInfo = await deleteImage(imageId, token);
       const index = images.findIndex(x => x.imageId === imageId);
       setImages([...images.slice(0, index),...images.slice(index + 1)]);
       setToastText('Image removed successfully');

@@ -1,16 +1,9 @@
 import React  from 'react';
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
-import { home, calendar, contacts, map, informationCircle, heart, chatboxes } from 'ionicons/icons';
-import SchedulePage from './SchedulePage';
-import SpeakerList from './SpeakerList';
-import SpeakerDetail from './SpeakerDetail';
-import SessionDetail from './SessionDetail';
-import MapView from './MapView';
-import About from './About';
+import { home, heart, chatboxes } from 'ionicons/icons';
 import Home from './Home';
 import MatchesList from './MatchesList';
-import ChatDetail from './ChatDetail';
 import ChatsList from './ChatsList';
 
 interface MainTabsProps { }
