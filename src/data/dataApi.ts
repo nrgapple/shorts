@@ -9,6 +9,8 @@ import { male } from 'ionicons/icons';
 import { GeoPoint } from '../models/GeoPoint';
 import { Message } from '../models/Message';
 import { Chat } from '../models/Chat';
+import { StompHeaders, Client } from '@stomp/stompjs';
+
 
 const { Storage } = Plugins;
 
@@ -304,7 +306,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
           firstName: message.firstName as string,
           lastName: message.lastName as string,
           content: message.content as string,
-          sentAt: message.sendAt as Date,
+          createdAt: message.sendAt as Date,
         }
       }) as Message[];
     } catch (e) {
@@ -361,6 +363,69 @@ export const getChats = async (token: string | undefined) => {
       const { data } = e.response;
       throw data;
     }
+  }
+}
+
+export const configureChatClient = (
+  token: string | undefined, 
+  client: Client | undefined,
+  chatId: number,
+  onConnect: ()=> void,
+  onDisconnect: () => void,
+  onWebSocketClose: () => void,
+  onMessage: (msg: Message) => void,
+  onWebSocketError: () => void,
+  ) => {
+  if (!token || !client) 
+    return;
+  const stompHeader = new StompHeaders();
+  stompHeader.Authorization = `Bearer ${token}`;
+  client.configure({
+    brokerURL: `wss://doctornelson.herokuapp.com/ws`,
+    connectHeaders: stompHeader,
+    onConnect: () => {
+      client.subscribe(`/chat/${chatId}`, response => {
+        const {data} = JSON.parse(response.body);
+        if (data.message) {
+          onMessage(data.message);
+        }
+      });
+      onConnect();
+    },
+    onDisconnect: () => {
+      console.log(`disconnected`);
+      onDisconnect();
+    },
+    onWebSocketClose: () => {
+      console.log(`web socket closed`);
+      onWebSocketClose();
+    },
+    onWebSocketError: (e) => {
+      console.log(`web socket error: ${e}`);
+      onWebSocketError();
+    }
+  });
+  client.activate();
+}
+
+export const publishMessageForClient = (
+  client: Client,
+  chatId: number,
+  message: string,
+) => {
+  if (!chatId)
+    return;
+  console.log(client);
+  if (!client.connected) {
+    console.log(`client is not connected!`)
+    return;
+  }
+  if (client.webSocket.readyState === 1) {
+    client.publish({
+      destination: `/app/message/${chatId}`, 
+      body: JSON.stringify({message: message})
+    });
+    return true;
   }
 }
 

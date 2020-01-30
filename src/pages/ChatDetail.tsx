@@ -8,8 +8,10 @@ import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
-import { getMessages } from '../data/dataApi';
+import { getMessages, configureChatClient, publishMessageForClient } from '../data/dataApi';
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
+import { Client, StompHeaders } from '@stomp/stompjs';
+
 
 interface OwnProps extends RouteComponentProps { };
 
@@ -35,9 +37,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loadChats,
   loadProfile,
 }) => {
-
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isUser, setIsUser] = useState(false);
+  const [client, setClient] = useState<Client | undefined>(undefined);
   const content = useRef(null);
   const value = useRef(null);
 
@@ -62,22 +63,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   const sendMessage = () => {
     // @ts-ignore
-    if (!userProfile || value.current.value === "")
+    if (!userProfile || value.current.value === "" || !chat)
       return;
 
-    setIsUser(true);
-      setMessages([...messages, 
-        {
-          fromUserId: userProfile.userId,
-          firstName: userProfile.firstName, 
-          //@ts-ignore
-          content: value.current.value,
-          lastName: userProfile.lastName,
-          sentAt: new Date(Date.now()),
-        }]);
-      scrollToTheBottom();
+    //@ts-ignore
+    publishMessageForClient(client, chat.chatId, value.current.value);
+    scrollToTheBottom();
       //@ts-ignore
-      value.current.value = '';
+    value.current.value = '';
   }
   
   const scrollToTheBottom = () => {
@@ -88,18 +81,42 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     content.current.scrollToBottom();
   }
 
+
   useEffect(() => {
-    if (token && chat)
+    if (token && chat && client)
       (async () => {
         console.log(`chat`);
         console.log(chat);
         console.log(userProfile);
         setLoading(true);
         await loadMessages(chat.chatId, token);
-        setLoading(false);
+        configureChatClient(
+          token,
+          client,
+          chat.chatId,
+          () => {
+            console.log(`Connected to chat`);
+            setLoading(false);
+          },
+          () => {
+            console.log(`Disconnect to chat ${chat.chatId}`);
+          },
+          () => {
+            console.log(`Websocket was closed for chat ${chat.chatId}`);
+          },
+          (msg: Message) => {
+            console.log(`Go a message! msg: ${msg}`);
+            setMessages([...messages, msg]);
+            scrollToTheBottom();
+          },
+          () => {
+            setLoading(false);
+          }
+        );
+
         scrollToTheBottom();
       })();
-  }, [token, chat]);
+  }, [token, chat, client]);
 
   useEffect(() => {
     if (token)
@@ -107,33 +124,19 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       if (!userProfile) loadProfile(token);
       loadChats(token);
     }
-  }, [token])
+  }, [token]);
 
   useEffect(() => {
-    console.log('here');
-    if (isUser && chat) {
-      setIsUser(false);
-      setTimeout(() => {
-        setMessages([...messages, 
-          {
-            fromUserId: chat.recipient.userId,
-            firstName: chat.recipient.firstName, 
-            lastName: chat.recipient.lastName,
-            sentAt: new Date(Date.now()),
-            content: "Hey"
-          }])
-        scrollToTheBottom();
-      }, 2000);
-    }
-  }, [messages])
-  
+    setClient(new Client());
+  },[]);
+
   return (
     <>
         <IonPage id="session-detail-page">
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonBackButton defaultHref="/tabs/matches"></IonBackButton>
+                <IonBackButton defaultHref="/tabs/chats"></IonBackButton>
               </IonButtons>
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
             </IonToolbar>
