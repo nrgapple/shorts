@@ -5,6 +5,7 @@ import { home, heart, chatboxes } from 'ionicons/icons';
 import Home from './Home';
 import MatchesList from './MatchesList';
 import ChatsList from './ChatsList';
+import ProfileDetail from './ProfileDetail';
 
 interface MainTabsProps { }
 

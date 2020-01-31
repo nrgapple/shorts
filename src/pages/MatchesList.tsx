@@ -97,7 +97,10 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, 
           buttons={[{
             text: 'Profile',
             handler: () => {
+              if (!selectedProfile)
+                return;
               console.log(`See ${selectedProfile && selectedProfile.firstName}'s profile`);
+              history.push(`/more/${selectedProfile.userId}`, {direction: 'forward'});
             }, 
           }, {
             text: 'Chat',

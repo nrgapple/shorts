@@ -29,7 +29,7 @@ const MatchItem: React.FC<MatchItemProps> = ({ profile, onAction }) => {
         </IonItem>
       </>
       ) : (
-        <IonItem button detail={false} routerLink={`/chats/[chatid]`} lines="none">
+        <IonItem button detail={false} lines="none">
           <IonAvatar slot="start">
             <IonSkeletonText animated style={{width: '30%'}}/>
           </IonAvatar>

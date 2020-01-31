@@ -13,6 +13,7 @@ const getNearMe = (state: AppState) => state.data.nearMe;
 const getCurrentProfileIndex = (state: AppState) => state.data.currentProfileIndex;
 const getChats = (state: AppState) => state.data.chats;
 const getMatches = (state: AppState) => state.data.matches;
+const getAllProfiles = (state: AppState) => state.data.nearMe && state.data.matches ?[...state.data.matches, ...state.data.nearMe] : undefined;
 
 export const getFilteredSessions = createSelector(
   getSessions, getFilteredTracks,
@@ -72,6 +73,11 @@ export const getChat = createSelector(
   getChats, getIdParam,
   (chats, id) => chats?chats.find(x => x.chatId === id):undefined,
 );
+
+export const getProfile = createSelector(
+  getAllProfiles, getIdParam,
+  (allProfiles, id) => allProfiles?allProfiles.find(x => x.userId === id): undefined,
+)
 
 function groupSessions(sessions: Session[]) {
   return sessions

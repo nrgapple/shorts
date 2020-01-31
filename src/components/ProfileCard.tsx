@@ -45,7 +45,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
           </IonCardHeader>
   
           <IonCardContent class="outer-content">
-            <IonList lines="none">
+            <IonList>
               <IonItem>
                 <IonIcon icon={calendar} slot="start"></IonIcon>
                 <IonLabel position="stacked">Age</IonLabel>
@@ -69,39 +69,44 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
                   D.C.
                 </IonLabel>
               </IonItem>
+              <IonItem>
+                <p className="ion-padding-start ion-padding-end">
+                  { profile.about? profile.about : ''}
+                </p>
+              </IonItem>
             </IonList>
+            
+            <IonRow justify-content-center>
+              <IonCol text-center size="6">
+                <IonButton
+                  fill="solid"
+                  size="small"
+                  color="danger"
+                  expand="block"
+                  onClick={() => swiped(false)}
+                >
+                  <IonIcon slot="start" icon={close} />
+                  Pass
+              </IonButton>
+              </IonCol>
+              <IonCol text-center size="6">
+                <IonButton 
+                  fill="solid" 
+                  size="small" 
+                  color="success"
+                  expand="block"
+                  onClick={() => swiped(true)}>
+                  <IonIcon slot="start" icon={heart} />
+                  Like
+              </IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton expand="block" routerLink={`/more/${profile.userId}`} >
+                  Profile
+                </IonButton>
+              </IonCol>
+            </IonRow>
           </IonCardContent>
-  
-          <IonRow justify-content-center>
-            <IonCol>
-              <p className="ion-padding-start ion-padding-end">
-                { profile.about? profile.about : ''}
-              </p>
-            </IonCol>
-          </IonRow>
-          <IonRow justify-content-center>
-            <IonCol text-center size="6">
-              <IonButton
-                fill="clear"
-                size="small"
-                color="primary"
-                onClick={() => swiped(false)}
-              >
-                <IonIcon slot="start" icon={close} />
-                Pass
-            </IonButton>
-            </IonCol>
-            <IonCol text-center size="6">
-              <IonButton 
-                fill="clear" 
-                size="small" 
-                color="primary"
-                onClick={() => swiped(true)}>
-                <IonIcon slot="start" icon={heart} />
-                Like
-            </IonButton>
-            </IonCol>
-          </IonRow>
           <IonRow>
             {
               profile.images.map((img) => (

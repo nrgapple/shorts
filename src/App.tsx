@@ -40,6 +40,7 @@ import { Profile } from './models/Profile';
 import { postUserLocation } from './data/dataApi';
 import { GeoPoint } from './models/GeoPoint';
 import ChatDetail from './pages/ChatDetail';
+import ProfileDetail from './pages/ProfileDetail';
 
 const App: React.FC = () => {
   return (
@@ -117,6 +118,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, token, userProfile, nearM
               return <Redirect to="/tabs" />
             }} />
             <Route path="/chat/:id" component={ChatDetail} />
+            <Route path="/more/:id" component={ProfileDetail} />
             <Route path="/" component={HomeOrLogin} exact />
           </IonRouterOutlet>
         </IonSplitPane>
