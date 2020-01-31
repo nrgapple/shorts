@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle, IonItem } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -11,6 +11,7 @@ import { Chat } from '../models/Chat';
 import { getMessages, configureChatClient, publishMessageForClient } from '../data/dataApi';
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders } from '@stomp/stompjs';
+import moment from 'moment';
 
 
 interface OwnProps extends RouteComponentProps { };
@@ -47,6 +48,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     try {
       const messages = await getMessages(chatId, token);
       if (messages) {
+        messages.sort((a:any, b:any) => a.createdAt - b.createdAt)
         setMessages(messages);
       } else {
         console.log(`No messages found`);
@@ -108,9 +110,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             setIsClientConnected(false);
           },
           (msg: Message) => {
-            console.log(`Go a message! msg: ${msg}`);
-            const oldMessages = messages;
-            setMessages(oldMessages => [...oldMessages, msg]);
+            console.log(msg);
+            setMessages(oldMessages => [...oldMessages, msg]
+              .sort((a:any, b:any) => a.createdAt - b.createdAt));
           },
           () => {
             setLoading(false);
@@ -161,24 +163,39 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                 
                 <IonCol size="12" style={{"--ion-grid-column-padding": 0, height: "100%"}}>
                   <IonList>
-                    {
-                      messages.map((message, key) => (
+                    { messages &&
+                      messages.map((message: Message, key, array) => (
+                        <div key={key}>
+                         
                         
-                        message.fromUserId === userProfile.userId? (
-                          <div key={key} className="chat-bubble send">
+                        {
+                        message.fromUserId === userProfile.userId? (<>
+                          <IonText>
+                          
+                        </IonText>
+                          <div className="chat-bubble send" slot="end">
                             <IonText>
                               {message.content}
                             </IonText>
+                            <p>
+                              {moment(message.createdAt.toString())
+                                .fromNow()}
+                            </p>
                           </div>
-
+                              </>
                         ) : (
-                          <div key={key} className="chat-bubble received">
+                          <div slot="start" className="chat-bubble received">
                             <IonText>
                               {message.content}
                             </IonText>
+                            <p>
+                              {moment(message.createdAt.toString())
+                                .fromNow()}
+                            </p>
                           </div>
-                        )
-                      ))
+                        )}
+                        </div>
+                        ))
                     }
                   </IonList>
                 </IonCol>

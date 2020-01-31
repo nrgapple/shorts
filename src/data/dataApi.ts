@@ -306,7 +306,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
           firstName: message.firstName as string,
           lastName: message.lastName as string,
           content: message.content as string,
-          createdAt: message.sendAt as Date,
+          createdAt: new Date(message.createdAt) as Date,
         }
       }) as Message[];
     } catch (e) {
@@ -392,7 +392,13 @@ export const configureChatClient = (
         
         if (data) {
           console.log(data);
-          onMessage(data as Message);
+          onMessage({
+            content: data.content as string,
+            createdAt: new Date(data.createdAt) as Date,
+            fromUserId: data.fromUserId,
+            firstName: data.firstName,
+            lastName: data.lastName,
+          } as Message);
         }
       });
       onConnect();
