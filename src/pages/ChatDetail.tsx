@@ -201,12 +201,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                   <IonList>
                     { messages &&
                       messages.map((message: Message, key, array) => {
-                        
                         const timestamp = getTimestamp(message.createdAt);
                         return (
                         <div key={key}>
-                         
-                        
                         {
                         message.fromUserId === userProfile.userId? (<>
                           <IonText>
@@ -234,6 +231,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                         </div>
                         )})
                     }
+                    {
+                      recipientIsTyping && 
+                      <div slot="start" className="chat-bubble received">
+                        <IonText>
+                          Typing...
+                        </IonText>
+                      </div>
+                    }
                   </IonList>
               )}
               </>
@@ -246,7 +251,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     <IonButton slot="end" fill="clear" onClick={sendMessage}>
                       <IonIcon icon={send} />
                     </IonButton>
-                    <IonToast isOpen={recipientIsTyping}></IonToast>
                     <IonInput 
                       spellCheck 
                       autofocus 
