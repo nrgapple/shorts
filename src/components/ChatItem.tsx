@@ -4,6 +4,7 @@ import { Profile } from '../models/Profile';
 import { contact, more } from 'ionicons/icons';
 import { Chat } from '../models/Chat';
 import moment from 'moment';
+import { getTimestamp } from '../util/util';
 
 interface ChatItemProps {
   chat?: Chat;
@@ -33,7 +34,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
               {chat.recipient.firstName}
             </h1>
             <p>
-              {moment(chat.lastMessage.toString()).fromNow()}
+              {getTimestamp(chat.lastMessage)}
             </p>
           </IonLabel> 
         </IonItem>

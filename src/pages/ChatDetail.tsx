@@ -12,6 +12,7 @@ import { getMessages, configureChatClient, publishMessageForClient } from '../da
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders } from '@stomp/stompjs';
 import moment from 'moment';
+import { getTimestamp } from '../util/util'
 
 
 interface OwnProps extends RouteComponentProps { };
@@ -165,17 +166,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                   <IonList>
                     { messages &&
                       messages.map((message: Message, key, array) => {
-                        const duration = moment.duration(Date.now() - message.createdAt.getTime());
-                        console.log(`Duration: ${duration.asHours()}`);
-                        const currMoment = moment(message.createdAt.toString());
-                        const timestamp = (() => {
-                          if (duration.asWeeks() > 1)
-                            return currMoment.format('dddd, MMMM Do YYYY');
-                          else if (duration.asDays() > 1)
-                            return currMoment.format('"ddd, h a"');
-                          else
-                            return currMoment.format('hh:mm a');
-                        })();
+                        
+                        const timestamp = getTimestamp(message.createdAt);
                         return (
                         <div key={key}>
                          
