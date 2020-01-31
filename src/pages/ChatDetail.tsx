@@ -48,7 +48,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     try {
       const messages = await getMessages(chatId, token);
       if (messages) {
-        messages.sort((a:any, b:any) => a.createdAt - b.createdAt)
+        messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
         setMessages(messages);
       } else {
         console.log(`No messages found`);
@@ -114,7 +114,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           (msg: Message) => {
             console.log(msg);
             setMessages(oldMessages => [...oldMessages, msg]
-              .sort((a:any, b:any) => a.createdAt - b.createdAt));
+              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
           },
           () => {
             setLoading(false);
@@ -162,9 +162,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               loading || !chat || !userProfile ? (
                 <IonProgressBar type="indeterminate" />
               ) : (
-              <IonRow>
-                
-                <IonCol size="12" style={{"--ion-grid-column-padding": 0, height: "100%"}}>
                   <IonList>
                     { messages &&
                       messages.map((message: Message, key, array) => (
@@ -201,28 +198,31 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                         ))
                     }
                   </IonList>
-                </IonCol>
-              </IonRow>
               )}
               </>
             </IonContent>
-            <IonFooter>
-              <IonToolbar>
-                <IonButton slot="end" fill="clear" onClick={sendMessage}>
-                  <IonIcon icon={send} />
-                </IonButton>
-                <IonInput 
-                  spellCheck 
-                  autofocus 
-                  autocomplete="off" 
-                  autocorrect="on" 
-                  placeholder="Send a message..." 
-                  ref={value} 
-                  onKeyDown={onKeyPressed}
-                  onFocus={scrollToTheBottom}
-                />
-              </IonToolbar>
-            </IonFooter>
+            {
+              !(loading || !chat || !userProfile) &&
+              (
+                <IonFooter>
+                  <IonToolbar>
+                    <IonButton slot="end" fill="clear" onClick={sendMessage}>
+                      <IonIcon icon={send} />
+                    </IonButton>
+                    <IonInput 
+                      spellCheck 
+                      autofocus 
+                      autocomplete="off" 
+                      autocorrect="on" 
+                      placeholder="Send a message..." 
+                      ref={value} 
+                      onKeyDown={onKeyPressed}
+                      onFocus={scrollToTheBottom}
+                    />
+                  </IonToolbar>
+                </IonFooter>
+              )
+            }
         </IonPage>
     </>
   );

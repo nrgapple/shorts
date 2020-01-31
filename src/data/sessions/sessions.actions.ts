@@ -93,7 +93,10 @@ export const loadMatches = (token: string | undefined) => async (dispatch: React
 
 export const loadChats = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
-  const chats = await getChats(token);
+  const chats = await getChats(token) as Chat[] | undefined;
+  if (chats) {
+    chats.sort((a: Chat,b: Chat) => b.lastMessage.getTime() - a.lastMessage.getTime())
+  }
   dispatch(setData({chats: chats}));
   dispatch(setLoading(false));
 }

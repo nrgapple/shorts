@@ -357,6 +357,7 @@ export const getChats = async (token: string | undefined) => {
       return data.map((chat: any) : Chat => ({
         chatId: chat.chatId,
         recipient: chat.recipient,
+        lastMessage: new Date(chat.lastMessage) as Date,
       } as Chat));
     } catch (e) {
       const { data } = e.response;

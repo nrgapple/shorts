@@ -3,6 +3,7 @@ import { IonCard, IonCardHeader, IonItem, IonAvatar, IonSkeletonText, IonIcon, I
 import { Profile } from '../models/Profile';
 import { contact, more } from 'ionicons/icons';
 import { Chat } from '../models/Chat';
+import moment from 'moment';
 
 interface ChatItemProps {
   chat?: Chat;
@@ -27,7 +28,14 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
               <img src={"https://via.placeholder.com/150?text=No+Image"} alt="Pic" />
             </IonAvatar>
           )}
-          <IonLabel >{chat.recipient.firstName}</IonLabel> 
+          <IonLabel >
+            <h1>
+              {chat.recipient.firstName}
+            </h1>
+            <p>
+              {moment(chat.lastMessage.toString()).fromNow()}
+            </p>
+          </IonLabel> 
         </IonItem>
         <IonItemOptions side="end">
           <IonItemOption color="danger" onClick={() => onAction(chat)}>Remove</IonItemOption>
