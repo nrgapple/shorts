@@ -1,11 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Session } from '../models/Session';
-import { Speaker } from '../models/Speaker';
-import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonActionSheet, IonLabel, IonSkeletonText, IonText, IonCardTitle, IonTitle, IonChip, IonSlides, IonSlide } from '@ionic/react';
-import { logoTwitter, shareAlt, chatboxes, calendar, body, pin, close, heart } from 'ionicons/icons';
-import { ActionSheetButton } from '@ionic/core';
+import { IonCard, IonCardHeader, IonItem, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonSkeletonText, IonCardTitle, IonChip, IonSlides, IonSlide } from '@ionic/react';
+import { calendar, body, close, heart } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
-import { postSwipe } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 
@@ -48,7 +44,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
         profile?
         <>
         <IonCol size="12" size-md="6">
-          <IonCard className="speaker-card">
+          <IonCard className="home-card">
           <IonSlides ref={slides} options={
             {
               slidesPerView: 1,
@@ -80,7 +76,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
           </IonCard>
         </IonCol>
         <IonCol size="12" size-md="6">
-          <IonCard >
+          <IonCard className="home-card">
             <IonCardHeader translucent>
               <IonCardTitle>
                 {profile.firstName}
