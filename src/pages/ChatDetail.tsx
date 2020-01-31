@@ -122,10 +122,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         );
 
       })();
-      return () => {
-        if (client)
-          client.deactivate();
-      }
+      
   }, [token, chat, client]);
 
   useEffect(() => {
@@ -138,6 +135,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   useEffect(() => {
     setClient(new Client());
+    return () => {
+      if (client)
+        client.deactivate();
+    }
   },[]);
 
   useEffect(() => {
