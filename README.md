@@ -1,11 +1,9 @@
 Shorts Dating App
 ====
 
-[![Join the chat at https://gitter.im/date-app/community](https://badges.gitter.im/date-app/community.svg)](https://gitter.im/date-app/plans?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Shorts is a project to create a dating app using ionic and react
 
-![image](https://user-images.githubusercontent.com/10817537/73150891-abcf8f00-4096-11ea-9490-a620bcc4c3c3.png)
+![image](https://user-images.githubusercontent.com/10817537/73545382-3f8fbb00-4409-11ea-9dd8-a29b75ee526b.png)
 
 ## Development
 
