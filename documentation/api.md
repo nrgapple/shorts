@@ -1,5 +1,4 @@
-API Documentation
-====
+# API Documentation
 
 ## Login
 
@@ -12,14 +11,14 @@ request = {
     'Content-Type': 'application/json'
   },
   data: {
-    username: string, 
+    username: string,
     password: string,
   }
 }
 
 response = {
-  token: string
-}
+  token as string
+};
 ```
 
 ## Sign up
@@ -33,7 +32,7 @@ request = {
     'Content-Type': 'application/json'
   },
   data: {
-    username: string, 
+    username: string,
     password: string,
     dob: Date().toString(),
     firstName: string,
@@ -43,11 +42,11 @@ request = {
 }
 
 response = {
-  token: string
-}
+  token as string
+};
 ```
 
-## Get Profile
+## Get User Profile
 
 ```js
 request = {
@@ -60,9 +59,7 @@ request = {
   },
 }
 
-response = {
-  userProfile: Profile
-}
+response = {} as Profile;
 ```
 
 ## Get Near me profiles
@@ -78,9 +75,7 @@ request = {
   },
 }
 
-response = {
-  [...Profile]
-}
+response = [] as Profile[];
 ```
 
 ## Post current location
@@ -94,14 +89,14 @@ reqeust = {
     'Content-Type': 'application/json'
   },
   data: {
-    longitude: number,
-    latitude: number, 
+    longitude as number,
+    latitude as number,
   }
 }
 
 response = {
-  profile: Profile
-}
+
+} as Profile;
 ```
 
 ## Post swipe
@@ -116,14 +111,14 @@ request = {
     'Accept': 'application/json',
   },
   data: {
-    userId: number,
-    liked: boolean, 
-  } 
+    userId as number,
+    liked as boolean,
+  }
 }
 
 response = {
-  matched: boolean
-}
+  matched as boolean
+};
 ```
 
 ## Get matches
@@ -140,8 +135,8 @@ request = {
 }
 
 response = {
-  matches: Profile[];
-}
+  matches as Profile[];
+};
 ```
 
 ## Post image
@@ -157,9 +152,7 @@ request = {
   data: formData():File
 }
 
-response = {
-  image: Image
-}
+response = {} as Image;
 ```
 
 ## Delete image
@@ -174,7 +167,54 @@ request = {
   },
 }
 
-response = {
-  undefined
+response = undefined;
+```
+
+## Get Messages
+
+```js
+request = {
+  {
+    url: `${apiURL}/secure/messages/${chatId}`,
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+  }
 }
+
+response = [] as Message[];
+```
+
+## Create Chat
+
+```js
+request = {
+  url: `${apiURL}/secure/chat/${userId}`,
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+}
+
+response = {} as Chat;
+```
+
+## Get Chats
+
+```js
+request = {
+  url: `${apiURL}/secure/chats`,
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+}
+
+response = [] as Chat[];
 ```
