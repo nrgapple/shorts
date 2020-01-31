@@ -79,8 +79,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     if (!content || !content.current)
       return;
 
-    // @ts-ignore
-    content.current.scrollToBottom();
+      setTimeout(() => {
+      // @ts-ignore
+      content.current.scrollToBottom(500);
+    }, 200);
   }
 
 
