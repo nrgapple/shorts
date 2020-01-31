@@ -299,7 +299,6 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
         },
       });
       const { data } = messagesResponse;
-      console.log(data);
       return data.map((message:any) : Message => {
         return {
           fromUserId: message.fromUserId as number,
