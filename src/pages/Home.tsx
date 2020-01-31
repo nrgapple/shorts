@@ -116,40 +116,34 @@ const Home: React.FC<HomeProps> = ({
               <IonRefresherContent>
               </IonRefresherContent>
             </IonRefresher>
-            <IonList>
-              <IonGrid fixed>
-                <IonRow justify-content-center align-items-center>
-                  <IonCol>
-                    {
-                      !hasValidProfile ? (
-                        <IonCard>
-                            <IonButton color="danger" expand="block" routerLink={"/profile"}>
-                              <IonText>
-                                Finish your profile
-                              </IonText>
-                            </IonButton>
-                          </IonCard>
-                      ) : (
-                        <>
-                        { nearMeCount !== 0 ? (
-                          <ProfileCard profile={profile} swiped={swipe}/>
-                        ) : (
-                          <IonCard>
-                            <IonItem>
-                              <IonText color="danger">
-                                No Matches in your area. Pull down to refresh or change your distance.
-                              </IonText>
-                            </IonItem>
-                          </IonCard>
-                        )
-                        }
-                        </>
-                      )
-                    }
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-            </IonList>
+            <IonRow>
+              {
+                !hasValidProfile ? (
+                  <IonCard>
+                      <IonButton color="danger" expand="block" routerLink={"/profile"}>
+                        <IonText>
+                          Finish your profile
+                        </IonText>
+                      </IonButton>
+                    </IonCard>
+                ) : (
+                  <>
+                  { nearMeCount !== 0 ? (
+                    <ProfileCard profile={profile} swiped={swipe}/>
+                  ) : (
+                    <IonCard>
+                      <IonItem>
+                        <IonText color="danger">
+                          No Matches in your area. Pull down to refresh or change your distance.
+                        </IonText>
+                      </IonItem>
+                    </IonCard>
+                  )
+                  }
+                  </>
+                )
+              }
+            </IonRow>
           </IonContent>
 
         ) : (

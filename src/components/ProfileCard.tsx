@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Session } from '../models/Session';
 import { Speaker } from '../models/Speaker';
-import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonActionSheet, IonLabel, IonSkeletonText } from '@ionic/react';
+import { IonCard, IonCardHeader, IonItem, IonAvatar, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonActionSheet, IonLabel, IonSkeletonText, IonText, IonCardTitle, IonTitle, IonChip, IonSlides, IonSlide } from '@ionic/react';
 import { logoTwitter, shareAlt, chatboxes, calendar, body, pin, close, heart } from 'ionicons/icons';
 import { ActionSheetButton } from '@ionic/core';
 import { Profile } from '../models/Profile';
@@ -28,148 +28,151 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
 
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
+  const slides = useRef<HTMLIonSlidesElement>(null);
+
+  useEffect(() => {
+    if (profile && slides.current) {
+      (async () => 
+      {
+        if (!slides.current)
+          return;
+        await slides.current.update();
+        console.log('slides should have updated');
+      })();
+    }
+  }, [profile])
 
   return (
     <>
       {
         profile?
         <>
-        <IonCard className="speaker-card">
-          <IonCardHeader>
-            <IonItem detail={false} lines="none">
-              <IonAvatar slot="start">
-                <img src={profile.images.length > 0 ? profile.images[0].imageUrl: 'none'} alt="Pic" />
-              </IonAvatar>
-              {profile.firstName}
-            </IonItem>
-          </IonCardHeader>
-  
-          <IonCardContent class="outer-content">
-            <IonList>
-              <IonItem>
-                <IonIcon icon={calendar} slot="start"></IonIcon>
-                <IonLabel position="stacked">Age</IonLabel>
-                <IonLabel position="stacked">
-                  {calculateAge(profile.dob)}
-                </IonLabel> 
-              </IonItem>
-
-              <IonItem>
-                <IonIcon icon={body} slot="start"></IonIcon>
-                <IonLabel position="stacked">Height</IonLabel>
-                <IonLabel position="stacked">
-                  {profile.height? profile.height : 'N/A'}
-                </IonLabel> 
-              </IonItem>
-
-              <IonItem>
-                <IonIcon icon={pin} slot="start"></IonIcon>
-                <IonLabel position="stacked">Location</IonLabel>
-                <IonLabel position="stacked">
-                  D.C.
-                </IonLabel>
-              </IonItem>
-              <IonItem>
-                <p className="ion-padding-start ion-padding-end">
-                  { profile.about? profile.about : ''}
-                </p>
-              </IonItem>
-            </IonList>
-            
-            <IonRow justify-content-center>
-              <IonCol text-center size="6">
-                <IonButton
-                  fill="solid"
-                  size="small"
-                  color="danger"
-                  expand="block"
-                  onClick={() => swiped(false)}
-                >
-                  <IonIcon slot="start" icon={close} />
-                  Pass
-              </IonButton>
-              </IonCol>
-              <IonCol text-center size="6">
-                <IonButton 
-                  fill="solid" 
-                  size="small" 
-                  color="success"
-                  expand="block"
-                  onClick={() => swiped(true)}>
-                  <IonIcon slot="start" icon={heart} />
-                  Like
-              </IonButton>
-              </IonCol>
-              <IonCol>
-                <IonButton expand="block" routerLink={`/more/${profile.userId}`} >
-                  Profile
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          </IonCardContent>
-          <IonRow>
+        <IonCol size="12" size-md="6">
+          <IonCard className="speaker-card">
+          <IonSlides ref={slides} options={
             {
-              profile.images.map((img) => (
-                <IonCol size="4" size-md="2" key={img.imageId}>
-                  <IonCard>
-                    <IonButton onClick={() => {setShowImage(true); setBigImage(img.imageUrl);}}>
-                      <img src={img.imageUrl} width="100%" height="100%"></img>
-                    </IonButton>
-                  </IonCard>
-                </IonCol>
-              ))
+              slidesPerView: 1,
+              slidesPerColumn: 1,
+              slidesPerGroup: 1,
+              watchSlidesProgress: true,
+              spaceBetween: 0,
             }
-          </IonRow>
-        </IonCard>
+          }
+          style={{width:'100%', height: '100%'}}>
+          {
+          profile.images.map((img, key) => (
+            <IonSlide key={key}>
+              <img key={img.imageId}
+                src={img.imageUrl}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+                onClick={() => {
+                  setShowImage(true); setBigImage(img.imageUrl);
+                  }
+                }
+              />
+            </IonSlide>
+            ))
+          }
+          </IonSlides>
+          </IonCard>
+        </IonCol>
+        <IonCol size="12" size-md="6">
+          <IonCard >
+            <IonCardHeader translucent>
+              <IonCardTitle>
+                {profile.firstName}
+              </IonCardTitle>
+            </IonCardHeader>
+            <IonRow justify-content-center>
+                <IonCol text-center size="6">
+                  <IonButton
+                    fill="solid"
+                    size="small"
+                    color="danger"
+                    expand="block"
+                    onClick={() => swiped(false)}
+                  >
+                    <IonIcon slot="start" icon={close} />
+                    Pass
+                </IonButton>
+                </IonCol>
+                <IonCol text-center size="6">
+                  <IonButton 
+                    fill="solid" 
+                    size="small" 
+                    color="success"
+                    expand="block"
+                    onClick={() => swiped(true)}>
+                    <IonIcon slot="start" icon={heart} />
+                    Like
+                </IonButton>
+                </IonCol>
+                <IonCol>
+                  <IonButton expand="block" routerLink={`/more/${profile.userId}`} >
+                    Profile
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            <IonCardContent class="outer-content">
+              <IonChip color="primary" outline>
+                <IonIcon icon={calendar} />
+                <IonLabel>
+                  {calculateAge(profile.dob)}
+                </IonLabel>
+              </IonChip>
+              <IonChip color="secondary" outline>
+                <IonIcon icon={body} />
+                <IonLabel>
+                {profile.height}
+                </IonLabel>
+              </IonChip>
+            </IonCardContent>
+            <IonCardContent>
+              <p className="ion-padding-start ion-padding-end">
+                { profile.about? profile.about : ''}
+              </p>
+            </IonCardContent>
+          </IonCard>
+        </IonCol>
         </>
         :
-        <IonCard className="speaker-card">
-          <IonCardHeader>
-            <IonItem detail={false} lines="none">
-              <IonAvatar slot="start">
-              <IonSkeletonText animated style={{ width: '20%' }}/>
-              </IonAvatar>
-              <IonSkeletonText animated style={{ width: '80%' }}/>
-            </IonItem>
-          </IonCardHeader>
-  
-          <IonCardContent class="outer-content">
-            <IonList lines="none">
-              <IonItem>
-                <IonSkeletonText animated />
-              </IonItem>
-
-              <IonItem>
-                <IonSkeletonText animated />
-              </IonItem>
-
-              <IonItem>
-                <IonSkeletonText animated />
-              </IonItem>
-            </IonList>
-          </IonCardContent>
-  
-          <IonRow justify-content-center>
-            <IonCol>
-              <IonSkeletonText animated />
-            </IonCol>
-          </IonRow>
-          <IonRow justify-content-center>
-            <IonCol text-center size="6">
-              <IonSkeletonText animated style={{ width: '50%' }}/>
-              <IonSkeletonText animated style={{ width: '50%' }} />
-            </IonCol>
-          </IonRow>
-        </IonCard>
+        <IonCol>
+          <IonCard className="speaker-card">
+            <IonCardHeader>
+              <IonCardTitle>
+                <IonSkeletonText animated style={{ width: '100%' }}/>
+              </IonCardTitle>
+            </IonCardHeader>
+            <IonSkeletonText animated style={{ width: '100%', height: '40vh'}}/>
+            <IonCardContent class="outer-content">
+              <IonList lines="none">
+                <IonItem>
+                  <IonSkeletonText animated />
+                </IonItem>
+                <IonItem>
+                  <IonSkeletonText animated />
+                </IonItem>
+                <IonItem>
+                  <IonSkeletonText animated />
+                </IonItem>
+              </IonList>
+            </IonCardContent>
+          </IonCard>
+        </IonCol>
       }
+      <>
       {
-          showImage && (
-            <Lightbox
-              mainSrc={bigImage?bigImage:''}
-              onCloseRequest={() => setShowImage(false)}
-            />
-          )
+        showImage && (
+          <Lightbox
+            mainSrc={bigImage?bigImage:''}
+            onCloseRequest={() => setShowImage(false)}
+          />
+        )
       }
+      </>
     </>
   );
 };
