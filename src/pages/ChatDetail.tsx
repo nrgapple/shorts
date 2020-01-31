@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle, IonItem } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle, IonItem, IonToast } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -8,7 +8,7 @@ import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
-import { getMessages, configureChatClient, publishMessageForClient } from '../data/dataApi';
+import { getMessages, configureChatClient, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders } from '@stomp/stompjs';
 import moment from 'moment';
@@ -42,6 +42,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [client, setClient] = useState<Client | undefined>(undefined);
   const [isClientConnected, setIsClientConnected] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
+  const [recipientIsTyping, setRecipientIsTyping] = useState(false);
   const content = useRef(null);
   const value = useRef(null);
 
@@ -62,16 +64,36 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const onKeyPressed = (event: any) => {
     if (event.keyCode == 13) {
       sendMessage();
+    } 
+    //@ts-ignore
+    else if (value.current.value !== "") {
+      if (client && chat) {
+        if (typingTimeout)
+          clearTimeout(typingTimeout);
+        setTypingTimeout(undefined);
+        publishTypingForClient(client, chat.chatId, true);
+        setTypingTimeout(setTimeout(() => {
+          console.log(`You stopped typing.`);
+          publishTypingForClient(client, chat.chatId, false);
+        }, 5000));
+      }
+    //@ts-ignore
+    } else if (value.current.value === "") {
+      if (client && chat) {
+        publishTypingForClient(client, chat.chatId, false);
+      }
     }
   }
 
   const sendMessage = () => {
     // @ts-ignore
-    if (!userProfile || value.current.value === "" || !chat)
+    if (!userProfile || value.current.value === "" || !chat ||
+    !client)
       return;
 
     //@ts-ignore
     publishMessageForClient(client, chat.chatId, value.current.value);
+    publishTypingForClient(client, chat.chatId, false);
       //@ts-ignore
     value.current.value = '';
   }
@@ -86,7 +108,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }, 200);
   }
 
-
   useEffect(() => {
     if (token && chat && client && !isClientConnected)
       (async () => {
@@ -98,9 +119,25 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         configureChatClient(
           token,
           client,
-          chat.chatId,
           () => {
             console.log(`Connected to chat`);
+            subscribeToChatMessages(
+              client, 
+              chat.chatId,
+              (msg: Message) => {
+                console.log(msg);
+                setMessages(oldMessages => [...oldMessages, msg]
+                  .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+              },
+            );
+            subscribeToTypingForClient(
+              client,
+              chat.chatId,
+              (isTyping: boolean) => {
+                console.log(`isTyping is ${isTyping}`);
+                setRecipientIsTyping(isTyping);
+              },
+            )
             setIsClientConnected(true);
             setLoading(false);
           },
@@ -112,11 +149,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             console.log(`Websocket was closed for chat ${chat.chatId}`);
             setIsClientConnected(false);
           },
-          (msg: Message) => {
-            console.log(msg);
-            setMessages(oldMessages => [...oldMessages, msg]
-              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-          },
+          
           () => {
             setLoading(false);
           }
@@ -137,8 +170,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     setClient(new Client());
     return () => {
-      if (client)
+      if (client && chat) {
+        publishTypingForClient(client, chat.chatId, false);
         client.deactivate();
+      }
     }
   },[]);
 
@@ -211,6 +246,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     <IonButton slot="end" fill="clear" onClick={sendMessage}>
                       <IonIcon icon={send} />
                     </IonButton>
+                    <IonToast isOpen={recipientIsTyping}></IonToast>
                     <IonInput 
                       spellCheck 
                       autofocus 

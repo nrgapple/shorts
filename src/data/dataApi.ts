@@ -369,11 +369,9 @@ export const getChats = async (token: string | undefined) => {
 export const configureChatClient = (
   token: string | undefined, 
   client: Client | undefined,
-  chatId: number,
   onConnect: ()=> void,
   onDisconnect: () => void,
   onWebSocketClose: () => void,
-  onMessage: (msg: Message) => void,
   onWebSocketError: () => void,
   ) => {
   if (!token || !client) 
@@ -386,21 +384,6 @@ export const configureChatClient = (
     brokerURL: `wss://doctornelson.herokuapp.com/ws`,
     connectHeaders: stompHeader,
     onConnect: () => {
-      client.subscribe(`/chat/${chatId}`, response => {
-        console.log(response);
-        const data = JSON.parse(response.body);
-        
-        if (data) {
-          console.log(data);
-          onMessage({
-            content: data.content as string,
-            createdAt: new Date(data.createdAt) as Date,
-            fromUserId: data.fromUserId,
-            firstName: data.firstName,
-            lastName: data.lastName,
-          } as Message);
-        }
-      });
       onConnect();
     },
     onDisconnect: () => {
@@ -419,6 +402,44 @@ export const configureChatClient = (
   client.activate();
 }
 
+export const subscribeToChatMessages = (
+  client: Client,
+  chatId: number,
+  onMessage: (msg: Message) => void,
+) => {
+  client.subscribe(`/chat/${chatId}`, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    
+    if (data) {
+      console.log(data);
+      onMessage({
+        content: data.content as string,
+        createdAt: new Date(data.createdAt) as Date,
+        fromUserId: data.fromUserId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+      } as Message);
+    }
+  });
+}
+
+export const subscribeToTypingForClient = (
+  client: Client,
+  chatId: number,
+  onTyping: (isTyping: boolean) => void,
+) => {
+  client.subscribe(`/user/typing/${chatId}`, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    
+    if (data) {
+      console.log(data);
+      onTyping(data.isTyping as boolean);
+    }
+  });
+}
+
 export const publishMessageForClient = (
   client: Client,
   chatId: number,
@@ -435,6 +456,26 @@ export const publishMessageForClient = (
     client.publish({
       destination: `/app/message/${chatId}`, 
       body: JSON.stringify({message: message})
+    });
+    return true;
+  }
+}
+
+export const publishTypingForClient = (
+  client: Client,
+  chatId: number,
+  isTyping: boolean,
+) => {
+  if (!chatId)
+    return;
+  if (!client.connected) {
+    console.log(`client is not connected!`)
+    return;
+  }
+  if (client.webSocket.readyState === 1) {
+    client.publish({
+      destination: `/app/typing/${chatId}`, 
+      body: JSON.stringify({isTyping: isTyping})
     });
     return true;
   }
