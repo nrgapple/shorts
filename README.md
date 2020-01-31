@@ -1,9 +1,14 @@
-Shorts Dating App
-====
+# Shorts Dating App
 
 Shorts is a project to create a dating app using ionic and react
 
 ![image](https://user-images.githubusercontent.com/10817537/73545382-3f8fbb00-4409-11ea-9dd8-a29b75ee526b.png)
+
+## Backend API
+
+The backend API was developed by [@mattruddy](https://github.com/mattruddy).
+
+[Service API Documentation](/documentation/api.md)
 
 ## Development
 
@@ -15,7 +20,6 @@ Shorts is a project to create a dating app using ionic and react
 1. Create a branch (either from issue or just a branch)
 2. Commit and **make sure to reference the issue in the commit that you are working on (ex. update readme #8)**
 3. Pull request with **reference to issue** in description.
-
 
 ## Icon
 
