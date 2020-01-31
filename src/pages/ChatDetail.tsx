@@ -164,7 +164,19 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               ) : (
                   <IonList>
                     { messages &&
-                      messages.map((message: Message, key, array) => (
+                      messages.map((message: Message, key, array) => {
+                        const duration = moment.duration(Date.now() - message.createdAt.getTime());
+                        console.log(`Duration: ${duration.asHours()}`);
+                        const currMoment = moment(message.createdAt.toString());
+                        const timestamp = (() => {
+                          if (duration.asWeeks() > 1)
+                            return currMoment.format('dddd, MMMM Do YYYY');
+                          else if (duration.asDays() > 1)
+                            return currMoment.format('"ddd, h a"');
+                          else
+                            return currMoment.format('hh:mm a');
+                        })();
+                        return (
                         <div key={key}>
                          
                         
@@ -178,8 +190,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </IonText>
                             <p>
-                              {moment(message.createdAt.toString())
-                                .fromNow()}
+                              {timestamp}
                             </p>
                           </div>
                               </>
@@ -189,13 +200,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </IonText>
                             <p>
-                              {moment(message.createdAt.toString())
-                                .fromNow()}
+                              {timestamp}
                             </p>
                           </div>
                         )}
                         </div>
-                        ))
+                        )})
                     }
                   </IonList>
               )}
