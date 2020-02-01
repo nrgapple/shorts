@@ -435,7 +435,7 @@ export const subscribeToTypingForClient = (
     
     if (data) {
       console.log(data);
-      onTyping(data.isTyping as boolean);
+      onTyping(data.typing as boolean);
     }
   });
 }
