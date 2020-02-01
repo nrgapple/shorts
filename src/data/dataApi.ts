@@ -432,7 +432,6 @@ export const subscribeToTypingForClient = (
   client.subscribe(`/user/typing/${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
-    
     if (data) {
       console.log(data);
       onTyping(data.typing as boolean);
@@ -475,7 +474,7 @@ export const publishTypingForClient = (
   if (client.webSocket.readyState === 1) {
     client.publish({
       destination: `/app/typing/${chatId}`, 
-      body: JSON.stringify({isTyping: isTyping})
+      body: JSON.stringify({typing: isTyping})
     });
     return true;
   }
