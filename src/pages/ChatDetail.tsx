@@ -183,7 +183,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   return (
     <>
-        <IonPage id="session-detail-page">
+        <IonPage>
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
@@ -192,7 +192,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
             </IonToolbar>
           </IonHeader>
-            <IonContent scrollEvents={true} ref={content}>
+            <IonContent scrollEvents={true} ref={content} >
               <>
               {
               loading || !chat || !userProfile ? (
@@ -220,9 +220,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               </>
                         ) : (
                           <div slot="start" className="chat-bubble received">
-                            <IonText>
+                            <p>
                               {message.content}
-                            </IonText>
+                            </p>
                             <p>
                               {timestamp}
                             </p>
@@ -233,7 +233,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     }
                     {
                       recipientIsTyping && 
-                      <div slot="start" className="chat-bubble received">
+                      <div slot="start" color="white" className="chat-bubble typing">
                         <IonText>
                           Typing...
                         </IonText>
