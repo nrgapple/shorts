@@ -192,6 +192,60 @@ export const postLogin = async (
   }
 }
 
+export const postProfileInfo = async (
+  token: string | undefined,
+  about: string,
+  gender: string,
+  genderPref: string,
+  height: number,
+  miles: number,
+) => {
+  if (!token) {
+    return
+  } 
+  try {
+    const response = await Axios.request({
+      url: `${apiURL}/secure/profile`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        data: {
+          about: about,
+          gender: gender.toUpperCase(),
+          genderPref: genderPref.toUpperCase(),
+          height: height,
+          miles: miles,
+        }
+    });
+    const {data} = response;
+    const updatedProfile = {
+      userId: data.userId as number, 
+      firstName: data.firstName as string,
+      lastName: data.lastName as string,
+      about: data.about as string,
+      height: data.height as number,
+      dob: data.dob as Date,
+      username: data.username as string,
+      gender: data.gender.toLowerCase() as string,
+      genderPref: data.genderPref.toLowerCase() as string,
+      images: data.images.map((image: any) : Image => {
+        return {
+          imageId: image.imageId,
+          imageUrl: image.imageUrl,
+        }
+      }),
+      searchMiles: data.miles,
+    } as Profile;
+    return updatedProfile;
+  } catch (e) {
+    const {data} = e.response;
+    throw data;
+  }
+}
+
 export const postSignup = async (
   username: string,
   password: string,

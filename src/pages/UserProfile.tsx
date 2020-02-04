@@ -9,7 +9,7 @@ import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
 import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage } from '../data/dataApi';
+import { postImage, postProfileInfo } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
@@ -73,46 +73,16 @@ const About: React.FC<UserProfileProps> = ({
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     console.trace('updating profile submit');
-    if (!token)
-      return;
     try {
-      const response = await Axios.request({
-        url: `${apiURL}/secure/profile`,
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          data: {
-            about: about,
-            gender: gender.toUpperCase(),
-            genderPref: genderPref.toUpperCase(),
-            height: height,
-            miles: distance,
-          }
-      });
-      const {data} = response;
-      console.log(data);
-      const updatedProfile = {
-        userId: data.userId as number, 
-        firstName: data.firstName as string,
-        lastName: data.lastName as string,
-        about: data.about as string,
-        height: data.height as number,
-        dob: data.dob as Date,
-        username: data.username as string,
-        gender: data.gender.toLowerCase() as string,
-        genderPref: data.genderPref.toLowerCase() as string,
-        images: data.images.map((image: any) : Image => {
-          return {
-            imageId: image.imageId,
-            imageUrl: image.imageUrl,
-          }
-        }),
-        searchMiles: data.miles,
-      } as Profile;
-
+      const updatedProfile = await postProfileInfo(
+        token,
+        about,
+        gender,
+        genderPref,
+        height,
+        distance,
+      ) as Profile;
+      console.log(updatedProfile);
       setUserProfile(updatedProfile);
       setHasValidProfile(true);
       setIsEditing(false);
