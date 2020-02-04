@@ -52,7 +52,7 @@ export const setIsClientConnected = (connected: boolean) => async (dispatch: Rea
   } as const)
 };
 
-export const setClient = (client: Client) => async (dispatch: React.Dispatch<any>) => {
+export const setClient = (client?: Client) => async (dispatch: React.Dispatch<any>) => {
   return ({
     type: 'set-client',
     client,

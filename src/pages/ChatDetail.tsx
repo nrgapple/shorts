@@ -10,7 +10,7 @@ import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
 import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
-import { Client, StompHeaders } from '@stomp/stompjs';
+import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import moment from 'moment';
 import { getTimestamp } from '../util/util'
 
@@ -46,6 +46,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [recipientIsTyping, setRecipientIsTyping] = useState(false);
+  const [messageSub, setMessageSub] = useState<StompSubscription | undefined>(undefined)
+  const [typingSub, setTypingSub] = useState<StompSubscription | undefined>(undefined)
   const content = useRef(null);
   const value = useRef(null);
 
@@ -118,24 +120,29 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         console.log(userProfile);
         setLoading(true);
         await loadMessages(chat.chatId, token);
-        subscribeToChatMessages(
-          client, 
-          chat.chatId,
-          (msg: Message) => {
-            console.log(msg);
-            setMessages(oldMessages => [...oldMessages, msg]
-              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-          },
-        );
-        subscribeToTypingForClient(
-          client,
-          chat.chatId,
-          (isTyping: boolean) => {
-            console.log(`isTyping is ${isTyping}`);
-            setRecipientIsTyping(isTyping);
-          },
-        );
-
+        if (!messageSub) {
+          const chatSub =  subscribeToChatMessages(
+            client, 
+            chat.chatId,
+            (msg: Message) => {
+              console.log(msg);
+              setMessages(oldMessages => [...oldMessages, msg]
+                .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+            },
+          );
+          if (chatSub) setMessageSub(chatSub);
+        }
+        if (!typingSub) {
+          const typeSub = subscribeToTypingForClient(
+            client,
+            chat.chatId,
+            (isTyping: boolean) => {
+              console.log(`isTyping is ${isTyping}`);
+              setRecipientIsTyping(isTyping);
+            },
+          );
+          if (typeSub) setTypingSub(typeSub);
+        }
       })();
       
   }, [token, chat, client]);
@@ -152,7 +159,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     return () => {
       if (client && chat) {
         publishTypingForClient(client, chat.chatId, false);
-        client.deactivate();
+        if (typingSub) {
+          typingSub.unsubscribe();
+          setTypingSub(undefined);
+        }
+        if (messageSub) {
+          messageSub.unsubscribe();
+          setMessageSub(undefined);
+        }
       }
     }
   },[]);

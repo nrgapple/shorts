@@ -125,6 +125,13 @@ const IonicApp: React.FC<IonicAppProps> = ({
     console.log("here");
     loadCurrentLocation();
     // eslint-disable-next-line
+    return () => {
+      if (client) {
+        client.deactivate();
+        setClient(undefined);
+        setIsClientConnected(false);
+      }
+    }
   }, []);
 
   useEffect(() => {

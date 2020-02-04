@@ -520,7 +520,7 @@ export const subscribeToChatMessages = (
   chatId: number,
   onMessage: (msg: Message) => void,
 ) => {
-  client.subscribe(`/chat/${chatId}`, response => {
+  return client.subscribe(`/chat/${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     
@@ -542,7 +542,7 @@ export const subscribeToTypingForClient = (
   chatId: number,
   onTyping: (isTyping: boolean) => void,
 ) => {
-  client.subscribe(`/user/typing/${chatId}`, response => {
+  return client.subscribe(`/user/typing/${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
@@ -556,7 +556,7 @@ export const subscribeToChatNotifications = (
   client: Client,
   onNotification: (chatId: number, message: string) => void,
 ) => {
-  client.subscribe(`/user/notification/chat`, response => {
+  return client.subscribe(`/user/notification/chat`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
@@ -574,7 +574,7 @@ export const subscribeToMatchNotifications = (
   client: Client,
   onNotification: (profile: Profile) => void,
 ) => {
-  client.subscribe(`/user/notification/match`, response => {
+  return client.subscribe(`/user/notification/match`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
