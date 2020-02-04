@@ -37,7 +37,7 @@ import UserProfile from './pages/UserProfile';
 import HomeOrLogin from './components/HomeOrLogin';
 import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
-import { postUserLocation, configureClient } from './data/dataApi';
+import { postUserLocation, configureClient, subscribeToChatNotifications } from './data/dataApi';
 import { GeoPoint } from './models/GeoPoint';
 import ChatDetail from './pages/ChatDetail';
 import ProfileDetail from './pages/ProfileDetail';
@@ -69,6 +69,7 @@ interface DispatchProps {
   setToken: typeof setToken;
   loadAllInfo: typeof loadAllInfo;
   setIsClientConnected: typeof setIsClientConnected,
+  setClient: typeof setClient,
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
@@ -83,6 +84,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   loadAllInfo, 
   setIsLoggedIn, 
   setUsername, 
+  setClient,
   setToken, 
   loadConfData, 
   loadUserData, 
@@ -90,13 +92,20 @@ const IonicApp: React.FC<IonicAppProps> = ({
 }) => {
 
   const configure = () => {
-    if (token) {
+    if (token && client) {
       configureClient(
         token,
         client,
         () => {
           setIsClientConnected(true);
-          console.log(`Connected to chat`);
+          console.log(`Connected to socket`);
+          subscribeToChatNotifications(
+            client,
+            (chatId,
+              msg) => {
+                alert("New message");
+              }
+            )
         },
         () => {
           console.log(`Client disconnected`);
@@ -137,8 +146,11 @@ const IonicApp: React.FC<IonicAppProps> = ({
   }, [location])
 
   useEffect(() => {
+    console.log(`client changed: ${client}`);
+    if (!client) return;
+    console.log(`Now time to configure`);
     configure();
-  },[client])
+  }, [client])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
@@ -182,6 +194,16 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
   }),
-  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setIsClientConnected, setUsername, setToken, loadCurrentLocation, loadAllInfo,},
+  mapDispatchToProps: { 
+    loadConfData, 
+    loadUserData, 
+    setIsLoggedIn, 
+    setIsClientConnected, 
+    setUsername, 
+    setToken, 
+    loadCurrentLocation, 
+    loadAllInfo,
+    setClient,
+  },
   component: IonicApp
 });

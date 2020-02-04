@@ -18,6 +18,7 @@ const locationsUrl = '/assets/data/locations.json';
 const sessionsUrl = '/assets/data/sessions.json';
 const speakersUrl = '/assets/data/speakers.json';
 const apiURL = 'https://shortsdate.herokuapp.com';
+const socketURL = `wss://shortsdate.herokuapp.com/ws`;
 
 const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
@@ -493,7 +494,7 @@ export const configureClient = (
   const stompHeader = new StompHeaders();
   stompHeader.Authorization = `Bearer ${token}`;
   client.configure({
-    brokerURL: `wss://doctornelson.herokuapp.com/ws`,
+    brokerURL: socketURL,
     connectHeaders: stompHeader,
     onConnect: () => {
       onConnect();
