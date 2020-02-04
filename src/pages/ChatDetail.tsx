@@ -3,7 +3,7 @@ import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, 
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
-import { send } from 'ionicons/icons';
+import { send, flash } from 'ionicons/icons';
 import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
@@ -46,10 +46,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [recipientIsTyping, setRecipientIsTyping] = useState(false);
-  const [messageSub, setMessageSub] = useState<StompSubscription | undefined>(undefined)
-  const [typingSub, setTypingSub] = useState<StompSubscription | undefined>(undefined)
+  const [isMessageSub, setIsMessageSub] = useState(false);
+  const [isTypingSub, setIsTypingSub] = useState(false);
   const content = useRef(null);
   const value = useRef(null);
+  var subs = useRef<StompSubscription[]>([]);
 
   const loadMessages = async (chatId: number, token: string) => {
     try {
@@ -120,8 +121,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         console.log(userProfile);
         setLoading(true);
         await loadMessages(chat.chatId, token);
-        if (messageSub === undefined) {
-          const chatSub =  subscribeToChatMessages(
+        if (!isMessageSub) {
+          subs.current = [...subs.current, subscribeToChatMessages(
             client, 
             chat.chatId,
             (msg: Message) => {
@@ -129,22 +130,23 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               setMessages(oldMessages => [...oldMessages, msg]
                 .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
             },
-          );
-          if (chatSub) setMessageSub(chatSub);
+          )];
+          setIsMessageSub(true);
+          console.log(subs.current);
         }
-        if (typingSub === undefined) {
-          const typeSub = subscribeToTypingForClient(
+        if (!isTypingSub) {
+          subs.current = [...subs.current, subscribeToTypingForClient(
             client,
             chat.chatId,
             (isTyping: boolean) => {
               console.log(`isTyping is ${isTyping}`);
               setRecipientIsTyping(isTyping);
             },
-          );
-          if (typeSub) setTypingSub(typeSub);
+            )];
+            setIsTypingSub(true);
+            console.log(subs.current);
         }
       })();
-      
   }, [token, chat, client]);
 
   useEffect(() => {
@@ -160,14 +162,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       if (client && chat) {
         console.log(`Unsubscribing to chat`);
         publishTypingForClient(client, chat.chatId, false);
-        if (typingSub) {
-          typingSub.unsubscribe();
-          setTypingSub(undefined);
-        }
-        if (messageSub) {
-          messageSub.unsubscribe();
-          setMessageSub(undefined);
-        }
+        console.log(subs.current);
+        subs.current.forEach(s => s.unsubscribe());
       }
     }
   },[]);
