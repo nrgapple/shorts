@@ -58,6 +58,7 @@ interface StateProps {
   nearMe?: Profile[],
   location?: GeoPoint,
   client?: Client,
+  isClientConnected: boolean,
 }
 
 interface DispatchProps {
@@ -89,6 +90,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   loadConfData, 
   loadUserData, 
   loadCurrentLocation, 
+  isClientConnected,
 }) => {
 
   const configure = () => {
@@ -147,7 +149,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
 
   useEffect(() => {
     console.log(`client changed: ${client}`);
-    if (!client) return;
+    if (!client || isClientConnected) return;
     console.log(`Now time to configure`);
     configure();
   }, [client])
