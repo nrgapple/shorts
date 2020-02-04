@@ -555,18 +555,18 @@ export const subscribeToTypingForClient = (
 
 export const subscribeToChatNotifications = (
   client: Client,
-  onNotification: (chatId: number, message: string) => void,
+  onNotification: (chatId: number, message: Message) => void,
 ) => {
   return client.subscribe(`/user/notification/chat`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
-      if (!data.chatId || !data.message) {
+      if (!data.chatId || !data.messageResponse) {
         console.error(`incorrect data respose.`);
         return;
       }
       console.log(data);
-      onNotification(data.chatId as number, data.message as string);
+      onNotification(data.chatId as number, data.messagesResponse as Message);
     }
   });
 }
