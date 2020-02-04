@@ -120,7 +120,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         console.log(userProfile);
         setLoading(true);
         await loadMessages(chat.chatId, token);
-        if (!messageSub) {
+        if (messageSub === undefined) {
           const chatSub =  subscribeToChatMessages(
             client, 
             chat.chatId,
@@ -132,7 +132,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           );
           if (chatSub) setMessageSub(chatSub);
         }
-        if (!typingSub) {
+        if (typingSub === undefined) {
           const typeSub = subscribeToTypingForClient(
             client,
             chat.chatId,
@@ -158,6 +158,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     return () => {
       if (client && chat) {
+        console.log(`Unsubscribing to chat`);
         publishTypingForClient(client, chat.chatId, false);
         if (typingSub) {
           typingSub.unsubscribe();

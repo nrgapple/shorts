@@ -105,6 +105,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
             client,
             (chatId,
               msg) => {
+                console.log(`New message ${msg}`);
                 alert("New message");
               }
             )

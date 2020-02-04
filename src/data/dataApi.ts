@@ -471,6 +471,7 @@ export const getChats = async (token: string | undefined) => {
         chatId: chat.chatId,
         recipient: chat.recipient,
         lastMessage: new Date(chat.lastMessage) as Date,
+        lastUnreadMessage: chat.lastUnreadMessage,
       } as Chat));
     } catch (e) {
       const { data } = e.response;
