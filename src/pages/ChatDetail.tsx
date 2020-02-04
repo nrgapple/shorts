@@ -8,7 +8,7 @@ import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
-import { getMessages, configureChatClient, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
+import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
 import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders } from '@stomp/stompjs';
 import moment from 'moment';
@@ -22,6 +22,8 @@ interface StateProps {
   chat?: Chat,
   token?: string,
   loading?: boolean,
+  client?: Client,
+  isClientConnected: boolean,
 };
 
 interface DispatchProps {
@@ -35,13 +37,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   userProfile, 
   chat, 
   token, 
+  client,
+  isClientConnected,
   loading,
   loadChats,
   loadProfile,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [client, setClient] = useState<Client | undefined>(undefined);
-  const [isClientConnected, setIsClientConnected] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [recipientIsTyping, setRecipientIsTyping] = useState(false);
   const content = useRef(null);
@@ -116,43 +118,22 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         console.log(userProfile);
         setLoading(true);
         await loadMessages(chat.chatId, token);
-        configureChatClient(
-          token,
+        subscribeToChatMessages(
+          client, 
+          chat.chatId,
+          (msg: Message) => {
+            console.log(msg);
+            setMessages(oldMessages => [...oldMessages, msg]
+              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+          },
+        );
+        subscribeToTypingForClient(
           client,
-          () => {
-            console.log(`Connected to chat`);
-            subscribeToChatMessages(
-              client, 
-              chat.chatId,
-              (msg: Message) => {
-                console.log(msg);
-                setMessages(oldMessages => [...oldMessages, msg]
-                  .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-              },
-            );
-            subscribeToTypingForClient(
-              client,
-              chat.chatId,
-              (isTyping: boolean) => {
-                console.log(`isTyping is ${isTyping}`);
-                setRecipientIsTyping(isTyping);
-              },
-            )
-            setIsClientConnected(true);
-            setLoading(false);
+          chat.chatId,
+          (isTyping: boolean) => {
+            console.log(`isTyping is ${isTyping}`);
+            setRecipientIsTyping(isTyping);
           },
-          () => {
-            console.log(`Disconnect to chat ${chat.chatId}`);
-            setIsClientConnected(false);
-          },
-          () => {
-            console.log(`Websocket was closed for chat ${chat.chatId}`);
-            setIsClientConnected(false);
-          },
-          
-          () => {
-            setLoading(false);
-          }
         );
 
       })();
@@ -168,7 +149,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }, [token]);
 
   useEffect(() => {
-    setClient(new Client());
     return () => {
       if (client && chat) {
         publishTypingForClient(client, chat.chatId, false);
@@ -276,6 +256,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     userProfile: state.data.userProfile,
     token: state.user.token,
     loading: state.data.loading,
+    client: state.user.client,
+    isClientConnected: state.user.isClientConnected,
   }),
   mapDispatchToProps: {
     loadChats,

@@ -17,6 +17,10 @@ export function userReducer(state: UserState, action: UserActions): UserState {
       return { ...state, darkMode: action.darkMode };
     case 'set-is-loggedin':
       return { ...state, isLoggedin: action.loggedIn };
+    case 'set-is-client-connected':
+      return { ...state, isClientConnected: action.connected };
+    case 'set-client':
+      return { ...state, client: action.client };
     case 'set-current-location':
       return { ...state, location: action.point};
   }

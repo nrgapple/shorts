@@ -6,6 +6,7 @@ import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
 import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
+import { postLogin } from '../data/dataApi';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -47,32 +48,20 @@ const Login: React.FC<LoginProps> = ({
 
     if(username && password) {
       try {
-        const response = await axios.request({
-          url: `${apiURL}/public/login`,
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          data: {
-            username: username, 
-            password: password,
-          }
-        });
-        const { data } = response;
-        console.log(data);
+        const data = await postLogin(
+          username,
+          password, 
+        );
         if (!data.token) {
           setTokenError(true);
-          throw Error("No Token data!");
+          return
         }
-
         setIsLoggedIn(true);
         setTokenAction(data.token);
         setUsernameAction(username);
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
-        const { data } = await e.response;
-        if (data.message === "Invalid Credentials") {
+        if (e.message === "Invalid Credentials") {
           setValidationError(true);
         }
         console.log(`Error logging in. ${e}`);

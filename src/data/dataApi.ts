@@ -5,7 +5,7 @@ import { Location } from '../models/Location';
 import Axios from 'axios';
 import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
-import { male } from 'ionicons/icons';
+import { male, returnRight } from 'ionicons/icons';
 import { GeoPoint } from '../models/GeoPoint';
 import { Message } from '../models/Message';
 import { Chat } from '../models/Chat';
@@ -17,7 +17,7 @@ const { Storage } = Plugins;
 const locationsUrl = '/assets/data/locations.json';
 const sessionsUrl = '/assets/data/sessions.json';
 const speakersUrl = '/assets/data/speakers.json';
-const apiURL = 'https://doctornelson.herokuapp.com';
+const apiURL = 'https://shortsdate.herokuapp.com';
 
 const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
@@ -164,6 +164,64 @@ export const getCurrentLocation = async () => {
   } catch (e) {
     console.error(e);
   }  
+}
+
+export const postLogin = async (
+  username: string,
+  password: string,
+) => {
+  try {
+    const response = await Axios.request({
+      url: `${apiURL}/public/login`,
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: {
+        username: username, 
+        password: password,
+      }
+    });
+    const { data } = response;
+    console.log(data);
+    return data;
+  } catch (e) {
+    const {data} = e.response;
+    throw data
+  }
+}
+
+export const postSignup = async (
+  username: string,
+  password: string,
+  dob: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+) => {
+  try {
+    const response = await Axios.request({
+      url: `${apiURL}/public/signup`,
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: {
+        username: username, 
+        password: password,
+        dob: dob.toString(),
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+      }
+    });
+    const {data} = response;
+    return data;
+  } catch (e) {
+    return e.response;
+  }
 }
 
 export const postUserLocation = async (point: GeoPoint, token: string | undefined) =>
@@ -366,7 +424,7 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
-export const configureChatClient = (
+export const configureClient = (
   token: string | undefined, 
   client: Client | undefined,
   onConnect: ()=> void,
@@ -435,6 +493,42 @@ export const subscribeToTypingForClient = (
     if (data) {
       console.log(data);
       onTyping(data.typing as boolean);
+    }
+  });
+}
+
+export const subscribeToChatNotifications = (
+  client: Client,
+  onNotification: (chatId: number, message: string) => void,
+) => {
+  client.subscribe(`/user/notification/chat`, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    if (data) {
+      if (!data.chatId || !data.message) {
+        console.error(`incorrect data respose.`);
+        return;
+      }
+      console.log(data);
+      onNotification(data.chatId as number, data.message as string);
+    }
+  });
+}
+
+export const subscribeToMatchNotifications = (
+  client: Client,
+  onNotification: (profile: Profile) => void,
+) => {
+  client.subscribe(`/user/notification/match`, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    if (data) {
+      if (!data.profile) {
+        console.error(`no profile returned`);
+        return;
+      }
+      console.log(data);
+      onNotification(data.profile as Profile);
     }
   });
 }

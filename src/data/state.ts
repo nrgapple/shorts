@@ -25,6 +25,8 @@ export const initialState: AppState = {
     darkMode: false,
     isLoggedin: false,
     loading: false,
+    isClientConnected: false,
+    client: undefined,
   }
 };
 

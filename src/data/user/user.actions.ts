@@ -2,6 +2,7 @@ import { getUserData, setIsLoggedInData, setUsernameData, setHasSeenTutorialData
 import { ActionType } from '../../util/types';
 import { UserState } from './user.state';
 import { GeoPoint } from '../../models/GeoPoint';
+import { Client } from '@stomp/stompjs';
 
 
 export const loadUserData = () => async (dispatch: React.Dispatch<any>) => {
@@ -19,6 +20,7 @@ export const loadCurrentLocation = () => async (dispatch: React.Dispatch<any>) =
   await setLocationData(point);
   dispatch(setLoading(false));
 }
+
 
 export const setLoading = (isLoading: boolean) => ({
   type: 'set-user-loading',
@@ -42,6 +44,22 @@ export const setIsLoggedIn = (loggedIn: boolean) => async (dispatch: React.Dispa
     loggedIn
   } as const)
 };
+
+export const setIsClientConnected = (connected: boolean) => async (dispatch: React.Dispatch<any>) => {
+  return ({
+    type: 'set-is-client-connected',
+    connected
+  } as const)
+};
+
+export const setClient = (client: Client) => async (dispatch: React.Dispatch<any>) => {
+  return ({
+    type: 'set-client',
+    client,
+  } as const)
+};
+
+
 
 export const setUsername = (username?: string) => async (dispatch: React.Dispatch<any>) => {
   await setUsernameData(username);
@@ -90,6 +108,8 @@ export type UserActions =
   | ActionType<typeof setLoading>
   | ActionType<typeof setData>
   | ActionType<typeof setIsLoggedIn>
+  | ActionType<typeof setIsClientConnected>
+  | ActionType<typeof setClient>
   | ActionType<typeof setUsername>
   | ActionType<typeof setToken>
   | ActionType<typeof setHasSeenTutorial>

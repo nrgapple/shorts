@@ -6,7 +6,7 @@ import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
 import { loadNearMe } from '../data/sessions/sessions.actions';
-import { postUserLocation } from '../data/dataApi';
+import { postUserLocation, postSignup } from '../data/dataApi';
 import { GeoPoint } from '../models/GeoPoint';
 
 interface OwnProps extends RouteComponentProps {}
@@ -57,23 +57,14 @@ const Login: React.FC<LoginProps> = ({
 
     if(username && password) {
       try {
-        const response = await axios.request({
-          url: `${apiURL}/public/signup`,
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          data: {
-            username: username, 
-            password: password,
-            dob: dob.toString(),
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-          }
-        });
-        const { data } = response;
+        const data = await postSignup(
+          username,
+          password,
+          dob,
+          firstName,
+          lastName,
+          email
+        );
         console.log(data);
         if (!data.token)
         {
@@ -81,9 +72,9 @@ const Login: React.FC<LoginProps> = ({
           throw "No Token data!";
         }
 
-        await setIsLoggedIn(true);
-        await setTokenAction(data.token);
-        await setUsernameAction(username);
+        setIsLoggedIn(true);
+        setTokenAction(data.token);
+        setUsernameAction(username);
         if (point)
           await postUserLocation(point, data.token);
         history.push('/tabs/home', {direction: 'none'});

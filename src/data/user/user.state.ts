@@ -1,4 +1,5 @@
 import { GeoPoint } from "../../models/GeoPoint";
+import { Client } from "@stomp/stompjs";
 
 export interface UserState {
   isLoggedin: boolean;
@@ -8,4 +9,6 @@ export interface UserState {
   token?: string;
   loading: boolean;
   location?: GeoPoint;
+  client?: Client;
+  isClientConnected: boolean;
 };

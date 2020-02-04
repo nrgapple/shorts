@@ -27,7 +27,7 @@ import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
 import { loadConfData, loadAllInfo } from './data/sessions/sessions.actions';
-import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation } from './data/user/user.actions';
+import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -37,10 +37,11 @@ import UserProfile from './pages/UserProfile';
 import HomeOrLogin from './components/HomeOrLogin';
 import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
-import { postUserLocation } from './data/dataApi';
+import { postUserLocation, configureClient } from './data/dataApi';
 import { GeoPoint } from './models/GeoPoint';
 import ChatDetail from './pages/ChatDetail';
 import ProfileDetail from './pages/ProfileDetail';
+import { Client } from '@stomp/stompjs';
 
 const App: React.FC = () => {
   return (
@@ -56,6 +57,7 @@ interface StateProps {
   userProfile?: Profile,
   nearMe?: Profile[],
   location?: GeoPoint,
+  client?: Client,
 }
 
 interface DispatchProps {
@@ -66,11 +68,46 @@ interface DispatchProps {
   setUsername: typeof setUsername;
   setToken: typeof setToken;
   loadAllInfo: typeof loadAllInfo;
+  setIsClientConnected: typeof setIsClientConnected,
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
 
-const IonicApp: React.FC<IonicAppProps> = ({ darkMode, token, userProfile, nearMe, location, loadAllInfo, setIsLoggedIn, setUsername, setToken, loadConfData, loadUserData, loadCurrentLocation }) => {
+const IonicApp: React.FC<IonicAppProps> = ({ 
+  darkMode, 
+  token, 
+  userProfile, 
+  nearMe, 
+  location, 
+  client,
+  loadAllInfo, 
+  setIsLoggedIn, 
+  setUsername, 
+  setToken, 
+  loadConfData, 
+  loadUserData, 
+  loadCurrentLocation, 
+}) => {
+
+  const configure = () => {
+    if (token) {
+      configureClient(
+        token,
+        client,
+        () => {
+          setIsClientConnected(true);
+          console.log(`Connected to chat`);
+        },
+        () => {
+          console.log(`Client disconnected`);
+        },
+        () => {
+        },
+        () => {
+        }
+      );
+    }
+  }
 
   useEffect(() => {
     loadUserData();
@@ -82,6 +119,7 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, token, userProfile, nearM
   useEffect(() => {
     console.log(token);
     loadConfData();
+    setClient(new Client());
     //loadAllInfo(token);
     console.log(userProfile);
   }, [token])
@@ -97,6 +135,10 @@ const IonicApp: React.FC<IonicAppProps> = ({ darkMode, token, userProfile, nearM
     if (location)
       postUserLocation(location, token);
   }, [location])
+
+  useEffect(() => {
+    configure();
+  },[client])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
@@ -136,8 +178,10 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     token: state.user.token,
     userProfile: state.data.userProfile,
     nearMe: state.data.nearMe,
-    location: state.user.location
+    location: state.user.location,
+    client: state.user.client,
+    isClientConnected: state.user.isClientConnected,
   }),
-  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setUsername, setToken, loadCurrentLocation, loadAllInfo,},
+  mapDispatchToProps: { loadConfData, loadUserData, setIsLoggedIn, setIsClientConnected, setUsername, setToken, loadCurrentLocation, loadAllInfo,},
   component: IonicApp
 });
