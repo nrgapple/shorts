@@ -59,6 +59,13 @@ export const getGroupedFavorites = createSelector(
   }
 )
 
+export const getHasMessages = createSelector(
+  getChats,
+  (chats) => {
+    return chats?chats.some(x => x.hasUnreadMessages):false
+  }
+)
+
 const getIdParam = (_state: AppState, props: any) => {
   const stringParam = props.match.params['id'];
   return parseInt(stringParam, 10);

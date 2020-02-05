@@ -1,15 +1,24 @@
 import React  from 'react';
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/react';
+import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
 import { home, heart, chatboxes } from 'ionicons/icons';
 import Home from './Home';
 import MatchesList from './MatchesList';
 import ChatsList from './ChatsList';
 import ProfileDetail from './ProfileDetail';
+import {connect} from '../data/connect';
+import * as selectors from '../data/selectors';
+import { RouteComponentProps } from 'react-router-dom';
 
-interface MainTabsProps { }
+interface StateProps {
+  hasMessages: boolean,
+}
 
-const MainTabs: React.FC<MainTabsProps> = () => {
+interface MainTabsProps extends StateProps { }
+
+const MainTabs: React.FC<MainTabsProps> = ({
+  hasMessages,
+}) => {
 
   return (
     <IonTabs>
@@ -33,6 +42,7 @@ const MainTabs: React.FC<MainTabsProps> = () => {
           <IonLabel>Matches</IonLabel>
         </IonTabButton>
         <IonTabButton tab="chats" href="/tabs/chats">
+          {hasMessages && <IonBadge><IonIcon icon={heart}/></IonBadge>}
           <IonIcon icon={chatboxes} />
           <IonLabel>Chats</IonLabel>
         </IonTabButton>
@@ -41,4 +51,9 @@ const MainTabs: React.FC<MainTabsProps> = () => {
   );
 };
 
-export default MainTabs;
+export default connect<StateProps>({
+  mapStateToProps: (state) => ({
+    hasMessages: selectors.getHasMessages(state),
+  }),
+  component: MainTabs
+});
