@@ -1,5 +1,6 @@
 import { SessionsActions } from './sessions.actions';
 import { SessionsState } from './sessions.state';
+import { Chat } from '../../models/Chat';
 
 export const sessionsReducer = (state: SessionsState, action: SessionsActions): SessionsState => {
   switch (action.type) {
@@ -20,6 +21,9 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
     }
     case 'remove-chat': {
       return { ...state, chats: state.chats?[...(state.chats).filter(x => x.chatId !== action.chat.chatId)]:undefined };
+    }
+    case 'replace-chat': {
+      return { ...state, chats: state.chats?[...(state.chats).filter(x => x.chatId !== action.chat.chatId), action.chat]:undefined };
     }
     case 'add-match': {
       return { ...state, matches: [...(state.matches), action.match] };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IonCard, IonCardHeader, IonItem, IonAvatar, IonSkeletonText, IonIcon, IonLabel, IonButton, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/react';
 import { Profile } from '../models/Profile';
-import { contact, more } from 'ionicons/icons';
+import { contact, more, heart } from 'ionicons/icons';
 import { Chat } from '../models/Chat';
 import moment from 'moment';
 import { getTimestamp } from '../util/util';
@@ -34,9 +34,12 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
               {chat.recipient.firstName}
             </h1>
             <p>
-              {getTimestamp(chat.lastMessage)}
+              {getTimestamp(chat.lastMessage.createdAt)}
             </p>
           </IonLabel> 
+          {
+            chat.hasUnreadMessages && <IonIcon icon={heart} color="danger" slot="end"/>
+          }
         </IonItem>
         <IonItemOptions side="end">
           <IonItemOption color="danger" onClick={() => onAction(chat)}>Remove</IonItemOption>

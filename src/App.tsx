@@ -26,7 +26,7 @@ import './theme/variables.css';
 import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
-import { loadConfData, loadAllInfo } from './data/sessions/sessions.actions';
+import { loadConfData, loadAllInfo, addChat, removeChat, replaceChat } from './data/sessions/sessions.actions';
 import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
@@ -71,6 +71,7 @@ interface DispatchProps {
   loadAllInfo: typeof loadAllInfo;
   setIsClientConnected: typeof setIsClientConnected,
   setClient: typeof setClient,
+  replaceChat: typeof replaceChat,
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
@@ -91,6 +92,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   loadUserData, 
   loadCurrentLocation, 
   isClientConnected,
+  replaceChat,
 }) => {
 
   const configure = () => {
@@ -103,10 +105,9 @@ const IonicApp: React.FC<IonicAppProps> = ({
           console.log(`Connected to socket`);
           subscribeToChatNotifications(
             client,
-            (chatId,
-              msg) => {
-                console.log(`New message from ${msg.firstName}: ${msg.content}`);
-                alert("New message");
+            (chat) => {
+                console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
+                replaceChat(chat);
               }
             )
         },
@@ -214,6 +215,7 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     loadCurrentLocation, 
     loadAllInfo,
     setClient,
+    replaceChat,
   },
   component: IonicApp
 });

@@ -3,6 +3,7 @@ import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 import { Chat } from '../../models/Chat';
+import { Message } from '@stomp/stompjs';
 
 export const loadConfData = () => async (dispatch: React.Dispatch<any>) => {
   try {
@@ -95,7 +96,7 @@ export const loadChats = (token: string | undefined) => async (dispatch: React.D
   dispatch(setLoading(true));
   const chats = await getChats(token) as Chat[] | undefined;
   if (chats) {
-    chats.sort((a: Chat,b: Chat) => b.lastMessage.getTime() - a.lastMessage.getTime())
+    chats.sort((a: Chat,b: Chat) => b.lastMessage.createdAt.getTime() - a.lastMessage.createdAt.getTime())
   }
   dispatch(setData({chats: chats}));
   dispatch(setLoading(false));
@@ -129,6 +130,11 @@ export const addFavorite = (sessionId: number) => ({
 export const removeFavorite = (sessionId: number) => ({
   type: 'remove-favorite',
   sessionId
+} as const);
+
+export const replaceChat = (chat: Chat) => ({
+  type: 'replace-chat',
+  chat,
 } as const);
 
 export const addChat = (chat: Chat) => ({
@@ -178,3 +184,4 @@ export type SessionsActions =
   | ActionType<typeof setSearchText>
   | ActionType<typeof incrementProfileIndex>
   | ActionType<typeof setHasValidProfile>
+  | ActionType<typeof replaceChat>

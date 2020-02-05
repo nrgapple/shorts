@@ -470,8 +470,14 @@ export const getChats = async (token: string | undefined) => {
       return data.map((chat: any) : Chat => ({
         chatId: chat.chatId,
         recipient: chat.recipient,
-        lastMessage: new Date(chat.lastMessage) as Date,
-        lastUnreadMessage: chat.lastUnreadMessage,
+        lastMessage: {
+          content: chat.lastMessage.content,
+          firstName: chat.lastMessage.firstName,
+          lastName: chat.lastMessage.lastName,
+          fromUserId: chat.lastMessage.fromUserId,
+          createdAt: new Date(chat.lastMessage.createdAt) as Date,
+        } as Message,
+        hasUnreadMessages: chat.hasUnreadMessages,
       } as Chat));
     } catch (e) {
       const { data } = e.response;
@@ -555,18 +561,14 @@ export const subscribeToTypingForClient = (
 
 export const subscribeToChatNotifications = (
   client: Client,
-  onNotification: (chatId: number, message: Message) => void,
+  onNotification: (chat: Chat) => void,
 ) => {
   return client.subscribe(`/user/notification/chat`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
-      if (!data.chatId || !data.messageResponse) {
-        console.error(`incorrect data respose.`);
-        return;
-      }
       console.log(data);
-      onNotification(data.chatId as number, data.messagesResponse as Message);
+      onNotification(data);
     }
   });
 }

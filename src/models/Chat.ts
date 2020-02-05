@@ -4,6 +4,6 @@ import { Profile } from "./Profile";
 export interface Chat {
     chatId: number;
     recipient: Profile;
-    lastMessage: Date;
-    lastUnreadMessage?: string;
+    lastMessage: Message;
+    hasUnreadMessages: boolean
 }
