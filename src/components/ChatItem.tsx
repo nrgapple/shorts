@@ -33,8 +33,11 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
             <h1>
               {chat.recipient.firstName}
             </h1>
-            <p>
+            <h3>
               {getTimestamp(chat.lastMessage.createdAt)}
+            </h3>
+            <p>
+              {chat.lastMessage.content}
             </p>
           </IonLabel> 
           {
