@@ -9,7 +9,7 @@ import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
 import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
-import { setLoading, loadChats, loadProfile } from '../data/sessions/sessions.actions';
+import { setLoading, loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import moment from 'moment';
 import { getTimestamp } from '../util/util'
@@ -29,6 +29,7 @@ interface StateProps {
 interface DispatchProps {
   loadChats: typeof loadChats;
   loadProfile: typeof loadProfile;
+  replaceChat: typeof replaceChat;
 }
 
 type ChatDetailProps = OwnProps & StateProps & DispatchProps;
@@ -42,6 +43,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loading,
   loadChats,
   loadProfile,
+  replaceChat,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -145,6 +147,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             )];
             setIsTypingSub(true);
             console.log(subs.current);
+        }
+        if (chat.hasUnreadMessages) {
+          replaceChat({...chat, hasUnreadMessages: false})
         }
       })();
   }, [token, chat, client]);
@@ -273,6 +278,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapDispatchToProps: {
     loadChats,
     loadProfile,
+    replaceChat,
   },
   component: withRouter(ChatDetail)
 });
