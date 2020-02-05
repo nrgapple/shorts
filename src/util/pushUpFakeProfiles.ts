@@ -31,28 +31,32 @@ export const fillProfiles = async () => {
       location: {lat: profile.locationLat, lng: profile.locationLng} as GeoPoint,
       email: profile.email as string,
     })) as Data[];
-    const localProfiles = allLocalProfiles.slice(0, 30);
+    const localProfiles = allLocalProfiles.slice(7, 35);
     console.log(localProfiles);
-    // for await (const localProfile of localProfiles) {
-    //   const token = await postSignup(
+    
+    // for (const localProfile of localProfiles) {
+    //   const data = await postSignup(
     //     localProfile.username,
     //     "test",
-    //     localProfile.dob.toString(),
+    //     localProfile.dob.toISOString(),
     //     localProfile.firstName,
     //     localProfile.lastName,
     //     localProfile.email,
     //   );
+    //   console.log(data);
     //   if (localProfile.location) {
-    //     await postUserLocation(localProfile.location, token);
+    //     await postUserLocation(localProfile.location, data.token);
     //   }
-    //   await postProfileInfo(
-    //     token,
+    //   //await new Promise(resolve => setTimeout(resolve, 1000));
+    //   const updatedProfile = await postProfileInfo(
+    //     data.token,
     //     localProfile.about? localProfile.about: "",
     //     localProfile.gender? localProfile.gender: "male",
     //     localProfile.genderPref? localProfile.genderPref: "female",
     //     localProfile.height? localProfile.height: 50,
     //     localProfile.searchMiles? localProfile.searchMiles: 500,
     //   );
+    //   console.log(updatedProfile);
     // }
   } catch (e) {
     console.log(e);
