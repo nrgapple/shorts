@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonText, IonTextarea, IonToast } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonText, IonTextarea, IonToast, IonAlert } from '@ionic/react';
 import './Login.scss';
 import { connect } from '../data/connect';
+import { fillProfiles } from '../util/pushUpFakeProfiles';
 
 interface OwnProps { }
 
@@ -15,6 +16,7 @@ const Support: React.FC<SupportProps> = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [messageError, setMessageError] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const send = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ const Support: React.FC<SupportProps> = () => {
       </IonHeader>
       <IonContent>
 
-        <div className="login-logo">
+        <div className="login-logo" onClick={()=> setShowAlert(true)}>
           <img src="assets/img/appicon.svg" alt="Ionic logo" />
         </div>
 
@@ -66,9 +68,30 @@ const Support: React.FC<SupportProps> = () => {
             </IonCol>
           </IonRow>
         </form>
-       
+        <IonAlert 
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          header={'Are you sure you want to do this?'}
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              cssClass: 'secondary',
+              handler: () => {
+                console.log('Canceled');
+              }
+            },
+            {
+              text: 'Do it... now.',
+              handler: () => {
+                console.log('Filling up profiles. This could take a long time....');
+                fillProfiles();
+              }
+            }
+          ]}
+        />
       </IonContent>
-     
+      
       <IonToast
         isOpen={showToast}
         duration={3000}
