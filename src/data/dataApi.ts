@@ -568,7 +568,17 @@ export const subscribeToChatNotifications = (
     const data = JSON.parse(response.body);
     if (data) {
       console.log(data);
-      onNotification(data);
+
+      onNotification({
+          ...data,
+          lastMessage: {
+            content: data.lastMessage.content,
+            firstName: data.lastMessage.firstName,
+            lastName: data.lastMessage.lastName,
+            fromUserId: data.lastMessage.fromUserId,
+            createdAt: new Date(data.lastMessage.createdAt) as Date,
+          } as Message
+      });
     }
   });
 }
