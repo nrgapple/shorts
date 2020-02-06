@@ -3,7 +3,9 @@ import { Profile } from "../models/Profile";
 import { GeoPoint } from "../models/GeoPoint";
 import { postSignup, postUserLocation, postProfileInfo } from "../data/dataApi";
 
-const profiles = `/assets/data/profiles.json`
+const profiles = `/assets/data/profiles.json`;
+const key = `476f9d30`;
+const dataURL = `https://my.api.mockaroo.com/shorts_profiles.json?key=${key}`;
 
 interface Data extends Profile{
   email: string,
@@ -13,7 +15,10 @@ export const fillProfiles = async () => {
 
   try {
     const localProfilesResponse = await Axios.request({
-      url: profiles
+      url: dataURL,
+      headers: {
+        'Accept': 'application/json',
+      },
     });
     const { data: localProfilesData } = localProfilesResponse;
     const allLocalProfiles = localProfilesData.map((profile: any): Data => ({
