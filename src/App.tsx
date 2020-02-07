@@ -106,7 +106,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
           subscribeToChatNotifications(
             client,
             (chat) => {
-                console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
+                chat.lastMessage && console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
                 replaceChat(chat);
               }
             )

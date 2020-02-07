@@ -470,17 +470,17 @@ export const getChats = async (token: string | undefined) => {
       return data.map((chat: any) : Chat => ({
         chatId: chat.chatId,
         recipient: chat.recipient,
-        lastMessage: {
+        lastMessage: chat.lastMessage? {
           content: chat.lastMessage.content,
           firstName: chat.lastMessage.firstName,
           lastName: chat.lastMessage.lastName,
           fromUserId: chat.lastMessage.fromUserId,
           createdAt: new Date(chat.lastMessage.createdAt) as Date,
-        } as Message,
+        } as Message : undefined,
         hasUnreadMessages: chat.hasUnreadMessages,
       } as Chat));
     } catch (e) {
-      const { data } = e.response;
+      const { data } = e;
       throw data;
     }
   }

@@ -34,10 +34,10 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
               {chat.recipient.firstName}
             </h1>
             <h3>
-              {getTimestamp(chat.lastMessage.createdAt)}
+              {chat.lastMessage && getTimestamp(chat.lastMessage.createdAt)}
             </h3>
             <p>
-              {chat.lastMessage.content}
+              {chat.lastMessage && chat.lastMessage.content}
             </p>
           </IonLabel> 
           {

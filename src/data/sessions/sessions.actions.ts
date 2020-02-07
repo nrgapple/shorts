@@ -96,7 +96,13 @@ export const loadChats = (token: string | undefined) => async (dispatch: React.D
   dispatch(setLoading(true));
   const chats = await getChats(token) as Chat[] | undefined;
   if (chats) {
-    chats.sort((a: Chat,b: Chat) => b.lastMessage.createdAt.getTime() - a.lastMessage.createdAt.getTime())
+    chats.sort((a: Chat,b: Chat) => {
+      if (a.lastMessage === undefined)
+        return 1;
+      if (b.lastMessage === undefined)
+        return -1;
+      return b.lastMessage.createdAt.getTime() - a.lastMessage.createdAt.getTime();
+    });
   }
   dispatch(setData({chats: chats}));
   dispatch(setLoading(false));
