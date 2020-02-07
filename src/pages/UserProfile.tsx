@@ -11,6 +11,7 @@ import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, postProfileInfo } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
+import ImageCard from '../components/ImageCard';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
 interface OwnProps { 
@@ -115,11 +116,18 @@ const About: React.FC<UserProfileProps> = ({
     }
   }
 
-  const removeImage = async (imageId: number) => {
+  const removeImage = async (imageId: number | undefined) => {
     console.log(`Remove image: ${imageId}`);
+    if (!imageId) {
+      return;
+    }
     try {
       const index = images.findIndex(x => x.imageId === imageId);
-      setImages([...images.slice(0, index),...images.slice(index + 1)]);
+      console.log(images.length);
+      images.length < 2?
+      setImages(oldImages => [] as Image[]):
+      setImages(oldImages => [...oldImages.slice(0, index),...oldImages.slice(index + 1)]);
+      console.log(images);
       setToastText('Image removed successfully');
       setShowToast(true);
     } catch (e) {
@@ -189,26 +197,14 @@ const About: React.FC<UserProfileProps> = ({
               :
               <>
               <IonRow>
-                {
-                  images.map((img) => (
-                    <IonCol size="4" size-md="2" key={img.imageId}>
-                      <IonFab vertical="top" horizontal="end">
-                        { isEditing?
-                          <IonFabButton color="danger" onClick={() => removeImage(img.imageId)} style={{width: '3vw', height: '5vh'}} >
-                            <IonIcon  icon={close}></IonIcon>
-                          </IonFabButton>
-                          :
-                          <></>
-                        }
-                      </IonFab>
-                      <IonCard>
-                        <button onClick={() => {setBigImage(img.imageUrl); setShowImage(true)}}>
-                          <img src={img.imageUrl} width="100%" height="100%"></img>
-                        </button>
-                      </IonCard>
-                    </IonCol>
-                  ))
-                }
+                <IonCol size="12">
+                  <ImageCard 
+                    images={images}
+                    areDeletable={isEditing}
+                    onDelete={removeImage}
+                  />
+
+                </IonCol>
                 {
                   isEditing && (
                     <>
