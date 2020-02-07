@@ -35,7 +35,6 @@ const ImageCard: React.FC<ImageCardProps> = ({
     <>
       <IonCard className="home-card">
         <Swiper ref={slides} 
-        nextButton={false}
         scrollBar 
         navigation={false}
         swiperOptions={
