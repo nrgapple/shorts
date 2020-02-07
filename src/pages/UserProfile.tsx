@@ -9,7 +9,7 @@ import EditPopover from '../components/EditPopover';
 import Axios from 'axios';
 import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage, postProfileInfo } from '../data/dataApi';
+import { postImage, postProfileInfo, deleteImage } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
 import { userInfo } from 'os';
@@ -124,6 +124,7 @@ const About: React.FC<UserProfileProps> = ({
     try {
       const index = images.findIndex(x => x.imageId === imageId);
       console.log(images.length);
+      await deleteImage(imageId, token);
       images.length < 2 ?
         setImages(oldImages => [] as Image[]) :
         setImages(oldImages => [...oldImages.slice(0, index), ...oldImages.slice(index + 1)]);
