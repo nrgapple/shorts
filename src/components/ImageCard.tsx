@@ -34,14 +34,21 @@ const ImageCard: React.FC<ImageCardProps> = ({
   return (
     <>
       <IonCard className="home-card">
-        <Swiper ref={slides} swiperOptions={
+        <Swiper ref={slides} 
+        nextButton={false}
+        scrollBar 
+        navigation={false}
+        swiperOptions={
           {
             slidesPerView: 1,
             slidesPerColumn: 1,
             slidesPerGroup: 1,
-            slidesPerRow: 1,
-            watchSlidesProgress: true,
             spaceBetween: 0,
+            autoHeight: true,
+            centeredSlides: true,
+            pagination: false,
+            effect: 'flip',
+            navigation: false,
           }
         }
           style={{ width: '100%', height: '100%' }}>

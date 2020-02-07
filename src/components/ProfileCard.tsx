@@ -4,6 +4,7 @@ import { calendar, body, close, heart } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
+import ImageCard from './ImageCard';
 
 interface ProfileCardProps {
   profile?: Profile;
@@ -44,36 +45,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
         profile?
         <>
         <IonCol size="12" size-md="6">
-          <IonCard className="home-card">
-          <IonSlides ref={slides} options={
-            {
-              slidesPerView: 1,
-              slidesPerColumn: 1,
-              slidesPerGroup: 1,
-              watchSlidesProgress: true,
-              spaceBetween: 0,
-            }
-          }
-          style={{width:'100%', height: '100%'}}>
-          {
-          profile.images.map((img, key) => (
-            <IonSlide key={key}>
-              <img key={img.imageId}
-                src={img.imageUrl}
-                style={{
-                  height: "100%",
-                  width: "100%",
-                }}
-                onClick={() => {
-                  setShowImage(true); setBigImage(img.imageUrl);
-                  }
-                }
-              />
-            </IonSlide>
-            ))
-          }
-          </IonSlides>
-          </IonCard>
+          <ImageCard images={profile.images} areDeletable={false}/>
         </IonCol>
         <IonCol size="12" size-md="6">
           <IonCard className="home-card">
