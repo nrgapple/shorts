@@ -10,6 +10,7 @@ import { Profile } from '../models/Profile';
 import { calculateAge } from '../util/util';
 import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
+import InfoCard from '../components/InfoCard';
 
 
 interface OwnProps extends RouteComponentProps { };
@@ -65,75 +66,11 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
             <IonRow>
               <ImageCard areDeletable={false} images={profile.images}/>
             </IonRow>
-            <IonRow>
-              <IonCol>
-              <IonList lines="full">
-                <IonItem>
-                  <IonIcon icon={calendar} slot="start"></IonIcon>
-                  <IonLabel>
-                    <IonText color="primary">
-                      <h2>Age</h2>
-                    </IonText>
-                    <h2>
-                      {calculateAge(profile.dob)}
-                    </h2> 
-                  </IonLabel>
-                </IonItem>
-
-                <IonItem>
-                  <IonIcon icon={body} slot="start"></IonIcon>
-                  <IonLabel>
-                    <IonText color="primary">
-                      <h2>
-                        Height
-                      </h2>
-                    </IonText>
-
-                    <h2>
-                      {profile.height}
-                    </h2>
-                  </IonLabel>
-                </IonItem>
-              
-                <IonItem>
-                  <IonIcon icon={pin} slot="start"></IonIcon>
-                  <IonLabel>
-                    <IonText color="primary">
-                      <h2>
-                        Location
-                      </h2>
-                    </IonText>
-                    <h2>
-                      {profile.displayAddress}
-                    </h2>
-                  </IonLabel>
-                </IonItem>
-
-                <IonItem>
-                  <IonLabel position="stacked">
-                    <IonText color="primary">
-                      <h2>About</h2>
-                    </IonText>
-                  </IonLabel>
-                  <p>
-                    {profile.about} jaskdf asdk fasd faskd kdafasdfasdf \n sadkjfals
-                  </p>
-                </IonItem>
-              </IonList>
-            </IonCol>
-          </IonRow>
+            <InfoCard profile={profile}/>
           </>
           )
         }
       </IonContent>
-      {
-        showImage && (
-          <Lightbox
-            mainSrc={bigImage?bigImage:''}
-            onCloseRequest={() => setShowImage(false)}
-          />
-        )
-      }
     </IonPage>
   )
 };
