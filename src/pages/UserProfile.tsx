@@ -188,7 +188,7 @@ const About: React.FC<UserProfileProps> = ({
                 :
                 <>
                   <IonRow>
-                    <IonCol size="12">
+                    <IonCol size="12" size-md="6">
                       <ImageCard
                         images={images}
                         areDeletable={isEditing}
@@ -217,7 +217,7 @@ const About: React.FC<UserProfileProps> = ({
                   </IonRow>
                   <form noValidate onSubmit={updateProfile}>
                     <IonRow>
-                      <IonCol size="12">
+                      <IonCol size="12" size-md="6">
                         <IonCard>
                           <IonCardHeader translucent>
                             <IonCardTitle>
