@@ -3,7 +3,7 @@ import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, 
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
-import { send, flash } from 'ionicons/icons';
+import { send, flash, person } from 'ionicons/icons';
 import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
@@ -44,6 +44,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loadChats,
   loadProfile,
   replaceChat,
+  history,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -186,6 +187,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                 <IonBackButton defaultHref="/tabs/chats"></IonBackButton>
               </IonButtons>
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
+              {
+                chat &&
+                <IonButtons slot="end">
+                  <IonButton fill="clear" onClick={() => history.push(`/more/${chat.recipient.userId}`, {direction: 'forward'})}>
+                    <IonIcon icon={person}/>
+                  </IonButton>
+                </IonButtons>
+              }
             </IonToolbar>
           </IonHeader>
             <IonContent scrollEvents={true} ref={content} >

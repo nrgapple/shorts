@@ -9,6 +9,7 @@ import { loadNearMe, loadMatches } from '../data/sessions/sessions.actions';
 import { Profile } from '../models/Profile';
 import { calculateAge } from '../util/util';
 import Lightbox from 'react-image-lightbox';
+import ImageCard from '../components/ImageCard';
 
 
 interface OwnProps extends RouteComponentProps { };
@@ -62,17 +63,7 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
           ) : (
             <>
             <IonRow>
-              {
-                profile.images.map((img) => (
-                  <IonCol size="4" size-md="2" key={img.imageId}>
-                    <IonCard>
-                      <button onClick={() => {setBigImage(img.imageUrl); setShowImage(true)}}>
-                        <img src={img.imageUrl} width="100%" height="100%"></img>
-                      </button>
-                    </IonCard>
-                  </IonCol>
-                ))
-              }
+              <ImageCard areDeletable={false} images={profile.images}/>
             </IonRow>
             <IonRow>
               <IonCol>
