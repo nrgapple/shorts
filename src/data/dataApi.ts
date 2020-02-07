@@ -5,7 +5,6 @@ import { Location } from '../models/Location';
 import Axios from 'axios';
 import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
-import { male, returnRight } from 'ionicons/icons';
 import { GeoPoint } from '../models/GeoPoint';
 import { Message } from '../models/Message';
 import { Chat } from '../models/Chat';
@@ -145,6 +144,7 @@ export const getUserProfile = async (token: string | undefined) => {
             imageUrl: image.imageUrl,
           }
         }),
+        searchMiles: userProfileData.miles,
       } as Profile;
       console.log('api call data');
       console.log(userProfile);
