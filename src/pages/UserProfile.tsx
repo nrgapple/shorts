@@ -188,7 +188,7 @@ const About: React.FC<UserProfileProps> = ({
                 :
                 <>
                   <IonRow>
-                    <IonCol size="12" size-md="6">
+                    <IonCol size="12" size-md="4">
                       <ImageCard
                         images={images}
                         areDeletable={isEditing}
@@ -214,10 +214,8 @@ const About: React.FC<UserProfileProps> = ({
                         </>
                       )
                     }
-                  </IonRow>
                   <form noValidate onSubmit={updateProfile}>
-                    <IonRow>
-                      <IonCol size="12" size-md="6">
+                      <IonCol size="12" size-md="4">
                         <IonCard>
                           <IonCardHeader translucent>
                             <IonCardTitle>
@@ -338,17 +336,16 @@ const About: React.FC<UserProfileProps> = ({
                           }
                         </IonCard>
                       </IonCol>
-                    </IonRow>
                     {
                       isEditing &&
-                      <IonRow>
+                        <>
                         <IonCol>
                           <IonButton type="submit" expand="block">Update</IonButton>
                         </IonCol>
                         <IonCol>
                           <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
                         </IonCol>
-                      </IonRow>
+                        </>
                     }
                     </form>
                     {
@@ -357,6 +354,7 @@ const About: React.FC<UserProfileProps> = ({
                         <IonButton expand="block" onClick={() => setIsEditing(true)}>Edit</IonButton>
                       </IonCol>
                     }
+                </IonRow>
                 </>
             }
           </IonContent>
