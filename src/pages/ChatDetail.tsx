@@ -117,7 +117,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
 
   useEffect(() => {
-    if (token && chat && client && !isClientConnected)
+    if (token && chat && client && !isClientConnected && userProfile)
       (async () => {
         console.log(`chat`);
         console.log(chat);
@@ -133,7 +133,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               setMessages(oldMessages => [...oldMessages, msg]
                 .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
             },
-            `chat-${userProfile!.userId}`,
+            `chat-${userProfile.userId}`,
           )];
           setIsMessageSub(true);
           console.log(subs.current);
@@ -146,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               console.log(`isTyping is ${isTyping}`);
               setRecipientIsTyping(isTyping);
             },
-            `typing-${userProfile!.userId}`,
+            `typing-${userProfile.userId}`,
             )];
             setIsTypingSub(true);
             console.log(subs.current);
@@ -155,7 +155,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           replaceChat({...chat, hasUnreadMessages: false})
         }
       })();
-  }, [token, chat, client]);
+  }, [token, chat, client, userProfile]);
 
   useEffect(() => {
     if (token)
