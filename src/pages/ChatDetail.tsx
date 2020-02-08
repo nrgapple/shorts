@@ -133,7 +133,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               setMessages(oldMessages => [...oldMessages, msg]
                 .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
             },
-            userProfile!.userId,
+            `chat-${userProfile!.userId}`,
           )];
           setIsMessageSub(true);
           console.log(subs.current);
@@ -146,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               console.log(`isTyping is ${isTyping}`);
               setRecipientIsTyping(isTyping);
             },
-            userProfile!.userId,
+            `typing-${userProfile!.userId}`,
             )];
             setIsTypingSub(true);
             console.log(subs.current);

@@ -526,6 +526,7 @@ export const subscribeToChatMessages = (
   client: Client,
   chatId: number,
   onMessage: (msg: Message) => void,
+  subId: string,
 ) => {
   return client.subscribe(`/chat/${chatId}`, response => {
     console.log(response);
@@ -541,13 +542,14 @@ export const subscribeToChatMessages = (
         lastName: data.lastName,
       } as Message);
     }
-  });
+  }, {id: subId} as StompHeaders);
 }
 
 export const subscribeToTypingForClient = (
   client: Client,
   chatId: number,
   onTyping: (isTyping: boolean) => void,
+  subId: string,
 ) => {
   return client.subscribe(`/user/typing/${chatId}`, response => {
     console.log(response);
@@ -556,7 +558,7 @@ export const subscribeToTypingForClient = (
       console.log(data);
       onTyping(data.typing as boolean);
     }
-  });
+  }, {id: subId} as StompHeaders);
 }
 
 export const subscribeToChatNotifications = (
