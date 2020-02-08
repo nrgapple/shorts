@@ -4,7 +4,6 @@ import './Login.scss';
 import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions';
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
-import axios from 'axios';
 import { loadNearMe } from '../data/sessions/sessions.actions';
 import { postUserLocation, postSignup } from '../data/dataApi';
 import { GeoPoint } from '../models/GeoPoint';
@@ -29,7 +28,6 @@ const Login: React.FC<LoginProps> = ({
   history, 
   setUsername: setUsernameAction, 
   setToken: setTokenAction,
-  loadNearMe: loadNearMeAction,
   point,
 }) => {
 
@@ -43,7 +41,6 @@ const Login: React.FC<LoginProps> = ({
   const [usernameError, setUsernameError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [tokenError, setTokenError] = useState(false);
-  const apiURL = 'https://doctornelson.herokuapp.com';
 
   const signup = async (e: React.FormEvent) => {
     e.preventDefault();
