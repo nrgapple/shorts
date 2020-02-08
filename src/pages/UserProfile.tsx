@@ -321,7 +321,7 @@ const About: React.FC<UserProfileProps> = ({
                                 <IonItem>
                                   <IonRange step={5} min={1} max={1000} pin value={distance} onIonChange={e => setDistance(e.detail.value as number)}>
                                     <IonLabel slot="start">1</IonLabel>
-                                    <IonLabel slot="end">500</IonLabel>
+                                    <IonLabel slot="end">1000</IonLabel>
                                   </IonRange>
                                 </IonItem>
                                 <IonItemDivider>
