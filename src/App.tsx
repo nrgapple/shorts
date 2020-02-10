@@ -26,7 +26,7 @@ import './theme/variables.css';
 import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
-import { loadConfData, loadAllInfo, addChat, removeChat, replaceChat } from './data/sessions/sessions.actions';
+import { loadAllInfo, addChat, removeChat, replaceChat } from './data/sessions/sessions.actions';
 import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
@@ -62,7 +62,6 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  loadConfData: typeof loadConfData;
   loadUserData: typeof loadUserData;
   loadCurrentLocation: typeof loadCurrentLocation
   setIsLoggedIn: typeof setIsLoggedIn;
@@ -88,7 +87,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setUsername, 
   setClient,
   setToken, 
-  loadConfData, 
   loadUserData, 
   loadCurrentLocation, 
   isClientConnected,
@@ -139,17 +137,10 @@ const IonicApp: React.FC<IonicAppProps> = ({
 
   useEffect(() => {
     console.log(token);
-    loadConfData();
     setClient(new Client());
-    //loadAllInfo(token);
+    loadAllInfo(token);
     console.log(userProfile);
   }, [token])
-  
-  useEffect(() => {
-    console.log(token);
-    console.log(userProfile);
-    console.log(nearMe);
-  }, [userProfile])
 
   useEffect(() => {
     console.log(`About post location: token: ${token} -- ${location?location.lat:null}`);
@@ -207,7 +198,6 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     isClientConnected: state.user.isClientConnected,
   }),
   mapDispatchToProps: { 
-    loadConfData, 
     loadUserData, 
     setIsLoggedIn, 
     setIsClientConnected, 

@@ -1,5 +1,4 @@
 import { Machine } from 'xstate'
-import {loadNearMe} from '../data/sessions/sessions.actions'
 
 export const homeMachine = Machine({
   id: 'home',
@@ -10,6 +9,18 @@ export const homeMachine = Machine({
       on: {
         LOAD: {
           target: 'loading',
+          actions: 'fetchData',
+        },
+        NOT_LOGGED_IN: {
+          target: 'notLoggedIn',
+        }
+      },
+    },
+    resetting: {
+      on: {
+        LOAD: {
+          target: 'loading',
+          actions: 'fetchData',
         },
         NOT_LOGGED_IN: {
           target: 'notLoggedIn',
@@ -17,23 +28,58 @@ export const homeMachine = Machine({
       },
     },
     loading: {
-      entry: ['load'],
       on: {
         FOUND_NO_USER_PROFILES: {
-          target: 'unFinishedProfile'
+          target: 'unFinishedProfile',
         },
         LOADED_NOTHING: {
-          target: 'noMatches'
+          target: 'noMatches',
         },
         LOADED_MATCHES: {
-          target: 'matches'
+          target: 'matches',
         },
-      }
+        RESET: {
+          target: 'start',
+        },
+      },
     },
-    noMatches: {},
-    matches: {},
-    unFinishedProfile: {},
-    notLoggedIn: {},
+    noMatches: {
+      on: {
+        LOAD: {
+          target: 'loading',
+          actions: 'fetchData',
+        },
+        RESET: {
+          target: 'resetting',
+        },
+      },
+    },
+    matches: {
+      on: {
+        LOAD: {
+          target: 'loading',
+          actions: 'fetchData',
+        },
+        RESET: {
+          target: 'resetting',
+        },
+      },
+
+    },
+    unFinishedProfile: {
+      on: {
+        RESET: {
+          target: 'resetting',
+        },
+      },
+    },
+    notLoggedIn: {
+      on: {
+        RESET: {
+          target: 'resetting',
+        },
+      },
+    },
   }
 });
 

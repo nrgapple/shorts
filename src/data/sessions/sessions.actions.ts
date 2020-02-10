@@ -1,22 +1,9 @@
-import { getConfData, getMatches, getUserProfile, getNearMe, getChats, getMessages } from '../dataApi';
+import { getMatches, getUserProfile, getNearMe, getChats, getMessages } from '../dataApi';
 import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 import { Chat } from '../../models/Chat';
 import { Message } from '@stomp/stompjs';
-
-export const loadConfData = () => async (dispatch: React.Dispatch<any>) => {
-  try {
-    dispatch(setLoading(true));
-    const data = await getConfData();
-    dispatch(setData({
-      ...data, 
-     }));
-    dispatch(setLoading(false));
-  } catch (e) {
-    throw e;
-  }
-}
 
 export const loadAllInfo = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   var profile = undefined;
@@ -34,7 +21,7 @@ export const loadAllInfo = (token: string | undefined) => async (dispatch: React
     dispatch(setHasValidProfile(true));
   } catch (e) {
     console.log(e);
-    if (e.code === "400") {
+    if (e.code === 400) {
       console.log('invalid profile');
       dispatch(setHasValidProfile(false))
     } 

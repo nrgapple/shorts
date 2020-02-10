@@ -45,10 +45,10 @@ const Home: React.FC<HomeProps> = ({
 
   const [currentMatch, setCurrentMatch] = useState(profile);
   const [showMatch, setShowMatch] = useState(false);
-  const [homeState, homeSend] = useMachine(homeMachine, {
+  const [homeState, homeSend, homeService] = useMachine(homeMachine, {
     actions: {
-      load: () => {
-        console.log('entry to loading nearme');
+      fetchData: () => {
+        console.log('transition with fetching data');
         loadNearMe(token)
       },
     }
@@ -57,12 +57,18 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     console.log(`loading near me.`);
+    if (!homeState.matches('start'))
+      homeSend('RESET');
     console.log(homeState.value);
-    if (isLoggedin && token && userProfile && homeSend) {
-      homeSend('LOAD');
-      console.log('move to loading');
+    if (!isLoggedin) {
+      homeSend('NOT_LOGGED_IN');
+      return;
     }
-  }, [userProfile, isLoggedin, token, homeSend]);
+    if (token && userProfile && homeSend) {
+      console.log('move to loading');
+      homeSend('LOAD');
+    }
+  }, [userProfile, isLoggedin, token, homeSend, hasValidProfile]);
 
   useEffect(() => {
     console.log(`Home state: ${homeState.value}`)
@@ -86,6 +92,15 @@ const Home: React.FC<HomeProps> = ({
       }
     }
   }, [nearMeCount, profile, loading, profile])
+
+  useEffect(() => {
+    const subscription = homeService.subscribe(state => {
+      // simple state logging
+      console.log(state);
+    });
+  
+    return subscription.unsubscribe;
+  }, [homeService]); // note: service should never change
 
   const swipe = async (liked: boolean) => {
     console.log(`Handling swipe`);
@@ -131,9 +146,9 @@ const Home: React.FC<HomeProps> = ({
       <IonContent className="">
         <IonRefresher slot="fixed"
           onIonRefresh={(event: any) => {
+            console.log('here man')
+            homeSend({type: 'LOAD', action: 'fetchData'});
             setTimeout(() => {
-              profile = undefined;
-              loadNearMe(token);
               event.detail.complete();
             }, 1000);
           }}
@@ -144,33 +159,39 @@ const Home: React.FC<HomeProps> = ({
         <IonRow>
           {
             homeState.matches('unFinishedProfile') ? (
-              <IonCard>
-                <IonButton color="danger" expand="block" routerLink={"/profile"}>
-                  <IonText>
-                    Finish your profile
-                  </IonText>
-                </IonButton>
-              </IonCard>
+              <IonCol size="12" size-md="6">
+                <IonCard>
+                  <IonButton color="danger" expand="block" routerLink={"/profile"}>
+                    <IonText>
+                      Finish your profile
+                    </IonText>
+                  </IonButton>
+                </IonCard>
+              </IonCol>
             ) : homeState.matches('matches') ? (
-              <>
-                <ProfileCard profile={profile} swiped={swipe} />
-              </>
-            ) : homeState.matches('matches') ? (
-              <IonCard>
-                <IonItem>
-                  <IonText color="danger">
-                    No Matches in your area. Pull down to refresh or change your distance.
-                  </IonText>
-                </IonItem>
-              </IonCard>
+              <ProfileCard profile={profile} swiped={swipe} />
             ) : homeState.matches('loading') ? (
-              <IonCard>
-                <IonButton expand="block" routerLink={"/Login"}>
-                  <IonText>
-                    Please Login
-                  </IonText>
-                </IonButton>
-              </IonCard>
+              <ProfileCard profile={undefined} swiped={swipe} />
+            ) : homeState.matches('matches') ? (
+              <IonCol size="12" size-md="6">
+                <IonCard>
+                  <IonItem>
+                    <IonText color="danger">
+                      No Matches in your area. Pull down to refresh or change your distance.
+                    </IonText>
+                  </IonItem>
+                </IonCard>
+              </IonCol>
+            ) : homeState.matches('notLoggedIn') ? (
+              <IonCol size="12" size-md="6">
+                <IonCard>
+                  <IonButton expand="block" routerLink={"/Login"}>
+                    <IonText>
+                      Please Login
+                    </IonText>
+                  </IonButton>
+                </IonCard>
+              </IonCol>
             ) : null
           }
         </IonRow>
