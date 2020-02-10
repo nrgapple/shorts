@@ -27,28 +27,6 @@ const DARK_MODE = 'darkMode';
 const LOCATION = 'location';
 const HAS_VALID_PROFILE = 'hasValidProfile';
 
-export const getConfData = async () => {
-  const response = await Promise.all([
-    fetch(sessionsUrl),
-    fetch(locationsUrl),
-    fetch(speakersUrl)]);
-  const sessions = await response[0].json() as Session[];
-  const locations = await response[1].json() as Location[];
-  const speakers = await response[2].json() as Speaker[];
-  const allTracks = sessions
-    .reduce((all, session) => all.concat(session.tracks), [] as string[])
-    .filter((trackName, index, array) => array.indexOf(trackName) === index)
-    .sort();
-  const data = {
-    sessions,
-    locations,
-    speakers,
-    allTracks,
-    filteredTracks: [...allTracks],
-  }
-  return data;
-}
-
 export const getUserData = async () => {
   const response = await Promise.all([
     Storage.get({ key: HAS_LOGGED_IN }),
