@@ -91,10 +91,10 @@ export const swipeMachine = Machine({
     idle: {
       on: {
         SWIPED_LEFT: {
-          target: 'like',
+          target: 'pass',
         },
         SWIPED_RIGHT: {
-          target: 'pass',
+          target: 'like',
         }
       }
     },
@@ -102,7 +102,11 @@ export const swipeMachine = Machine({
       entry: ['onLike'],
       on: {
         SUCCESS: {
-          target: 'loadingNext',
+          target: 'idle',
+          actions: 'next'
+        },
+        GOT_MATCH: {
+          target: 'match'
         }
       }
     },
@@ -110,24 +114,19 @@ export const swipeMachine = Machine({
       entry: ['onPass'],
       on: {
         SUCCESS: {
-          target: 'loadingNext',
+          target: 'idle',
+          actions: 'next'
         }
       }
     },
     match: {
-      entry: ['match'],
+      entry: ['onMatch'],
       on: {
         DISMISS: {
-          target: 'loadingNext',
+          target: 'idle',
+          actions: 'next',
         }
       }
     },
-    loadingNext: {
-      on: {
-        DONE : {
-          target: 'idle'
-        }
-      }
-    }
   }
 });

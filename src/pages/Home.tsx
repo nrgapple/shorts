@@ -53,7 +53,13 @@ const Home: React.FC<HomeProps> = ({
       },
     }
   });
-  const [swipeState, swipeSend] = useMachine(swipeMachine);
+  const [swipeState, swipeSend] = useMachine(swipeMachine, {
+    actions: {
+      onPass: () => swipe(false),
+      onLike: () => swipe(true),
+      onMatch: () => setShowMatch(true),
+    }
+  });
 
   useEffect(() => {
     console.log(`loading near me.`);
@@ -111,18 +117,18 @@ const Home: React.FC<HomeProps> = ({
 
     try {
       const isMatch = await postSwipe(profile.userId, liked, token);
-
       if (!isMatch === undefined) {
         console.log(`incorrect data returned.`);
+        swipeSend('SUCCESS');
       }
-
       if (isMatch) {
         console.log(`You got a match!`);
         setCurrentMatch(profile);
+        swipeSend('GOT_MATCH');
       } else {
         console.log(`No match yet cuz isMatch: ${isMatch}`);
+        swipeSend('SUCCESS')
       }
-
       incrementProfileIndexAction();
     } catch (e) {
       console.log(e);
@@ -169,7 +175,9 @@ const Home: React.FC<HomeProps> = ({
                 </IonCard>
               </IonCol>
             ) : homeState.matches('matches') ? (
-              <ProfileCard profile={profile} swiped={swipe} />
+              <>
+              {swipeState.matches('idle') && <ProfileCard profile={profile} swiped={(choice: boolean) => swipeSend(choice?'SWIPED_RIGHT':'SWIPED_LEFT')} />}
+              </>
             ) : homeState.matches('loading') ? (
               <ProfileCard profile={undefined} swiped={swipe} />
             ) : homeState.matches('matches') ? (
