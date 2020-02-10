@@ -102,7 +102,7 @@ export const swipeMachine = Machine({
       entry: ['onLike'],
       on: {
         SUCCESS: {
-          target: 'idle',
+          target: 'loadingNextProfile',
           actions: 'next'
         },
         GOT_MATCH: {
@@ -114,7 +114,7 @@ export const swipeMachine = Machine({
       entry: ['onPass'],
       on: {
         SUCCESS: {
-          target: 'idle',
+          target: 'loadingNextProfile',
           actions: 'next'
         }
       }
@@ -123,10 +123,18 @@ export const swipeMachine = Machine({
       entry: ['onMatch'],
       on: {
         DISMISS: {
-          target: 'idle',
-          actions: 'next',
+          target: 'loadingNextProfile',
         }
       }
     },
+    loadingNextProfile: {
+      entry: ['onNext'],
+      on: {
+        SUCCESS: {
+          target: 'idle',
+          actions: 'next'
+        }
+      }
+    }
   }
 });

@@ -8,7 +8,7 @@ import { Profile } from '../models/Profile';
 import ProfileCard from '../components/ProfileCard';
 import { postSwipe, getNearMe } from '../data/dataApi';
 import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
-import { close, heart } from 'ionicons/icons';
+import { close, heart, send } from 'ionicons/icons';
 import { homeMachine, swipeMachine } from '../machines/homeMachines';
 
 interface OwnProps {
@@ -57,12 +57,24 @@ const Home: React.FC<HomeProps> = ({
     actions: {
       onPass: () => swipe(false),
       onLike: () => swipe(true),
-      onMatch: () => setShowMatch(true),
+      onMatch: () => {swipeSend('DISMISS');},
+      onNext: () => {
+        incrementProfileIndexAction();
+        setTimeout(() => {
+          swipeSend('SUCCESS');
+        }, 200);
+      },
+      next: () => {
+        console.log(`checking next profile ${profile}`);
+        if (!profile) {
+          homeSend('RESET');
+          init();
+        }
+      }
     }
   });
 
-  useEffect(() => {
-    console.log(`loading near me.`);
+  const init = () => {
     if (!homeState.matches('start'))
       homeSend('RESET');
     console.log(homeState.value);
@@ -74,6 +86,10 @@ const Home: React.FC<HomeProps> = ({
       console.log('move to loading');
       homeSend('LOAD');
     }
+  }
+
+  useEffect(() => {
+    init();
   }, [userProfile, isLoggedin, token, homeSend, hasValidProfile]);
 
   useEffect(() => {
@@ -129,7 +145,6 @@ const Home: React.FC<HomeProps> = ({
         console.log(`No match yet cuz isMatch: ${isMatch}`);
         swipeSend('SUCCESS')
       }
-      incrementProfileIndexAction();
     } catch (e) {
       console.log(e);
       if (e.message === "Already swiped user") {
@@ -180,7 +195,7 @@ const Home: React.FC<HomeProps> = ({
               </>
             ) : homeState.matches('loading') ? (
               <ProfileCard profile={undefined} swiped={swipe} />
-            ) : homeState.matches('matches') ? (
+            ) : homeState.matches('noMatches') ? (
               <IonCol size="12" size-md="6">
                 <IonCard>
                   <IonItem>

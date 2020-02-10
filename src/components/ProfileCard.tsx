@@ -28,6 +28,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
   const slides = useRef<HTMLIonSlidesElement>(null);
 
   useEffect(() => {
+    console.log(profile);
     if (profile && slides.current) {
       (async () => 
       {
