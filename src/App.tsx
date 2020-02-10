@@ -108,8 +108,9 @@ const IonicApp: React.FC<IonicAppProps> = ({
             (chat) => {
                 chat.lastMessage && console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
                 replaceChat(chat);
-              }
-            )
+              },
+            `notify-chat-${userProfile!.userId}`,
+            );
         },
         () => {
           console.log(`Client disconnected`);
@@ -158,10 +159,10 @@ const IonicApp: React.FC<IonicAppProps> = ({
 
   useEffect(() => {
     console.log(`client changed: ${client}`);
-    if (!client || isClientConnected) return;
+    if (!client || isClientConnected || !userProfile) return;
     console.log(`Now time to configure`);
     configure();
-  }, [client])
+  }, [client, userProfile])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>

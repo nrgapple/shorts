@@ -564,6 +564,7 @@ export const subscribeToTypingForClient = (
 export const subscribeToChatNotifications = (
   client: Client,
   onNotification: (chat: Chat) => void,
+  subId: string,
 ) => {
   return client.subscribe(`/user/notification/chat`, response => {
     console.log(response);
@@ -582,7 +583,7 @@ export const subscribeToChatNotifications = (
           } as Message
       });
     }
-  });
+  }, {id: subId} as StompHeaders);
 }
 
 export const subscribeToMatchNotifications = (
