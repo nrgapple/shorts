@@ -6,6 +6,9 @@ import Lightbox from "react-image-lightbox";
 //@ts-ignore
 import {Swiper, Slide} from 'react-dynamic-swiper';
 import 'react-dynamic-swiper/lib/styles.css';
+import {
+  useWindowSize,
+} from '@react-hook/window-size/throttled'
 
 interface ImageCardProps {
   images: Image[];
@@ -21,6 +24,8 @@ const ImageCard: React.FC<ImageCardProps> = ({
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<any>(null);
+  const [width, height] = useWindowSize();
+
 
   const onClick = async () => {
     if (slides.current) {
@@ -30,6 +35,13 @@ const ImageCard: React.FC<ImageCardProps> = ({
         await onDelete(images[swiper.realIndex] ? images[swiper.realIndex].imageId : undefined);
     }
   }
+
+  useEffect(() => {
+    if (slides.current) {
+      const swiper = slides.current.swiper();
+      swiper.update();
+    }
+  }, [width, height]);
 
   return (
     <>
