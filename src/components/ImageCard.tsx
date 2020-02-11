@@ -60,6 +60,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
             pagination: false,
             effect: 'flip',
             navigation: false,
+            grabCursor: true,
           }
         }
           style={{ width: '100%', height: '100%' }}>
