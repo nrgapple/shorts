@@ -193,29 +193,31 @@ const About: React.FC<UserProfileProps> = ({
                         images={images}
                         areDeletable={isEditing}
                         onDelete={removeImage}
-                      />
+                      >
+                        {
+                          isEditing && (
+                            <>
+                              <IonCol size="12" size-md="6">
+                                <IonCard>
+                                  <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
+                                  {
+                                    inputImage && (
+                                      <IonButton onClick={uploadImage}>
+                                        Upload
+                                  </IonButton>
+                                    )
+                                  }
+                                </IonCard>
+                              </IonCol>
+                            </>
+                          )
+                        }
+                      </ImageCard>
 
                     </IonCol>
-                    {
-                      isEditing && (
-                        <>
-                          <IonCol size="12" size-md="6">
-                            <IonCard>
-                              <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
-                              {
-                                inputImage && (
-                                  <IonButton onClick={uploadImage}>
-                                    Upload
-                            </IonButton>
-                                )
-                              }
-                            </IonCard>
-                          </IonCol>
-                        </>
-                      )
-                    }
-                  <form noValidate onSubmit={updateProfile}>
-                      <IonCol size="12" size-md="4">
+
+                      <IonCol size="12" size-md="6">
+                        <form noValidate onSubmit={updateProfile}>
                         <IonCard>
                           <IonCardHeader translucent>
                             <IonCardTitle>
@@ -330,31 +332,33 @@ const About: React.FC<UserProfileProps> = ({
                                 </IonLabel>
                                 </IonItemDivider>
                                 <IonItem>
-                                  <IonTextarea value={about} onIonChange={e => setAbout(e.detail.value!)} autoGrow spellCheck={true}></IonTextarea>
+                                  <IonTextarea 
+                                    value={about} 
+                                    onIonChange={e => setAbout(e.detail.value!)} 
+                                    autoGrow 
+                                    spellCheck={true}
+                                    rows={4}
+                                  ></IonTextarea>
                                 </IonItem>
                               </IonList>
                           }
+                        {
+                          isEditing &&
+                          <>
+                            <IonButton type="submit" expand="block">Update</IonButton>
+                            <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
+                          </>
+                        }
+                        {
+                          !isEditing &&
+                            <IonButton expand="block" onClick={() => setIsEditing(true)}>Edit</IonButton>
+                        }
                         </IonCard>
+                        </form>
                       </IonCol>
-                    {
-                      isEditing &&
-                        <>
-                        <IonCol>
-                          <IonButton type="submit" expand="block">Update</IonButton>
-                        </IonCol>
-                        <IonCol>
-                          <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
-                        </IonCol>
-                        </>
-                    }
-                    </form>
-                    {
-                      !isEditing &&
-                      <IonCol>
-                        <IonButton expand="block" onClick={() => setIsEditing(true)}>Edit</IonButton>
-                      </IonCol>
-                    }
-                </IonRow>
+
+                    
+                  </IonRow>
                 </>
             }
           </IonContent>

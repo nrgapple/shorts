@@ -20,6 +20,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
   images,
   areDeletable,
   onDelete,
+  children,
 }) => {
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
@@ -38,6 +39,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
 
   useEffect(() => {
     if (slides.current) {
+      console.log('update width');
       const swiper = slides.current.swiper();
       swiper.update();
     }
@@ -60,6 +62,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
             pagination: false,
             effect: 'flip',
             navigation: false,
+            grabCursor: true,
           }
         }
           style={{ width: '100%', height: '100%' }}>
@@ -69,6 +72,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
               <Slide key={key}>
                 <img key={img.imageId}
                   src={img.imageUrl}
+                  alt="no img"
                   style={{
                     height: "100%",
                     width: "100%",
@@ -83,6 +87,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
               <Slide>
                 <img 
                   src="https://via.placeholder.com/150?text=No+Image"
+                  alt="no img"
                   style={{
                     height: "100%",
                     width: "100%",
@@ -92,16 +97,13 @@ const ImageCard: React.FC<ImageCardProps> = ({
             )
           }
         </Swiper>
-
-
-      </IonCard>
-      <IonCard>
         {
           areDeletable &&
             <IonButton expand="block" color="danger" onClick={  () => onClick()}>
                 Delete
             </IonButton>
         }
+        {children}
       </IonCard>
       {
         showImage && (
