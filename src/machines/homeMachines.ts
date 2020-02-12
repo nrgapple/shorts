@@ -1,4 +1,4 @@
-import { Machine } from 'xstate'
+import { Machine } from 'xstate';
 
 export const homeMachine = Machine({
   id: 'home',

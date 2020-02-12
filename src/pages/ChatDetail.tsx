@@ -12,7 +12,10 @@ import { getMessages, publishMessageForClient, publishTypingForClient, subscribe
 import { setLoading, loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
 import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import moment from 'moment';
-import { getTimestamp } from '../util/util'
+import { getTimestamp } from '../util/util';
+import { chatMachine } from '../machines/chatDetailMachines';
+import { useMachine } from '@xstate/react';
+import { stateValuesEqual } from 'xstate/lib/State';
 
 
 interface OwnProps extends RouteComponentProps { };
@@ -48,12 +51,81 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
-  const [recipientIsTyping, setRecipientIsTyping] = useState(false);
-  const [isMessageSub, setIsMessageSub] = useState(false);
-  const [isTypingSub, setIsTypingSub] = useState(false);
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
+  const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
+    loadMessages: async () => {
+      if (chat && token) {
+        await loadMessages(chat.chatId, token);
+        chatSend('SUCCESS');
+      }
+    },
+    sendMessage: () => {
+      //@ts-ignore
+      publishMessageForClient(client, chat.chatId, value.current.value);
+      chatSend('SENT');
+    },
+    clearInput: () => {
+      //@ts-ignore
+      value.current.value = '';
+    },
+    sendTyping: () => {
+      publishTypingForClient(client!, chat!.chatId, true);
+    },
+    resetTypingTimout: () => {
+      if (typingTimeout)
+        clearTimeout(typingTimeout);
+      setTypingTimeout(undefined);
+      setTypingTimeout(setTimeout(() => {
+        console.log(`You stopped typing.`);
+        chatSend('STOPPED')
+      }, 5000));
+    },
+    stopTyping: () => {
+      if (typingTimeout)
+        clearTimeout(typingTimeout);
+      setTypingTimeout(undefined);
+      publishTypingForClient(client!, chat!.chatId, false);
+    },
+    scrollToTheBottom: () => {
+      setTimeout(() => {
+        scrollToTheBottom();
+      }, 200);
+    },
+    subToChat: () => {
+      subs.current = [...subs.current, subscribeToChatMessages(
+        client!, 
+        chat!.chatId,
+        (msg: Message) => {
+          console.log(msg);
+          setMessages(oldMessages => [...oldMessages, msg]
+            .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+        },
+        `chat-${userProfile!.userId}`,
+      )];
+      console.log(subs.current);
+      chatSend('SUCCESS');
+    },
+    subToTyping: () => {
+      subs.current = [...subs.current, subscribeToTypingForClient(
+        client!,
+        chat!.chatId,
+        (isTyping: boolean) => {
+          console.log(`isTyping is ${isTyping}`);
+        },
+        `typing-${userProfile!.userId}`,
+      )];
+      console.log(subs.current);
+      chatSend("SUCCESS");
+    },
+    getUnreadMessages: () => {
+      if (chat!.hasUnreadMessages) {
+        replaceChat({...chat!, hasUnreadMessages: false})
+      }
+      chatSend('SUCCESS');
+    }
+  });
 
   const loadMessages = async (chatId: number, token: string) => {
     try {
@@ -70,40 +142,23 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
   
   const onKeyPressed = (event: any) => {
-    if (event.keyCode === 13) {
-      sendMessage();
-    } 
+    
     //@ts-ignore
-    else if (value.current.value !== "") {
-      if (client && chat) {
-        if (typingTimeout)
-          clearTimeout(typingTimeout);
-        setTypingTimeout(undefined);
-        publishTypingForClient(client, chat.chatId, true);
-        setTypingTimeout(setTimeout(() => {
-          console.log(`You stopped typing.`);
-          publishTypingForClient(client, chat.chatId, false);
-        }, 5000));
+    if (value.current.value !== "") {
+      if (event.keyCode === 13) {
+        if (chatState.matches({ready: 'idle'}) || chatState.matches({ready: 'typing'})) {
+          chatSend('SENT');
+        }
+      } 
+      else if (chatState.matches({ready: 'idle'}) || chatState.matches({ready: 'typing'})) {
+        chatSend('TYPED');
       }
     //@ts-ignore
-    } else if (value.current.value === "") {
-      if (client && chat) {
-        publishTypingForClient(client, chat.chatId, false);
+    } else {
+      if (chatState.matches({ready: 'typed'})) {
+        chatSend('STOPPED');
       }
     }
-  }
-
-  const sendMessage = () => {
-    // @ts-ignore
-    if (!userProfile || value.current.value === "" || !chat ||
-    !client)
-      return;
-
-    //@ts-ignore
-    publishMessageForClient(client, chat.chatId, value.current.value);
-    publishTypingForClient(client, chat.chatId, false);
-      //@ts-ignore
-    value.current.value = '';
   }
   
   const scrollToTheBottom = () => {
@@ -116,47 +171,32 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }, 200);
   }
 
+  const getProgress = () => {
+    if (chatState.matches({idle: 'wait'}))
+      return .2;
+    else if (chatState.matches({int: {fetchMessages: 'loadMessages'}}))
+      return .4;
+    else if (chatState.matches({int: {fetchMessages: 'getUnreadMessages'}}))
+      return .6;
+    else if (chatState.matches('subscribe'))
+      return .8;
+    else if (chatState.matches('idle'))
+      return 1;
+  }
+
+  // 
   useEffect(() => {
-    if (token && chat && client && !isClientConnected && userProfile)
-      (async () => {
-        console.log(`chat`);
-        console.log(chat);
-        console.log(userProfile);
-        setLoading(true);
-        await loadMessages(chat.chatId, token);
-        if (!isMessageSub) {
-          subs.current = [...subs.current, subscribeToChatMessages(
-            client, 
-            chat.chatId,
-            (msg: Message) => {
-              console.log(msg);
-              setMessages(oldMessages => [...oldMessages, msg]
-                .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-            },
-            `chat-${userProfile.userId}`,
-          )];
-          setIsMessageSub(true);
-          console.log(subs.current);
+    if (token && 
+        chat && 
+        client && 
+        !isClientConnected && 
+        userProfile &&
+        chatState.matches({init: 'wait'})) {
+          chatSend('DEPENDENCIES_LOADED');
         }
-        if (!isTypingSub) {
-          subs.current = [...subs.current, subscribeToTypingForClient(
-            client,
-            chat.chatId,
-            (isTyping: boolean) => {
-              console.log(`isTyping is ${isTyping}`);
-              setRecipientIsTyping(isTyping);
-            },
-            `typing-${userProfile.userId}`,
-            )];
-            setIsTypingSub(true);
-            console.log(subs.current);
-        }
-        if (chat.hasUnreadMessages) {
-          replaceChat({...chat, hasUnreadMessages: false})
-        }
-      })();
   }, [token, chat, client, userProfile]);
 
+  // Get dependencies once we have our token.
   useEffect(() => {
     if (token)
     {
@@ -165,6 +205,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
   }, [token]);
 
+  // Clean up subs.
   useEffect(() => {
     return () => {
       if (client && chat) {
@@ -176,6 +217,17 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
   },[]);
 
+  // Log the states.
+  useEffect(() => {
+    const subscription = chatService.subscribe(state => {
+      // simple state logging
+      console.log(state);
+    });
+  
+    return subscription.unsubscribe;
+  }, [chatService]); // note: service should never change
+
+  // Scroll to the bottom if new massages.
   useEffect(() => {
     scrollToTheBottom();
   }, [messages])
@@ -202,8 +254,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             <IonContent scrollEvents={true} ref={content} >
               <>
               {
-              loading || !chat || !userProfile ? (
-                <IonProgressBar type="indeterminate" />
+              chatState.matches('ready')? (
+                <IonProgressBar type="determinate" value={getProgress()}/>
               ) : (
                   <IonList>
                     { messages &&
@@ -212,7 +264,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                         return (
                         <div key={key}>
                         {
-                        message.fromUserId === userProfile.userId? (<>
+                        message.fromUserId === userProfile!.userId? (<>
                           <IonText>
                           
                         </IonText>
@@ -239,7 +291,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                         )})
                     }
                     {
-                      recipientIsTyping && 
+                      chatState.matches({ready: 'typing'}) && 
                       <div slot="start" color="white" className="chat-bubble typing">
                         <IonText>
                           Typing...
@@ -251,11 +303,20 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               </>
             </IonContent>
             {
-              !(loading || !chat || !userProfile) &&
+              chatState.matches('ready') &&
               (
                 <IonFooter>
                   <IonToolbar>
-                    <IonButton slot="end" fill="clear" onClick={sendMessage}>
+                    <IonButton 
+                      slot="end" 
+                      fill="clear" 
+                      onClick={(e) => {
+                        //@ts-ignore
+                        value.current.value !== "" &&
+                        chatSend('SENT')
+                      }}
+                      disabled={chatState.matches({ready: 'sendMessage'})}
+                    >
                       <IonIcon icon={send} />
                     </IonButton>
                     <IonInput 
