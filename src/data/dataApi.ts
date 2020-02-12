@@ -9,6 +9,7 @@ import { GeoPoint } from '../models/GeoPoint';
 import { Message } from '../models/Message';
 import { Chat } from '../models/Chat';
 import { StompHeaders, Client } from '@stomp/stompjs';
+import moment from 'moment';
 
 
 const { Storage } = Plugins;
@@ -70,7 +71,7 @@ export const getNearMe = async (token: string | undefined) => {
           lastName: Profile.lastName as string,
           about: Profile.about as string,
           height: Profile.height as number,
-          dob: Profile.dob as Date,
+          dob: moment(Profile.dob).toDate() as Date,
           username: Profile.username as string,
           images: Profile.images.map((image: any) : Image => {
             return {
@@ -111,7 +112,7 @@ export const getUserProfile = async (token: string | undefined) => {
         lastName: userProfileData.lastName as string,
         about: userProfileData.about as string,
         height: userProfileData.height as number,
-        dob: userProfileData.dob as Date,
+        dob: moment(userProfileData.dob).toDate() as Date,
         username: userProfileData.username as string,
         gender: userProfileData.gender?userProfileData.gender.toLowerCase(): undefined,
         genderPref: userProfileData.gender?userProfileData.genderPref.toLowerCase(): undefined,
@@ -206,7 +207,7 @@ export const postProfileInfo = async (
       lastName: data.lastName as string,
       about: data.about as string,
       height: data.height as number,
-      dob: data.dob as Date,
+      dob: moment(data.dob).toDate() as Date,
       username: data.username as string,
       gender: data.gender.toLowerCase() as string,
       genderPref: data.genderPref.toLowerCase() as string,
@@ -396,7 +397,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
           firstName: message.firstName as string,
           lastName: message.lastName as string,
           content: message.content as string,
-          createdAt: new Date(message.createdAt) as Date,
+          createdAt: moment(message.createdAt).toDate() as Date,
         }
       }) as Message[];
     } catch (e) {
@@ -453,7 +454,7 @@ export const getChats = async (token: string | undefined) => {
           firstName: chat.lastMessage.firstName,
           lastName: chat.lastMessage.lastName,
           fromUserId: chat.lastMessage.fromUserId,
-          createdAt: new Date(chat.lastMessage.createdAt) as Date,
+          createdAt: moment(chat.lastMessage.createdAt).toDate() as Date,
         } as Message : undefined,
         hasUnreadMessages: chat.hasUnreadMessages,
       } as Chat));
@@ -514,7 +515,7 @@ export const subscribeToChatMessages = (
       console.log(data);
       onMessage({
         content: data.content as string,
-        createdAt: new Date(data.createdAt) as Date,
+        createdAt: moment(data.createdAt).toDate() as Date,
         fromUserId: data.fromUserId,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -557,7 +558,7 @@ export const subscribeToChatNotifications = (
             firstName: data.lastMessage.firstName,
             lastName: data.lastMessage.lastName,
             fromUserId: data.lastMessage.fromUserId,
-            createdAt: new Date(data.lastMessage.createdAt) as Date,
+            createdAt: moment(data.lastMessage.createdAt).toDate() as Date,
           } as Message
       });
     }
