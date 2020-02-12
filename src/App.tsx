@@ -91,6 +91,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   loadCurrentLocation, 
   isClientConnected,
   replaceChat,
+  setIsClientConnected
 }) => {
 
   const configure = () => {
