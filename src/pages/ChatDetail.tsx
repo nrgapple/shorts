@@ -1,22 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonRow, IonCol, IonFooter, IonProgressBar, IonTitle, IonItem, IonToast } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
-import { send, flash, person } from 'ionicons/icons';
+import { send, person } from 'ionicons/icons';
 import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
 import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
-import { setLoading, loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
-import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
-import moment from 'moment';
+import { loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
+import { Client, StompSubscription } from '@stomp/stompjs';
 import { getTimestamp } from '../util/util';
 import { chatMachine } from '../machines/chatDetailMachines';
 import { useMachine } from '@xstate/react';
-import { stateValuesEqual } from 'xstate/lib/State';
-
 
 interface OwnProps extends RouteComponentProps { };
 
@@ -43,7 +40,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   token, 
   client,
   isClientConnected,
-  loading,
   loadChats,
   loadProfile,
   replaceChat,
@@ -54,7 +50,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
-  const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
+  const [ chatState, chatSend ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
         if (chat && token) {
@@ -112,7 +108,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           `chat-${userProfile!.userId}`,
         )];
         console.log(subs.current);
-        chatSend('SUCCESS');
+        chatSend('SUB_CHAT_SUCCESS');
       },
       subToTyping: () => {
         subs.current = [...subs.current, subscribeToTypingForClient(
@@ -125,7 +121,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           `typing-${userProfile!.userId}`,
         )];
         console.log(subs.current);
-        chatSend("SUCCESS");
+        chatSend("SUB_TYPING_SUCCESS");
       },
       getUnreadMessages: () => {
         console.log('getting unread');
@@ -197,7 +193,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       return 1;
   }
 
-  // 
+  // Wait for all dependencies.
   useEffect(() => {
     if (token && 
         chat && 
@@ -229,16 +225,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   },[]);
-
-  // Log the states.
-  useEffect(() => {
-    const subscription = chatService.subscribe(state => {
-      // simple state logging
-      console.log(state);
-    });
-  
-    return subscription.unsubscribe;
-  }, [chatService]); // note: service should never change
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
@@ -272,7 +258,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               ) : (
                   <IonList>
                     { messages &&
-                      messages.map((message: Message, key, array) => {
+                      messages.map((message: Message, key) => {
                         const timestamp = getTimestamp(message.createdAt);
                         return (
                         <div key={key}>
@@ -323,7 +309,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     <IonButton 
                       slot="end" 
                       fill="clear" 
-                      onClick={(e) => {
+                      onClick={() => {
                         //@ts-ignore
                         value.current.value !== "" &&
                         chatSend('USER_SENT');

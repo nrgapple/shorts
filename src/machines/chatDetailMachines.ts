@@ -54,7 +54,7 @@ export const chatMachine = Machine({
             start: {
               entry: ['subToChat'],
               on: {
-                SUCCESS: 'success',
+                SUB_CHAT_SUCCESS: 'success',
               },
             },
             success: { type: 'final' },
@@ -66,7 +66,7 @@ export const chatMachine = Machine({
             start: {
               entry: ['subToTyping'],
               on: {
-                SUCCESS: 'success',
+                SUB_TYPING_SUCCESS: 'success',
               },
             },
             success: { type: 'final' },
