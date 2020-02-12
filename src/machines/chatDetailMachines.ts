@@ -77,45 +77,72 @@ export const chatMachine = Machine({
     },
     ready:
     {
-      initial: 'idle',
+      type: 'parallel',
       states: {
-        idle: {
-          on: {
-            TYPED: {
-              target: 'typing',
-              actions: ['sendTyping', 'scrollToTheBottom'],
+        user: {
+          id: 'user',
+          initial: 'idle',
+          states: {
+            idle: {
+              on: {
+                USER_TYPED: {
+                  target: 'typing',
+                  actions: ['sendTyping', 'scrollToTheBottom'],
+                },
+                USER_SENT: {
+                  target: 'sendMessage',
+                }
+              }
             },
-            SENT: {
-              target: 'sendMessage',
-            }
-          }
-        },
-        sendMessage: {
-          entry: ['sendMessage'],
-          on: {
-            SENT: {
-              target: 'idle',
-              actions: ['clearInput'],
-            }
-          }
-        },
-        typing: {
-          entry: ['resetTypingTimout'],
-          on: {
-            SENT: {
-              target: 'sendMessage',
-              actions: ['stopTyping'],
+            sendMessage: {
+              entry: ['sendMessage'],
+              on: {
+                USER_SENT: {
+                  target: 'idle',
+                  actions: ['clearInput'],
+                }
+              }
             },
-            TYPED: {
-              target: 'typing',
-            },
-            STOPPED: {
-              target: 'idle',
-              actions: ['stopTyping'],
+            typing: {
+              entry: ['resetTypingTimout'],
+              on: {
+                USER_SENT: {
+                  target: 'sendMessage',
+                  actions: ['stopTyping'],
+                },
+                USER_TYPED: {
+                  target: 'typing',
+                },
+                USER_STOPPED: {
+                  target: 'idle',
+                  actions: ['stopTyping'],
+                },
+              },
             },
           },
         },
-      },
+        recipient: {
+          id: 'recipient',
+          initial: 'idle',
+          states: {
+            idle: {
+              on: {
+                REC_TYPED: {
+                  target: 'typing',
+                }
+              }
+            },
+            typing: {
+              on: {
+                REC_STOPPED: {
+                  target: 'idle',
+                }
+              }
+            }
+          }
+        }
+      }
+
     },
   },
 });

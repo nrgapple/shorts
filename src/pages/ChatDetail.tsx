@@ -70,7 +70,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       sendMessage: () => {
         //@ts-ignore
         publishMessageForClient(client, chat.chatId, value.current.value);
-        chatSend('SENT');
+        chatSend('USER_SENT');
       },
       clearInput: () => {
         //@ts-ignore
@@ -86,7 +86,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         setTypingTimeout(undefined);
         setTypingTimeout(setTimeout(() => {
           console.log(`You stopped typing.`);
-          chatSend('STOPPED')
+          chatSend('USER_STOPPED');
         }, 5000));
       },
       stopTyping: () => {
@@ -119,6 +119,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (isTyping: boolean) => {
+            chatSend(isTyping?'RES_TYPED':'RES_STOPPED');
             console.log(`isTyping is ${isTyping}`);
           },
           `typing-${userProfile!.userId}`,
@@ -157,17 +158,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     //@ts-ignore
     if (value.current.value !== "") {
       if (event.keyCode === 13) {
-        if (chatState.matches({ready: 'idle'}) || chatState.matches({ready: 'typing'})) {
-          chatSend('SENT');
+        if (chatState.matches({ready: {user: 'idle'}}) || chatState.matches({ready: {user: 'typing'}})) {
+          chatSend('USER_SENT');
         }
       } 
-      else if (chatState.matches({ready: 'idle'}) || chatState.matches({ready: 'typing'})) {
-        chatSend('TYPED');
+      else if (chatState.matches({ready: {user: 'idle'}}) || chatState.matches({ready: {user: 'typing'}})) {
+        console.log('setting typing');
+        chatSend('USER_TYPED');
       }
     //@ts-ignore
     } else {
-      if (chatState.matches({ready: 'typed'})) {
-        chatSend('STOPPED');
+      if (chatState.matches({ready: {user: 'typed'}})) {
+        chatSend('USER_STOPPED');
       }
     }
   }
@@ -302,7 +304,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                         )})
                     }
                     {
-                      chatState.matches({ready: 'typing'}) && 
+                      chatState.matches({ready: {recipient: 'typing'}}) && 
                       <div slot="start" color="white" className="chat-bubble typing">
                         <IonText>
                           Typing...
@@ -324,7 +326,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                       onClick={(e) => {
                         //@ts-ignore
                         value.current.value !== "" &&
-                        chatSend('SENT')
+                        chatSend('USER_SENT');
                       }}
                       disabled={chatState.matches({ready: 'sendMessage'})}
                     >
