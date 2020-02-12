@@ -50,7 +50,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
-  const [ chatState, chatSend ] = useMachine(chatMachine, {
+  const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
         if (chat && token) {
@@ -93,6 +93,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       scrollToTheBottom: () => {
         setTimeout(() => {
+          console.log('scroll to bottom');
           scrollToTheBottom();
         }, 200);
       },
@@ -115,7 +116,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (isTyping: boolean) => {
-            chatSend(isTyping?'RES_TYPED':'RES_STOPPED');
+            chatSend(isTyping?'REC_TYPED':'REC_STOPPED');
             console.log(`isTyping is ${isTyping}`);
           },
           `typing-${userProfile!.userId}`,
@@ -230,6 +231,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     scrollToTheBottom();
   }, [messages])
+
+  // Log the states.
+  useEffect(() => {
+    const subscription = chatService.subscribe(state => {
+      // simple state logging
+      console.log(state);
+    });
+  
+    return subscription.unsubscribe;
+  }, [chatService]); // note: service should never change
+  
+  
 
   return (
     <>
