@@ -55,81 +55,92 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
-    loadMessages: async () => {
-      if (chat && token) {
-        await loadMessages(chat.chatId, token);
+    services: {
+      loadMessages: async () => {
+        if (chat && token) {
+          await loadMessages(chat.chatId, token);
+          console.log('loaded messages');
+          chatSend('SUCCESS');
+        } else {
+          console.error(`should not get here: chat: ${chat}`);
+        }
+      },
+    },
+    actions: {
+      sendMessage: () => {
+        //@ts-ignore
+        publishMessageForClient(client, chat.chatId, value.current.value);
+        chatSend('SENT');
+      },
+      clearInput: () => {
+        //@ts-ignore
+        value.current.value = '';
+      },
+      sendTyping: () => {
+        publishTypingForClient(client!, chat!.chatId, true);
+      },
+      resetTypingTimout: () => {
+        console.log('setting timeout');
+        if (typingTimeout)
+          clearTimeout(typingTimeout);
+        setTypingTimeout(undefined);
+        setTypingTimeout(setTimeout(() => {
+          console.log(`You stopped typing.`);
+          chatSend('STOPPED')
+        }, 5000));
+      },
+      stopTyping: () => {
+        if (typingTimeout)
+          clearTimeout(typingTimeout);
+        setTypingTimeout(undefined);
+        publishTypingForClient(client!, chat!.chatId, false);
+      },
+      scrollToTheBottom: () => {
+        setTimeout(() => {
+          scrollToTheBottom();
+        }, 200);
+      },
+      subToChat: () => {
+        subs.current = [...subs.current, subscribeToChatMessages(
+          client!, 
+          chat!.chatId,
+          (msg: Message) => {
+            console.log(msg);
+            setMessages(oldMessages => [...oldMessages, msg]
+              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+          },
+          `chat-${userProfile!.userId}`,
+        )];
+        console.log(subs.current);
+        chatSend('SUCCESS');
+      },
+      subToTyping: () => {
+        subs.current = [...subs.current, subscribeToTypingForClient(
+          client!,
+          chat!.chatId,
+          (isTyping: boolean) => {
+            console.log(`isTyping is ${isTyping}`);
+          },
+          `typing-${userProfile!.userId}`,
+        )];
+        console.log(subs.current);
+        chatSend("SUCCESS");
+      },
+      getUnreadMessages: () => {
+        console.log('getting unread');
+        if (chat!.hasUnreadMessages) {
+          replaceChat({...chat!, hasUnreadMessages: false})
+        }
         chatSend('SUCCESS');
       }
-    },
-    sendMessage: () => {
-      //@ts-ignore
-      publishMessageForClient(client, chat.chatId, value.current.value);
-      chatSend('SENT');
-    },
-    clearInput: () => {
-      //@ts-ignore
-      value.current.value = '';
-    },
-    sendTyping: () => {
-      publishTypingForClient(client!, chat!.chatId, true);
-    },
-    resetTypingTimout: () => {
-      if (typingTimeout)
-        clearTimeout(typingTimeout);
-      setTypingTimeout(undefined);
-      setTypingTimeout(setTimeout(() => {
-        console.log(`You stopped typing.`);
-        chatSend('STOPPED')
-      }, 5000));
-    },
-    stopTyping: () => {
-      if (typingTimeout)
-        clearTimeout(typingTimeout);
-      setTypingTimeout(undefined);
-      publishTypingForClient(client!, chat!.chatId, false);
-    },
-    scrollToTheBottom: () => {
-      setTimeout(() => {
-        scrollToTheBottom();
-      }, 200);
-    },
-    subToChat: () => {
-      subs.current = [...subs.current, subscribeToChatMessages(
-        client!, 
-        chat!.chatId,
-        (msg: Message) => {
-          console.log(msg);
-          setMessages(oldMessages => [...oldMessages, msg]
-            .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-        },
-        `chat-${userProfile!.userId}`,
-      )];
-      console.log(subs.current);
-      chatSend('SUCCESS');
-    },
-    subToTyping: () => {
-      subs.current = [...subs.current, subscribeToTypingForClient(
-        client!,
-        chat!.chatId,
-        (isTyping: boolean) => {
-          console.log(`isTyping is ${isTyping}`);
-        },
-        `typing-${userProfile!.userId}`,
-      )];
-      console.log(subs.current);
-      chatSend("SUCCESS");
-    },
-    getUnreadMessages: () => {
-      if (chat!.hasUnreadMessages) {
-        replaceChat({...chat!, hasUnreadMessages: false})
-      }
-      chatSend('SUCCESS');
     }
   });
 
   const loadMessages = async (chatId: number, token: string) => {
     try {
+      console.log('starting to load');
       const messages = await getMessages(chatId, token);
+      console.log(messages);
       if (messages) {
         messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
         setMessages(messages);
@@ -172,15 +183,15 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
 
   const getProgress = () => {
-    if (chatState.matches({idle: 'wait'}))
+    if (chatState.matches({init: 'wait'}))
       return .2;
-    else if (chatState.matches({int: {fetchMessages: 'loadMessages'}}))
+    else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
       return .4;
-    else if (chatState.matches({int: {fetchMessages: 'getUnreadMessages'}}))
+    else if (chatState.matches({init: {fetchMessages: 'getUnreadMessages'}}))
       return .6;
     else if (chatState.matches('subscribe'))
       return .8;
-    else if (chatState.matches('idle'))
+    else if (chatState.matches('ready'))
       return 1;
   }
 
@@ -254,7 +265,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             <IonContent scrollEvents={true} ref={content} >
               <>
               {
-              chatState.matches('ready')? (
+              !chatState.matches('ready')? (
                 <IonProgressBar type="determinate" value={getProgress()}/>
               ) : (
                   <IonList>

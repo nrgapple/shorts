@@ -20,11 +20,9 @@ export const chatMachine = Machine({
           initial: 'loadMessages',
           states: {
             loadMessages: {
-              entry: ['loadMessages'],
-              on: {
-                SUCCESS: {
-                  target: 'getUnreadMessages',
-                },
+              invoke: {
+                src: 'loadMessages',
+                onDone: 'getUnreadMessages',
               },
             },
             getUnreadMessages: {
@@ -75,11 +73,11 @@ export const chatMachine = Machine({
           }
         },
       },
-      onDone: 'idle'
+      onDone: 'ready'
     },
     ready:
     {
-      initial: '',
+      initial: 'idle',
       states: {
         idle: {
           on: {
@@ -102,7 +100,7 @@ export const chatMachine = Machine({
           }
         },
         typing: {
-          entry: ['resetTypingTimeout'],
+          entry: ['resetTypingTimout'],
           on: {
             SENT: {
               target: 'sendMessage',
