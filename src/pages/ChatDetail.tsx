@@ -50,7 +50,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
-  const [ chatState, chatSend ] = useMachine(chatMachine, {
+  const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
         if (chat && token) {
@@ -93,6 +93,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       scrollToTheBottom: () => {
         setTimeout(() => {
+          console.log('scroll to bottom');
           scrollToTheBottom();
         }, 200);
       },
@@ -115,7 +116,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (isTyping: boolean) => {
-            chatSend(isTyping?'RES_TYPED':'RES_STOPPED');
+            chatSend(isTyping?'REC_TYPED':'REC_STOPPED');
             console.log(`isTyping is ${isTyping}`);
           },
           `typing-${userProfile!.userId}`,
@@ -182,13 +183,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   const getProgress = () => {
     if (chatState.matches({init: 'wait'}))
-      return .2;
-    else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
       return .4;
+    else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
+      return .9;
     else if (chatState.matches({init: {fetchMessages: 'getUnreadMessages'}}))
-      return .6;
+      return .95;
     else if (chatState.matches('subscribe'))
-      return .8;
+      return .98;
     else if (chatState.matches('ready'))
       return 1;
   }
@@ -231,6 +232,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     scrollToTheBottom();
   }, [messages])
 
+  // Log the states.
+  useEffect(() => {
+    const subscription = chatService.subscribe(state => {
+      // simple state logging
+      console.log(state);
+    });
+  
+    return subscription.unsubscribe;
+  }, [chatService]); // note: service should never change
+  
+  
+
   return (
     <>
         <IonPage>
@@ -268,11 +281,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                           
                         </IonText>
                           <div className="chat-bubble send" slot="end">
-                            <IonText>
-                              {message.content}
-                            </IonText>
                             <p>
-                              {timestamp}
+                              {message.content}
+                            </p>
+                            <p>
+                              <i>{timestamp}</i>
                             </p>
                           </div>
                               </>
@@ -282,7 +295,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </p>
                             <p>
-                              {timestamp}
+                              <i>{timestamp}</i>
                             </p>
                           </div>
                         )}
@@ -292,9 +305,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     {
                       chatState.matches({ready: {recipient: 'typing'}}) && 
                       <div slot="start" color="white" className="chat-bubble typing">
-                        <IonText>
+                        <p>
                           Typing...
-                        </IonText>
+                        </p>
                       </div>
                     }
                   </IonList>

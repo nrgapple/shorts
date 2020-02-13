@@ -56,9 +56,10 @@
     margin-bottom: 0;
 
     &.received {
-        background: var(--ion-color-secondary);
+        background: var(--ion-color-dark);
         float: left;
-        color: #fff;
+        color: var(--ion-color-dark-contrast);
+        
     }
 
     &.send {
@@ -69,9 +70,9 @@
     }
     
     &.typing {
-        background: var(--ion-color-dark-contrast);
+        background: var(--ion-color-medium);
         float: left;
-        color: var(--ion-color-dark-shade);
+        color: var(--ion-color-medium-contrast);
     }
 
     h6 {
@@ -83,7 +84,7 @@
     p {
         margin: 0;
         font-size: 1rem;
-        opacity: .4;
+        opacity: 1;
     }
 
 }

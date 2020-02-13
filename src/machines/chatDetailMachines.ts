@@ -87,7 +87,7 @@ export const chatMachine = Machine({
               on: {
                 USER_TYPED: {
                   target: 'typing',
-                  actions: ['sendTyping', 'scrollToTheBottom'],
+                  actions: ['sendTyping', ],
                 },
                 USER_SENT: {
                   target: 'sendMessage',
@@ -129,6 +129,7 @@ export const chatMachine = Machine({
               on: {
                 REC_TYPED: {
                   target: 'typing',
+                  actions: ['scrollToTheBottom'],
                 }
               }
             },
