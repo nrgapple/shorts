@@ -553,7 +553,7 @@ export const subscribeToChatRead = (
   onRead: (msgId: number) => void,
   subId: string,
 ) => {
-  return client.subscribe(`user/read/${chatId}`, response => {
+  return client.subscribe(`/user/read/${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     
