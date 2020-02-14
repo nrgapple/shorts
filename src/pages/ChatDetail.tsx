@@ -8,7 +8,7 @@ import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
 import { Chat } from '../models/Chat';
-import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient } from '../data/dataApi';
+import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient, subscribeToChatRead, publishReadForClient } from '../data/dataApi';
 import { loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { getTimestamp } from '../util/util';
@@ -47,6 +47,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
+  const [lastRead, setLastRead] = useState<number>(0);
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
@@ -105,6 +106,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             console.log(msg);
             setMessages(oldMessages => [...oldMessages, msg]
               .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+            chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
           },
           `chat-${userProfile!.userId}`,
         )];
@@ -124,12 +126,42 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         console.log(subs.current);
         chatSend("SUB_TYPING_SUCCESS");
       },
+      subToRead: () => {
+        subs.current = [...subs.current, subscribeToChatRead(
+          client!,
+          chat!.chatId,
+          (msgId: number) => {
+            chatSend({type: 'REC_INCOMING_MSG', data: msgId});
+          },
+          `read-${userProfile!.userId}`,
+        )];
+        chatSend('SUB_READ_SUCCESS');
+      },
       getUnreadMessages: () => {
         console.log('getting unread');
         if (chat!.hasUnreadMessages) {
           replaceChat({...chat!, hasUnreadMessages: false})
         }
         chatSend('SUCCESS');
+      },
+      sendRead: (context, event) => {
+        // TODO: update latread.
+        if (event.data) {
+          console.log(`sendRead: ${event.data}`);
+          publishReadForClient(
+            client!,
+            event.data,
+          );
+        }
+        chatSend('REC_UPDATED');
+      },
+      updateLastRead: (context, event) => {
+        // TODO: update the read message in messages.
+        if (event.data) {
+          console.log(`updateLastRead: ${event.data}`);
+          setLastRead(event.data);
+        }
+        chatSend('READ_UPDATE_SUCCESS');
       }
     }
   });
@@ -137,11 +169,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const loadMessages = async (chatId: number, token: string) => {
     try {
       console.log('starting to load');
-      const messages = await getMessages(chatId, token);
+      const data = await getMessages(chatId, token);
       console.log(messages);
-      if (messages) {
+      if (data) {
+        const messages = [...data.messages];
         messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
         setMessages(messages);
+        setLastRead(data.lastReadMessageId);
       } else {
         console.log(`No messages found`);
       }
@@ -287,6 +321,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                             <p>
                               <i>{timestamp}</i>
                             </p>
+                            {
+                              lastRead === message.messageId &&
+                              <p className="read">
+                                Read
+                              </p>
+                            }
                           </div>
                               </>
                         ) : (
