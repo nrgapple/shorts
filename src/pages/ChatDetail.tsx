@@ -121,7 +121,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             console.log(msg);
             setMessages(oldMessages => [...oldMessages, msg]
               .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
-            chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
+            if (msg.fromUserId !== userProfile!.userId)
+              chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
           },
           `chat-${userProfile!.userId}`,
         )];
@@ -150,7 +151,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           },
           `read-${userProfile!.userId}`,
         )];
-        chatSend({type: 'SUB_READ_SUCCESS', data: messages.slice().reverse().find(x => x.fromUserId === chat?.recipient!.userId)!.messageId});
+        const lastReadMessageFromRecipient = messages.slice().reverse().find(x => x.fromUserId === chat!.recipient!.userId);
+        chatSend({type: 'SUB_READ_SUCCESS', data: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
       },
       getUnreadMessages: () => {
         console.log('getting unread');
