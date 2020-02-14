@@ -525,6 +525,7 @@ export const subscribeToChatMessages = (
         fromUserId: data.fromUserId,
         firstName: data.firstName,
         lastName: data.lastName,
+        messageId: data.messageId,
       } as Message);
     }
   }, {id: subId} as StompHeaders);

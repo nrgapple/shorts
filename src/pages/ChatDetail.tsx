@@ -146,8 +146,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       sendRead: (context, event) => {
         // TODO: update latread.
+        console.log(`sendRead: ${event.data}`);
         if (event.data) {
-          console.log(`sendRead: ${event.data}`);
           publishReadForClient(
             client!,
             event.data,
@@ -157,8 +157,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       updateLastRead: (context, event) => {
         // TODO: update the read message in messages.
+        console.log(`updateLastRead: ${event.data}`);
         if (event.data) {
-          console.log(`updateLastRead: ${event.data}`);
           setLastRead(event.data);
         }
         chatSend('READ_UPDATE_SUCCESS');
