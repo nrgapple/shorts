@@ -316,12 +316,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </p>
                             <p>
-                              <i>{timestamp}</i>
+                              <i>{timestamp} {message.messageId}</i>
                             </p>
                             {
                               lastRead === message.messageId &&
                               <p className="read">
-                                Read
+                                Read 
                               </p>
                             }
                           </div>
@@ -332,7 +332,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </p>
                             <p>
-                              <i>{timestamp}</i>
+                              <i>{timestamp} {message.messageId}</i>
                             </p>
                           </div>
                         )}
