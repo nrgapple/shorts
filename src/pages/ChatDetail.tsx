@@ -147,6 +147,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (msgId: number) => {
+            console.log('recipient read a message');
             chatSend({type: 'REC_READ', data: msgId});
           },
           `read-${userProfile!.userId}`,
