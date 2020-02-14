@@ -3,7 +3,7 @@ import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, 
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
-import { send, person, arrowBack } from 'ionicons/icons';
+import { send, person } from 'ionicons/icons';
 import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
@@ -229,16 +229,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       return 1;
   }
 
-  const unsubscribe = () => {
-    console.log(`Unsubscribing to chat`);
-    if (client && chat)
-    {
-      publishTypingForClient(client, chat.chatId, false);
-      console.log(subs.current);
-      subs.current.forEach(s => s.unsubscribe());
-    }
-  }
-
   // Wait for all dependencies.
   useEffect(() => {
     if (token && 
@@ -263,10 +253,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   // Clean up subs.
   useEffect(() => {
     return () => {
-      unsubscribe();
+      if (client && chat) {
+        console.log(`Unsubscribing to chat`);
+        publishTypingForClient(client, chat.chatId, false);
+        console.log(subs.current);
+        subs.current.forEach(s => s.unsubscribe());
+      }
     }
   },[]);
-
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
@@ -291,15 +285,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonButton 
-                  fill="clear" 
-                  onClick={() => {
-                    unsubscribe();
-                    history.push(`/tabs/chats`, {direction: 'forward'});
-                  }}
-                >
-                  <IonIcon icon={arrowBack} />
-                </IonButton>
+                <IonBackButton defaultHref="/tabs/chats"></IonBackButton>
               </IonButtons>
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
               {
