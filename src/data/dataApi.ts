@@ -559,7 +559,7 @@ export const subscribeToChatRead = (
     
     if (data) {
       console.log(data);
-      onRead(data);
+      onRead(data.lastReadMessageId);
     }
   }, {id: subId} as StompHeaders);
 }
