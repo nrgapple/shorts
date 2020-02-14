@@ -135,7 +135,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           },
           `read-${userProfile!.userId}`,
         )];
-        chatSend('SUB_READ_SUCCESS');
+        chatSend({type: 'SUB_READ_SUCCESS', data: messages.slice(-1)[0].messageId});
       },
       getUnreadMessages: () => {
         console.log('getting unread');

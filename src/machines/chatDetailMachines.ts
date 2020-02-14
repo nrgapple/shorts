@@ -82,7 +82,7 @@ export const chatMachine = Machine({
               },
             },
             sendRead: {
-              entry: ['updateLastRead'],
+              entry: ['sendRead'],
               on: {
                 REC_UPDATED: 'success',
               }
