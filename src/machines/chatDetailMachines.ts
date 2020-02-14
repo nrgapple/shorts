@@ -22,16 +22,8 @@ export const chatMachine = Machine({
             loadMessages: {
               invoke: {
                 src: 'loadMessages',
-                onDone: 'getUnreadMessages',
+                onDone: 'finish',
               },
-            },
-            getUnreadMessages: {
-              entry: ['getUnreadMessages'],
-              on: {
-                SUCCESS: {
-                  target: 'finish'
-                }
-              }
             },
             finish: {
               type: 'final',

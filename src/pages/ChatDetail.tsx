@@ -55,9 +55,24 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     services: {
       loadMessages: async () => {
         if (chat && token) {
-          await loadMessages(chat.chatId, token);
+          try {
+            console.log('starting to load');
+            const data = await getMessages(chat.chatId, token);
+            if (data) {
+              const messages = [...data.messages];
+              messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
+              console.log(data.lastReadMessageId);
+              setMessages(messages);
+              setLastRead(data.lastReadMessageId);
+              chatSend('SUCCESS');
+            } else {
+              console.log(`No messages found`);
+            }
+          } catch (e) {
+            console.log(`Error loading messages: ${e}`);
+          }
           console.log('loaded messages');
-          chatSend('SUCCESS');
+          
         } else {
           console.error(`should not get here: chat: ${chat}`);
         }
@@ -131,7 +146,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (msgId: number) => {
-            chatSend({type: 'REC_INCOMING_MSG', data: msgId});
+            chatSend({type: 'REC_READ', data: msgId});
           },
           `read-${userProfile!.userId}`,
         )];
@@ -165,24 +180,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   });
-
-  const loadMessages = async (chatId: number, token: string) => {
-    try {
-      console.log('starting to load');
-      const data = await getMessages(chatId, token);
-      console.log(messages);
-      if (data) {
-        const messages = [...data.messages];
-        messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
-        setMessages(messages);
-        setLastRead(data.lastReadMessageId);
-      } else {
-        console.log(`No messages found`);
-      }
-    } catch (e) {
-      console.log(`Error loading messages: ${e}`);
-    }
-  }
   
   const onKeyPressed = (event: any) => {
     
