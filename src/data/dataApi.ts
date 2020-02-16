@@ -391,15 +391,21 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
         },
       });
       const { data } = messagesResponse;
-      return data.map((message:any) : Message => {
-        return {
-          fromUserId: message.fromUserId as number,
-          firstName: message.firstName as string,
-          lastName: message.lastName as string,
-          content: message.content as string,
-          createdAt: moment(message.createdAt).toDate() as Date,
-        }
-      }) as Message[];
+      return {
+        lastReadMessageId: data.lastReadMessageId as number,
+        messages: data.messages.map((message:any) : Message => {
+          return {
+            fromUserId: message.fromUserId as number,
+            firstName: message.firstName as string,
+            lastName: message.lastName as string,
+            content: message.content as string,
+            createdAt: moment(message.createdAt).toDate() as Date,
+            messageId: message.messageId,
+          }
+        }) as Message[]
+      };
+      
+      
     } catch (e) {
       const {data} = e.response;
       throw data
@@ -519,6 +525,7 @@ export const subscribeToChatMessages = (
         fromUserId: data.fromUserId,
         firstName: data.firstName,
         lastName: data.lastName,
+        messageId: data.messageId,
       } as Message);
     }
   }, {id: subId} as StompHeaders);
@@ -536,6 +543,23 @@ export const subscribeToTypingForClient = (
     if (data) {
       console.log(data);
       onTyping(data.typing as boolean);
+    }
+  }, {id: subId} as StompHeaders);
+}
+
+export const subscribeToChatRead = (
+  client: Client,
+  chatId: number,
+  onRead: (msgId: number) => void,
+  subId: string,
+) => {
+  return client.subscribe(`/user/read/${chatId}`, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    
+    if (data) {
+      console.log(data);
+      onRead(data.lastReadMessageId);
     }
   }, {id: subId} as StompHeaders);
 }
@@ -619,6 +643,23 @@ export const publishTypingForClient = (
     client.publish({
       destination: `/app/typing/${chatId}`, 
       body: JSON.stringify({typing: isTyping})
+    });
+    return true;
+  }
+}
+
+export const publishReadForClient = (
+  client: Client,
+  messageId: number,
+) => {
+  console.log(client);
+  if (!client.connected) {
+    console.log(`client is not connected!`)
+    return;
+  }
+  if (client.webSocket.readyState === 1) {
+    client.publish({
+      destination: `/app/read/${messageId}`, 
     });
     return true;
   }

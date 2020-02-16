@@ -22,16 +22,8 @@ export const chatMachine = Machine({
             loadMessages: {
               invoke: {
                 src: 'loadMessages',
-                onDone: 'getUnreadMessages',
+                onDone: 'finish',
               },
-            },
-            getUnreadMessages: {
-              entry: ['getUnreadMessages'],
-              on: {
-                SUCCESS: {
-                  target: 'finish'
-                }
-              }
             },
             finish: {
               type: 'final',
@@ -72,6 +64,24 @@ export const chatMachine = Machine({
             success: { type: 'final' },
           }
         },
+        subToRead: {
+          initial: 'start',
+          states: {
+            start: {
+              entry: ['subToRead'],
+              on: {
+                SUB_READ_SUCCESS: 'sendRead',
+              },
+            },
+            sendRead: {
+              entry: ['sendRead'],
+              on: {
+                REC_UPDATED: 'success',
+              }
+            },
+            success: { type: 'final' },
+          }
+        },
       },
       onDone: 'ready'
     },
@@ -87,7 +97,7 @@ export const chatMachine = Machine({
               on: {
                 USER_TYPED: {
                   target: 'typing',
-                  actions: ['sendTyping', ],
+                  actions: ['sendTyping'],
                 },
                 USER_SENT: {
                   target: 'sendMessage',
@@ -121,8 +131,7 @@ export const chatMachine = Machine({
             },
           },
         },
-        recipient: {
-          id: 'recipient',
+        recipientTyping: {
           initial: 'idle',
           states: {
             idle: {
@@ -139,11 +148,52 @@ export const chatMachine = Machine({
                   target: 'idle',
                 }
               }
-            }
+            },
+            
+          }
+        },
+        recipientMessages: {
+          initial: 'idle',
+          states: {
+            idle: {
+              on: {
+                REC_INCOMING_MSG: {
+                  target: 'incomingMessage',
+                }
+              }
+            },
+            incomingMessage: {
+              entry: ['sendRead'],
+              on: {
+                REC_UPDATED: {
+                  target: 'idle',
+                }
+              }
+            },
+          }
+        },
+        read: {
+          id: 'read',
+          initial: 'idle',
+          states: {
+            idle: {
+              on: {
+                REC_READ: {
+                  target: 'updatingLastRead',
+                }
+              }
+            },
+            updatingLastRead: {
+              entry: ['updateLastRead'],
+              on: {
+                READ_UPDATE_SUCCESS: {
+                  target: 'idle',
+                }
+              }
+            },
           }
         }
       }
-
     },
   },
 });
