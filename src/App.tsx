@@ -42,6 +42,8 @@ import { GeoPoint } from './models/GeoPoint';
 import ChatDetail from './pages/ChatDetail';
 import ProfileDetail from './pages/ProfileDetail';
 import { Client } from '@stomp/stompjs';
+import { useMachine } from '@xstate/react';
+import { appMachine } from './machines/appMachines';
 
 const App: React.FC = () => {
   return (
@@ -93,6 +95,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   replaceChat,
   setIsClientConnected
 }) => {
+  const [appState, appSend ] = useMachine(appMachine)
 
   const configure = () => {
     if (token && client) {
@@ -162,7 +165,11 @@ const IonicApp: React.FC<IonicAppProps> = ({
         <IonSplitPane contentId="main">
           <Menu />
           <IonRouterOutlet id="main">
-            <Route path="/tabs" component={MainTabs} />
+            <Route path="/tabs" render={() => {
+                console.log("tabs tabs tabs");
+                return <MainTabs hasMessages={false}/>
+              }}
+            />
             <Route path="/account" component={Account} />
             <Route path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
