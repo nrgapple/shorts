@@ -1,7 +1,4 @@
 import { Plugins, Geolocation } from '@capacitor/core';
-import { Session } from '../models/Session';
-import { Speaker } from '../models/Speaker';
-import { Location } from '../models/Location';
 import Axios from 'axios';
 import { Profile } from '../models/Profile';
 import { Image } from '../models/Image';
@@ -10,15 +7,9 @@ import { Message } from '../models/Message';
 import { Chat } from '../models/Chat';
 import { StompHeaders, Client } from '@stomp/stompjs';
 import moment from 'moment';
-
+import { vars } from './env';
 
 const { Storage } = Plugins;
-
-const locationsUrl = '/assets/data/locations.json';
-const sessionsUrl = '/assets/data/sessions.json';
-const speakersUrl = '/assets/data/speakers.json';
-const apiURL = 'https://shortsdate.herokuapp.com';
-const socketURL = `wss://shortsdate.herokuapp.com/ws`;
 
 const HAS_LOGGED_IN = 'hasLoggedIn';
 const HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
@@ -26,7 +17,7 @@ const USERNAME = 'username';
 const TOKEN = 'token';
 const DARK_MODE = 'darkMode';
 const LOCATION = 'location';
-const HAS_VALID_PROFILE = 'hasValidProfile';
+
 
 export const getUserData = async () => {
   const response = await Promise.all([
@@ -54,7 +45,7 @@ export const getNearMe = async (token: string | undefined) => {
   if (token) {
     try {
       const nearMeResponse = await Axios.request({
-        url: `${apiURL}/secure/profiles`,
+        url: `${vars().env.API_URL}/secure/profiles`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -96,7 +87,7 @@ export const getUserProfile = async (token: string | undefined) => {
   if (token) {
     try {
       const userProfileResponse = await Axios.request({
-        url: `${apiURL}/secure/profile`,
+        url: `${vars().env.API_URL}/secure/profile`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -152,7 +143,7 @@ export const postLogin = async (
 ) => {
   try {
     const response = await Axios.request({
-      url: `${apiURL}/public/login`,
+      url: `${vars().env.API_URL}/public/login`,
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -185,7 +176,7 @@ export const postProfileInfo = async (
   } 
   try {
     const response = await Axios.request({
-      url: `${apiURL}/secure/profile`,
+      url: `${vars().env.API_URL}/secure/profile`,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -236,7 +227,7 @@ export const postSignup = async (
 ) => {
   try {
     const response = await Axios.request({
-      url: `${apiURL}/public/signup`,
+      url: `${vars().env.API_URL}/public/signup`,
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -265,7 +256,7 @@ export const postUserLocation = async (point: GeoPoint, token: string | undefine
   {
     try {
       const sendLocationResponse = await Axios.request({
-        url: `${apiURL}/secure/location`,
+        url: `${vars().env.API_URL}/secure/location`,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -289,7 +280,7 @@ export const postSwipe = async (userId: number, liked: boolean, token: string | 
   if (token) {
     try {
       const swipeResponse = await Axios.request({
-        url: `${apiURL}/secure/swipe`,
+        url: `${vars().env.API_URL}/secure/swipe`,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -316,7 +307,7 @@ export const getMatches = async (token: string | undefined) => {
   if (token) {
     try {
       const matchesResponse = await Axios.request({
-        url: `${apiURL}/secure/matches`,
+        url: `${vars().env.API_URL}/secure/matches`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -341,7 +332,7 @@ export const postImage = async (image:File, token:string | undefined) => {
       var formData = new FormData();
       formData.append("image", image);
       const imageResponse = await Axios.request({
-        url: `${apiURL}/secure/image`,
+        url: `${vars().env.API_URL}/secure/image`,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -352,7 +343,6 @@ export const postImage = async (image:File, token:string | undefined) => {
       const {data} = imageResponse;
       return data as Image;
     } catch (e) {
-      const {data} = e;
       throw e;
     }
   }
@@ -362,7 +352,7 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
   if (token) {
     try {
       const deleteResponse = await Axios.request({
-        url: `${apiURL}/secure/image/${imageId}`,
+        url: `${vars().env.API_URL}/secure/image/${imageId}`,
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -372,7 +362,6 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
       const {data} = deleteResponse;
       return data;
     } catch (e) {
-      const {data} = e;
       throw e;
     }
   }
@@ -382,7 +371,7 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   if (token) {
     try {
       const messagesResponse = await Axios.request({
-        url: `${apiURL}/secure/messages/${chatId}`,
+        url: `${vars().env.API_URL}/secure/messages/${chatId}`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -417,7 +406,7 @@ export const createChat = async (userId: number, token: string | undefined) => {
   if (token) {
     try {
       const chatsResponse = await Axios.request({
-        url: `${apiURL}/secure/chat/${userId}`,
+        url: `${vars().env.API_URL}/secure/chat/${userId}`,
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -442,7 +431,7 @@ export const getChats = async (token: string | undefined) => {
   if (token) {
     try {
       const chatsResponse = await Axios.request({
-        url: `${apiURL}/secure/chats`,
+        url: `${vars().env.API_URL}/secure/chats`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -486,7 +475,7 @@ export const configureClient = (
   const stompHeader = new StompHeaders();
   stompHeader.Authorization = `Bearer ${token}`;
   client.configure({
-    brokerURL: socketURL,
+    brokerURL: vars().env.SOCKET_URL,
     connectHeaders: stompHeader,
     onConnect: () => {
       onConnect();
@@ -513,7 +502,7 @@ export const subscribeToChatMessages = (
   onMessage: (msg: Message) => void,
   subId: string,
 ) => {
-  return client.subscribe(`/chat/${chatId}`, response => {
+  return client.subscribe(`${vars().env.CHAT}${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     
@@ -537,7 +526,7 @@ export const subscribeToTypingForClient = (
   onTyping: (isTyping: boolean) => void,
   subId: string,
 ) => {
-  return client.subscribe(`/user/typing/${chatId}`, response => {
+  return client.subscribe(`${vars().env.TYPE}${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
@@ -553,7 +542,7 @@ export const subscribeToChatRead = (
   onRead: (msgId: number) => void,
   subId: string,
 ) => {
-  return client.subscribe(`/user/read/${chatId}`, response => {
+  return client.subscribe(`${vars().env.READ}${chatId}`, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     
@@ -569,7 +558,7 @@ export const subscribeToChatNotifications = (
   onNotification: (chat: Chat) => void,
   subId: string,
 ) => {
-  return client.subscribe(`/user/notification/chat`, response => {
+  return client.subscribe(vars().env.CHAT_NOTIFY, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
@@ -593,7 +582,7 @@ export const subscribeToMatchNotifications = (
   client: Client,
   onNotification: (profile: Profile) => void,
 ) => {
-  return client.subscribe(`/user/notification/match`, response => {
+  return client.subscribe(vars().env.MATCH_NOTIFY, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
@@ -621,7 +610,7 @@ export const publishMessageForClient = (
   }
   if (client.webSocket.readyState === 1) {
     client.publish({
-      destination: `/app/message/${chatId}`, 
+      destination: `${vars().env.PUBLISH_MESSAGE}/${chatId}`, 
       body: JSON.stringify({message: message})
     });
     return true;
@@ -641,7 +630,7 @@ export const publishTypingForClient = (
   }
   if (client.webSocket.readyState === 1) {
     client.publish({
-      destination: `/app/typing/${chatId}`, 
+      destination: `${vars().env.PUBLISH_TYPING}/${chatId}`, 
       body: JSON.stringify({typing: isTyping})
     });
     return true;
@@ -659,7 +648,7 @@ export const publishReadForClient = (
   }
   if (client.webSocket.readyState === 1) {
     client.publish({
-      destination: `/app/read/${messageId}`, 
+      destination: `${vars().env.PUBLISH_READ}/${messageId}`, 
     });
     return true;
   }
