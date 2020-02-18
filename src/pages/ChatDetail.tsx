@@ -52,6 +52,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
+    context: {
+    },
     services: {
       loadMessages: async () => {
         if (chat && token) {
@@ -64,7 +66,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               console.log(data.lastReadMessageId);
               setMessages(messages);
               setLastRead(data.lastReadMessageId);
-              chatSend('SUCCESS');
             } else {
               console.log(`No messages found`);
             }
@@ -113,8 +114,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           scrollToTheBottom();
         }, 200);
       },
-      subToChat: () => {
-        subs.current = [...subs.current, subscribeToChatMessages(
+      subToChat: (context, event) => {
+         context.subs = [...subs.current, subscribeToChatMessages(
           client!, 
           chat!.chatId,
           (msg: Message) => {
@@ -122,7 +123,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             setMessages(oldMessages => [...oldMessages, msg]
               .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
             if (msg.fromUserId !== userProfile!.userId)
-              chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
+              chatSend({type: 'REC_INCOMING_MSG', msgId: msg.messageId, read: true});
           },
           `chat-${userProfile!.userId}`,
         )];
@@ -149,36 +150,35 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           (msgId: number) => {
             console.log('recipient read a message');
             console.log(msgId);
-            chatSend({type: 'REC_READ', data: msgId});
+            chatSend({type: 'REC_READ', msgId: msgId});
           },
           `read-${userProfile!.userId}`,
         )];
         const lastReadMessageFromRecipient = messages.slice().reverse().find(x => x.fromUserId === chat!.recipient!.userId);
-        chatSend({type: 'SUB_READ_SUCCESS', data: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
+        chatSend({type: 'SUB_READ_SUCCESS', msgId: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
       },
       getUnreadMessages: () => {
         console.log('getting unread');
         if (chat!.hasUnreadMessages) {
           replaceChat({...chat!, hasUnreadMessages: false})
         }
-        chatSend('SUCCESS');
       },
       sendRead: (context, event) => {
         // TODO: update latread.
-        console.log(`sendRead: ${event.data}`);
-        if (event.data) {
+        console.log(`sendRead: ${event.msgId}`);
+        if (event.msgId) {
           publishReadForClient(
             client!,
-            event.data,
+            event.msgId,
           );
         }
         chatSend('REC_UPDATED');
       },
       updateLastRead: (context, event) => {
         // TODO: update the read message in messages.
-        console.log(`updateLastRead: ${event.data}`);
-        if (event.data) {
-          setLastRead(event.data);
+        console.log(`updateLastRead: ${event.msgId}`);
+        if (event.msgId) {
+          setLastRead(event.msgId);
         }
         chatSend('READ_UPDATE_SUCCESS');
       }
@@ -221,8 +221,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       return .4;
     else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
       return .9;
-    else if (chatState.matches({init: {fetchMessages: 'getUnreadMessages'}}))
-      return .95;
     else if (chatState.matches('subscribe'))
       return .98;
     else if (chatState.matches('ready'))

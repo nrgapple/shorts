@@ -1,10 +1,18 @@
 import { Machine, send } from 'xstate';
+import { StompSubscription } from '@stomp/stompjs';
+import { ChatStateSchema } from './chatStateSchema';
+import { ChatEvent } from './chatEvents';
 
-export const chatMachine = Machine({
-  id: 'chat-app',
-  context: {
-  },
+interface ChatContext {
+  subs: StompSubscription[];
+}
+
+export const chatMachine = Machine<ChatContext, ChatStateSchema, ChatEvent>({
+  key: 'chat-app',
   initial: 'init',
+  context: {
+    subs: [],
+  },
   states: {
     init: {
       initial: 'wait',
