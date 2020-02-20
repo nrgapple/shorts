@@ -1,0 +1,8 @@
+{
+  "appId": "com.nrgapple.shorts",
+  "appName": "shorts",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {}
+}

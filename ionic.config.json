@@ -1,0 +1,7 @@
+{
+  "name": "shorts",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

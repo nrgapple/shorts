@@ -1,0 +1,31 @@
+{
+  "short_name": "Shorts",
+  "name": "Shorts",
+  "icons": [
+    {
+      "src": "assets/icon/shorts-256.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icon/shorts-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "assets/icon/shorts-512.png",
+      "type": "image/png",
+      "sizes": "120x120"
+    },
+    {
+      "src": "assets/icon/shorts-512.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#cc00ff",
+  "display": "standalone",
+  "orientation": "landscape",
+  "theme_color": "#FFA500"
+}
