@@ -251,6 +251,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Wait for all dependencies.
   useEffect(() => {
+    console.log(isClientConnected);
     if (token && 
         chat && 
         client && 
@@ -293,8 +294,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   
     return subscription.unsubscribe;
   }, [chatService]); // note: service should never change
-  
-  
 
   return (
     <>
@@ -337,7 +336,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </p>
                             <p>
-                              <i>{timestamp} {message.messageId}</i>
+                              <i>{timestamp}</i>
                             </p>
                             {
                               lastRead === message.messageId &&
@@ -353,7 +352,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                               {message.content}
                             </p>
                             <p>
-                              <i>{timestamp} {message.messageId}</i>
+                              <i>{timestamp}</i>
                             </p>
                           </div>
                         )}
