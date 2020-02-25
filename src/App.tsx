@@ -44,6 +44,8 @@ import ProfileDetail from './pages/ProfileDetail';
 import { Client } from '@stomp/stompjs';
 import { useMachine } from '@xstate/react';
 import { appMachine } from './machines/appMachines';
+import { useHistory } from 'react-router';
+import Connections from './components/Connections';
 
 const App: React.FC = () => {
   return (
@@ -95,42 +97,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   replaceChat,
   setIsClientConnected
 }) => {
-  const [appState, appSend ] = useMachine(appMachine)
-
-  const configure = () => {
-    if (token && client) {
-      configureClient(
-        token,
-        client,
-        () => {
-          setIsClientConnected(true);
-          console.log(`Connected to socket`);
-          subscribeToChatNotifications(
-            client,
-            (chat) => {
-                chat.lastMessage && console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
-                replaceChat(chat);
-              },
-            `notify-chat-${userProfile!.userId}`,
-            );
-          subscribeToMatchNotifications(
-            client,
-            (profile) => {
-              console.log(`MATCH!!`);
-              console.log(profile);
-            }
-          )
-        },
-        () => {
-          console.log(`Client disconnected`);
-        },
-        () => {
-        },
-        () => {
-        }
-      );
-    }
-  }
 
   useEffect(() => {
     loadUserData();
@@ -148,7 +114,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
 
   useEffect(() => {
     console.log(token);
-    setClient(new Client());
     loadAllInfo(token);
     console.log(userProfile);
   }, [token])
@@ -159,18 +124,12 @@ const IonicApp: React.FC<IonicAppProps> = ({
       postUserLocation(location, token);
   }, [location])
 
-  useEffect(() => {
-    console.log(`client changed: ${client}`);
-    if (!client || isClientConnected || !userProfile) return;
-    console.log(`Now time to configure`);
-    configure();
-  }, [client, userProfile])
-
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
       <IonReactRouter>
         <IonSplitPane contentId="main">
           <Menu />
+          <Connections />
           <IonRouterOutlet id="main">
             <Route path="/tabs" render={() => {
                 console.log("tabs tabs tabs");
