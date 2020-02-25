@@ -581,19 +581,20 @@ export const subscribeToChatNotifications = (
 export const subscribeToMatchNotifications = (
   client: Client,
   onNotification: (profile: Profile) => void,
+  subId: string,
 ) => {
   return client.subscribe(vars().env.MATCH_NOTIFY, response => {
     console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
-      if (!data.profile) {
+      if (!data) {
         console.error(`no profile returned`);
         return;
       }
       console.log(data);
       onNotification(data as Profile);
     }
-  });
+  }, {id: subId} as StompHeaders);
 }
 
 export const publishMessageForClient = (
