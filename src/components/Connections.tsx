@@ -108,57 +108,55 @@ const Connections: React.FC<ConnectionProps> = ({
 
   return (
     <>
-      <IonContent>
-        <IonModal
-          isOpen={showModal}
-        >
-          <IonHeader translucent>
-            <IonToolbar>
-              <IonTitle color="danger">You got a Match!</IonTitle>
-              {
-                <IonButtons slot="end">
-                  <IonButton fill="clear" onClick={() => {
-                    setShowModal(false);
-                    setMatch(undefined);
-                  }}
-                  >
-                    Close
-                  </IonButton>
-                </IonButtons>
-              }
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
+      <IonModal
+        isOpen={showModal}
+      >
+        <IonHeader translucent>
+          <IonToolbar>
+            <IonTitle color="danger">You got a Match!</IonTitle>
             {
-              !match ? (
-                <IonProgressBar type="indeterminate" />
-              ) : (
-                <>
-                  <IonRow>
-                    <ImageCard areDeletable={false} images={match.images} />
-                  </IonRow>
-                  <InfoCard profile={match} />
-                  {
-                    !creatingChat && <IonButton
-                      fill="solid" 
-                      color="success"
-                      expand="block"
-                      onClick={() => {
-                        onCreateChat();
-                        setTimeout(() => {
-                          setShowModal(false);
-                        }, 500);
-                      }}
-                    >
-                      Start Chatting
-                    </IonButton>
-                  }
-                </>
-              )
+              <IonButtons slot="end">
+                <IonButton fill="clear" onClick={() => {
+                  setShowModal(false);
+                  setMatch(undefined);
+                }}
+                >
+                  Close
+                </IonButton>
+              </IonButtons>
             }
-          </IonContent>
-        </IonModal>
-      </IonContent>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          {
+            !match ? (
+              <IonProgressBar type="indeterminate" />
+            ) : (
+              <>
+                <IonRow>
+                  <ImageCard areDeletable={false} images={match.images} />
+                </IonRow>
+                <InfoCard profile={match} />
+                {
+                  !creatingChat && <IonButton
+                    fill="solid" 
+                    color="success"
+                    expand="block"
+                    onClick={() => {
+                      onCreateChat();
+                      setTimeout(() => {
+                        setShowModal(false);
+                      }, 500);
+                    }}
+                  >
+                    Start Chatting
+                  </IonButton>
+                }
+              </>
+            )
+          }
+        </IonContent>
+      </IonModal>
     </>
   );
 };
