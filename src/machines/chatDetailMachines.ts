@@ -193,7 +193,20 @@ export const chatMachine = Machine({
             },
           }
         }
+      },
+      on: {
+        LEFT: {
+          target: 'notInView',
+        },
       }
     },
+    notInView: {
+      on: {
+        REENTERED: {
+          target: 'subscribe',
+          actions: ['scrollToTheBottom'],
+        }
+      }
+    }
   },
 });

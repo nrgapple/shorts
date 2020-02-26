@@ -240,11 +240,20 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   useEffect(() => {
     console.log(location);
-    if (chat && 
-        location.pathname !== `/chat/${chat.chatId}` &&
+    if (!chat)
+      return;
+    
+    if (location.pathname !== `/chat/${chat.chatId}` &&
         subs && subs.current.length > 0 &&
         client) {
       unSub(client, chat.chatId);
+      chatSend('LEFT');
+    }
+    else if (location.pathname === `/chat/${chat.chatId}`) {
+      console.log(`Went back into the chat`);
+      if (chatState.matches('notInView')) {
+        chatSend('REENTERED');
+      }
     }
   }, [location, chat, client])
 
@@ -305,7 +314,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               </IonButtons>
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
               {
-                chat &&
+                chat && chatState.matches('ready') &&
                 <IonButtons slot="end">
                   <IonButton fill="clear" onClick={() => history.push(`/more/${chat.recipient.userId}`, {direction: 'forward'})}>
                     <IonIcon icon={person}/>
