@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonActionSheet, IonRefresher, IonRefresherContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonActionSheet, IonRefresher, IonRefresherContent, IonAlert } from '@ionic/react';
 import { connect } from '../data/connect';
 import './ChatsList.scss';
 import { loadChats, removeMatch, removeChat } from '../data/sessions/sessions.actions';
@@ -23,7 +23,7 @@ interface DispatchProps {
 interface ChatsListProps extends OwnProps, StateProps, DispatchProps { };
 
 const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats }) => {
-  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | undefined>(undefined);
   const [IsDeletingChat, setIsDeletingChat] = useState(false);
 
@@ -33,14 +33,13 @@ const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats })
 
   const onSelectChat = (chat: Chat) => {
     setSelectedChat(chat);
-    setShowActionSheet(true);
+    setShowDeleteAlert(true);
   }
 
   const onDeleteChat = async () => {
     if (token && selectedChat) {
       try {
         setIsDeletingChat(true);
-        //TODO: delete chat.
         console.log(selectedChat);
         await deleteMatch(
           selectedChat!.recipient.userId,
@@ -51,7 +50,7 @@ const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats })
         console.log(`Could not remove chat: ${e}`);
       } finally {
         setIsDeletingChat(false);
-        setShowActionSheet(false)
+        setShowDeleteAlert(false)
       }
     }
   }
@@ -91,18 +90,29 @@ const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats })
             ))
           )} 
         </IonList>
-        <IonActionSheet
-          isOpen={showActionSheet}
-          onDidDismiss={() => setShowActionSheet(false)}
-          buttons={[{
-            text: 'Remove',
-            role: 'destructive',
-            handler: () => {
-              onDeleteChat();
-            }, 
-          }
-        ]}
-        ></IonActionSheet>
+        <IonAlert
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => setShowDeleteAlert(false)}
+          header={`Remove Match`}
+          message={`Are you sure you want to unmatch with ${selectedChat?selectedChat.recipient.firstName: ''}`}
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              cssClass: 'secondary',
+              handler: blah => {
+                console.log('Confirm Cancel: blah');
+              }
+            },
+            {
+              text: 'Unmatch',
+              role: 'destructive',
+              handler: () => {
+                onDeleteChat();
+              }
+            }
+          ]}
+        />
       </IonContent>
     </IonPage>
   );

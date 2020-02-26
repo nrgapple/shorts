@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet, IonRefresher, IonRefresherContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet, IonRefresher, IonRefresherContent, IonAlert } from '@ionic/react';
 import SpeakerItem from '../components/SpeakerItem';
 import { Speaker } from '../models/Speaker';
 import { Session } from '../models/Session';
@@ -8,8 +8,8 @@ import * as selectors from '../data/selectors';
 import './MatchesList.scss';
 import { Profile } from '../models/Profile';
 import MatchItem from '../components/MatchItem';
-import { loadMatches, loadChats } from '../data/sessions/sessions.actions';
-import { createChat } from '../data/dataApi';
+import { loadMatches, loadChats, removeMatch } from '../data/sessions/sessions.actions';
+import { createChat, deleteMatch } from '../data/dataApi';
 import { RouteComponentProps } from 'react-router-dom';
 
 interface OwnProps extends RouteComponentProps { 
@@ -31,6 +31,7 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, 
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   useEffect(() => {
     loadMatches(token);
@@ -40,6 +41,22 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, 
   const onSelectProfile = (profile: Profile) => {
     setSelectedProfile(profile);
     setShowActionSheet(true);
+  }
+
+  const onDeleteMatch = async () => {
+    if (token && selectedProfile) {
+      try {
+        console.log(selectedProfile);
+        await deleteMatch(
+          selectedProfile!.userId,
+          token);
+        removeMatch(selectedProfile);
+      } catch (e) {
+        console.log(`Could not remove chat: ${e}`);
+      } finally {
+        setShowDeleteAlert(false)
+      }
+    }
   }
 
   const onCreateChat = async () => {
@@ -108,9 +125,38 @@ const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, 
               console.log(`Chat with ${selectedProfile && selectedProfile.firstName}`);
               onCreateChat();
             }
+          }, {
+            text: 'Unmatch',
+            role: 'destructive',
+            handler: () => {
+              setShowDeleteAlert(true);
+            }
           }
         ]}
         ></IonActionSheet>
+        <IonAlert
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => setShowDeleteAlert(false)}
+          header={`Remove Match`}
+          message={`Are you sure you want to unmatch with ${selectedProfile?selectedProfile.firstName: ''}`}
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+              cssClass: 'secondary',
+              handler: blah => {
+                console.log('Confirm Cancel: blah');
+              }
+            },
+            {
+              text: 'Unmatch',
+              role: 'destructive',
+              handler: () => {
+                onDeleteMatch();
+              }
+            }
+          ]}
+        />
       </IonContent>
     </IonPage>
   );
