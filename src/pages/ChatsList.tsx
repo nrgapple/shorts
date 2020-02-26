@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonActionSheet, IonRefresher, IonRefresherContent } from '@ionic/react';
 import { connect } from '../data/connect';
 import './ChatsList.scss';
-import { loadChats } from '../data/sessions/sessions.actions';
+import { loadChats, removeMatch, removeChat } from '../data/sessions/sessions.actions';
 import { RouteComponentProps } from 'react-router-dom';
 import { Chat } from '../models/Chat';
 import ChatItem from '../components/ChatItem';
+import { deleteMatch } from '../data/dataApi';
 
 interface OwnProps extends RouteComponentProps { 
   token?: string;
@@ -24,7 +25,7 @@ interface ChatsListProps extends OwnProps, StateProps, DispatchProps { };
 const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats }) => {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | undefined>(undefined);
-  const [, setIsDeletingChat] = useState(false);
+  const [IsDeletingChat, setIsDeletingChat] = useState(false);
 
   useEffect(() => {
     loadChats(token);
@@ -40,10 +41,17 @@ const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats })
       try {
         setIsDeletingChat(true);
         //TODO: delete chat.
+        console.log(selectedChat);
+        await deleteMatch(
+          selectedChat!.recipient.userId,
+          token);
+        removeChat(selectedChat);
+        removeMatch(selectedChat.recipient);
       } catch (e) {
-        console.log(`Could not create a chat: ${e}`);
+        console.log(`Could not remove chat: ${e}`);
       } finally {
         setIsDeletingChat(false);
+        setShowActionSheet(false)
       }
     }
   }

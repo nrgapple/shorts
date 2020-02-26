@@ -367,6 +367,24 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
   }
 }
 
+export const deleteMatch = async (userId: number, token: string | undefined) => {
+  if (token) {
+    try {
+      const deleteResponse = await Axios.request({
+        url: `${vars().env.API_URL}/secure/unmatch/${userId}`,
+        method: `POST`,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      const {data} = deleteResponse;
+      return data;
+    } catch (e) {
+      throw e;
+    }
+  }
+}
+
 export const getMessages = async (chatId: number, token: string | undefined) => {
   if (token) {
     try {
