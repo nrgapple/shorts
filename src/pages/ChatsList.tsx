@@ -18,18 +18,25 @@ interface StateProps {
 
 interface DispatchProps {
   loadChats: typeof loadChats;
+  removeChat: typeof removeChat;
+  removeMatch: typeof removeMatch;
 };
 
 interface ChatsListProps extends OwnProps, StateProps, DispatchProps { };
 
-const ChatsList: React.FC<ChatsListProps> = ({ Chats: chats, token, loadChats }) => {
+const ChatsList: React.FC<ChatsListProps> = ({ 
+  Chats: chats, 
+  token, loadChats,
+  removeChat,
+  removeMatch,
+}) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | undefined>(undefined);
   const [IsDeletingChat, setIsDeletingChat] = useState(false);
 
   useEffect(() => {
     loadChats(token);
-  },[])
+  },[]);
 
   const onSelectChat = (chat: Chat) => {
     setSelectedChat(chat);
@@ -124,7 +131,9 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     token: state.user.token,
   }),
   mapDispatchToProps: {
-    loadChats
+    loadChats,
+    removeChat,
+    removeMatch,
   },
   component: React.memo(ChatsList)
 });

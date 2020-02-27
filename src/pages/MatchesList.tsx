@@ -23,11 +23,19 @@ interface StateProps {
 interface DispatchProps {
   loadMatches: typeof loadMatches;
   loadChats: typeof loadChats;
+  removeMatch: typeof removeMatch;
 };
 
 interface MatchesListProps extends OwnProps, StateProps, DispatchProps { };
 
-const MatchesList: React.FC<MatchesListProps> = ({ matches, token, loadMatches, history, loadChats }) => {
+const MatchesList: React.FC<MatchesListProps> = ({ 
+  matches, 
+  token, 
+  loadMatches, 
+  history, 
+  loadChats,
+  removeMatch,
+ }) => {
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<Profile | undefined>(undefined);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
@@ -169,7 +177,8 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   }),
   mapDispatchToProps: {
     loadMatches,
-    loadChats
+    loadChats,
+    removeMatch,
   },
   component: React.memo(MatchesList)
 });
