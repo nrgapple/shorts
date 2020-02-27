@@ -320,8 +320,7 @@ export const getMatches = async (token: string | undefined) => {
       return data.matches as Profile[];
     } catch (e) {
       console.log(`Error posting swipe: ${e}`);
-      const {data} = e.response;
-      throw data;
+      throw e.response?e.response: e;
     }
   }
 }
@@ -611,6 +610,25 @@ export const subscribeToMatchNotifications = (
       }
       console.log(data);
       onNotification(data as Profile);
+    }
+  }, {id: subId} as StompHeaders);
+}
+
+export const subscribeToUnmatchNotifications = (
+  client: Client,
+  onNotification: (userId: number) => void,
+  subId: string,
+) => {
+  return client.subscribe(vars().env.UNMATCH_NOTIFY, response => {
+    console.log(response);
+    const data = JSON.parse(response.body);
+    if (data) {
+      if (!data.userId) {
+        console.error(`no id returned`);
+        return;
+      }
+      console.log(data);
+      onNotification(data.userId as number);
     }
   }, {id: subId} as StompHeaders);
 }

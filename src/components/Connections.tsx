@@ -1,27 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router';
-import { configureClient, subscribeToChatNotifications, subscribeToMatchNotifications, createChat } from '../data/dataApi';
+import { useHistory, useLocation } from 'react-router';
+import { configureClient, subscribeToChatNotifications, subscribeToMatchNotifications, createChat, subscribeToUnmatchNotifications } from '../data/dataApi';
 import { Profile } from '../models/Profile';
 import { Client } from '@stomp/stompjs';
 import { setClient, setIsClientConnected } from '../data/user/user.actions';
-import { replaceChat } from '../data/sessions/sessions.actions';
+import { replaceChat, removeChat, removeMatch } from '../data/sessions/sessions.actions';
 import { connect } from '../data/connect';
 import { IonModal, IonButton, IonContent, IonHeader, IonToolbar, IonButtons, IonText, IonTitle, IonProgressBar, IonRow, IonIcon } from '@ionic/react';
 import ImageCard from './ImageCard';
 import InfoCard from './InfoCard';
 import { heart } from 'ionicons/icons';
+import { Chat } from '../models/Chat';
 
 interface StateProps {
   token?: string,
   userProfile?: Profile,
   client?: Client,
   isClientConnected: boolean,
+  chats?: Chat[],
+  matches?: Profile[],
 }
 
 interface DispatchProps {
   setClient: typeof setClient,
   replaceChat: typeof replaceChat,
   setIsClientConnected: typeof setIsClientConnected,
+  removeChat: typeof removeChat,
+  removeMatch: typeof removeMatch,
 }
 
 interface ConnectionProps extends StateProps, DispatchProps { }
@@ -34,8 +39,13 @@ const Connections: React.FC<ConnectionProps> = ({
   setClient,
   setIsClientConnected,
   replaceChat,
+  removeChat,
+  removeMatch,
+  chats,
+  matches,
 }) => {
   const history = useHistory();
+  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [match, setMatch] = useState<Profile | undefined>(undefined);
   const [creatingChat, setIsCreatingChat] = useState(false);
@@ -67,6 +77,26 @@ const Connections: React.FC<ConnectionProps> = ({
             },
             `notify-match-${userProfile!.userId}`,
           );
+          subscribeToUnmatchNotifications(
+            client,
+            (userId) => {
+              console.log(`Unmatched with: ${userId}`);
+              if (chats) {
+                console.log(chats);
+                const chat = chats.find(x => x.recipient.userId === userId);
+                if (chat) {
+                  removeChat(chat);
+                }
+              }
+              if (matches) {
+                const match = matches.find(x => x.userId === userId);
+                if (match) {
+                  removeMatch(match);
+                }
+              }
+            },
+            `notify-ummatch-${userProfile!.userId}`,
+          );
         },
         () => {
           console.log(`Client disconnected`);
@@ -84,6 +114,7 @@ const Connections: React.FC<ConnectionProps> = ({
       try {
         setIsCreatingChat(true);
         const chat = await createChat(match.userId, token);
+        //console.log(history);
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -167,11 +198,15 @@ export default connect<{}, StateProps, DispatchProps>({
     userProfile: state.data.userProfile,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
+    chats: state.data.chats,
+    matches: state.data.matches,
   }),
   mapDispatchToProps: {
     setClient,
     replaceChat,
     setIsClientConnected,
+    removeChat,
+    removeMatch,
   },
   component: Connections,
 });
