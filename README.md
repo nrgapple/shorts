@@ -8,7 +8,7 @@ Shorts is a project to create a dating app using ionic and react
 
 The backend API was developed by [@mattruddy](https://github.com/mattruddy).
 
-[Service API Documentation](/documentation/api.md)
+[Service API Documentation](https://selfconnect.dev/swagger-ui.html)
 
 ## Development
 
