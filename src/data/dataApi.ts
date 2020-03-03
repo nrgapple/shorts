@@ -163,6 +163,72 @@ export const postLogin = async (
   }
 }
 
+export const postForgot = async (
+  email: string,
+) => {
+  try {
+    const response = await Axios.request({
+      url: `${vars().env.API_URL}/public/credentials/forgot`,
+      method: 'POST',
+      data: {
+        email
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    const { data } = response;
+    console.log(data);
+    return data;
+  } catch (e) {
+    const {data} = e.response;
+    throw data
+  }
+}
+
+export const getVerify = async (
+  token: string,
+) => {
+  try {
+    const response = await Axios.request({
+      url: `${vars().env.API_URL}/public/credentials/verify/${token}`,
+      method: 'GET',
+    });
+    const { data } = response;
+    console.log(data);
+    return data;
+  } catch (e) {
+    const {data} = e.response;
+    throw data
+  }
+}
+
+export const postReset = async (
+  token: string,
+  password: string,
+) => {
+  try {
+    const response = await Axios.request({
+      url: `${vars().env.API_URL}/public/credentials/reset`,
+      method: 'POST',
+      data: {
+        token: token,
+        password: password,
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+    });
+    const { data } = response;
+    console.log(data);
+    return data;
+  } catch (e) {
+    const {data} = e.response;
+    throw data
+  }
+}
+
 export const postProfileInfo = async (
   token: string | undefined,
   about: string,

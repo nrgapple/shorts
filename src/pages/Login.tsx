@@ -111,6 +111,7 @@ const Login: React.FC<LoginProps> = ({
               <IonInput name="password" type="password" value={password} onIonChange={e => setPassword(e.detail.value!)}>
               </IonInput>
             </IonItem>
+            <IonItem routerLink="/forgot"><IonText>Forgot password</IonText></IonItem>
 
             {formSubmitted && passwordError && <IonText color="danger">
               <p className="ion-padding-start">

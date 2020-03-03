@@ -26,7 +26,7 @@ import './theme/variables.css';
 import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
-import { loadAllInfo, addChat, removeChat, replaceChat } from './data/sessions/sessions.actions';
+import { loadAllInfo, replaceChat } from './data/sessions/sessions.actions';
 import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
@@ -35,17 +35,14 @@ import Support from './pages/Support';
 import Tutorial from './pages/Tutorial';
 import UserProfile from './pages/UserProfile';
 import HomeOrLogin from './components/HomeOrLogin';
-import { Session } from "./models/Session";
 import { Profile } from './models/Profile';
-import { postUserLocation, configureClient, subscribeToChatNotifications, subscribeToMatchNotifications } from './data/dataApi';
+import { postUserLocation } from './data/dataApi';
 import { GeoPoint } from './models/GeoPoint';
 import ChatDetail from './pages/ChatDetail';
 import ProfileDetail from './pages/ProfileDetail';
 import { Client } from '@stomp/stompjs';
-import { useMachine } from '@xstate/react';
-import { appMachine } from './machines/appMachines';
-import { useHistory } from 'react-router';
 import Connections from './components/Connections';
+import Forgot from './pages/Forgot';
 
 const App: React.FC = () => {
   return (
@@ -83,7 +80,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   darkMode, 
   token, 
   userProfile, 
-  nearMe, 
   location, 
   client,
   loadAllInfo, 
@@ -93,8 +89,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setToken, 
   loadUserData, 
   loadCurrentLocation, 
-  isClientConnected,
-  replaceChat,
   setIsClientConnected
 }) => {
 
@@ -142,6 +136,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/support" component={Support} />
             <Route path="/profile" component={UserProfile} />
             <Route path="/tutorial" component={Tutorial} />
+            <Route path="/forgot" component={Forgot} />
             <Route path="/logout" render={() => {
               setIsLoggedIn(false);
               setUsername(undefined);
