@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle } from '@ionic/react';
 import { connect } from '../data/connect';
-import { withRouter, RouteComponentProps, useLocation } from 'react-router';
+import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
 import { send, person } from 'ionicons/icons';
 import './ChatDetail.scss';
@@ -43,7 +43,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loadChats,
   loadProfile,
   replaceChat,
-  history,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -52,6 +51,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
   const location = useLocation();
+  const history = useHistory();
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
@@ -185,6 +185,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   });
+  
+  useEffect(() => {
+    console.log(history);
+  }, [history])
   
   const onKeyPressed = (event: any) => {
     
