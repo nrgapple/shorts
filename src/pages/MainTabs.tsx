@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useEffect }  from 'react';
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
 import { home, heart, chatboxes } from 'ionicons/icons';
@@ -12,13 +12,19 @@ import { RouteComponentProps } from 'react-router-dom';
 
 interface StateProps {
   hasMessages: boolean,
+  hasValidProfile?: boolean,
+  isLoggedin?: boolean,
 }
 
 interface MainTabsProps extends StateProps { }
 
 const MainTabs: React.FC<MainTabsProps> = ({
   hasMessages,
+  hasValidProfile,
+  isLoggedin,
 }) => {
+
+  useEffect(() => {console.log(isLoggedin)}, [isLoggedin])
 
   return (
     <IonTabs>
@@ -37,15 +43,20 @@ const MainTabs: React.FC<MainTabsProps> = ({
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="matches" href="/tabs/matches">
-          <IonIcon icon={heart} />
-          <IonLabel>Matches</IonLabel>
-        </IonTabButton>
-        <IonTabButton tab="chats" href="/tabs/chats">
-          {hasMessages && <IonBadge><IonIcon icon={heart}/></IonBadge>}
-          <IonIcon icon={chatboxes} />
-          <IonLabel>Chats</IonLabel>
-        </IonTabButton>
+        {
+          isLoggedin && hasValidProfile &&
+          <>
+          <IonTabButton tab="matches" href="/tabs/matches">
+            <IonIcon icon={heart} />
+            <IonLabel>Matches</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="chats" href="/tabs/chats">
+            {hasMessages && <IonBadge><IonIcon icon={heart}/></IonBadge>}
+            <IonIcon icon={chatboxes} />
+            <IonLabel>Chats</IonLabel>
+          </IonTabButton>
+          </>
+        }
       </IonTabBar>
     </IonTabs>
   );
@@ -54,6 +65,8 @@ const MainTabs: React.FC<MainTabsProps> = ({
 export default connect<StateProps>({
   mapStateToProps: (state) => ({
     hasMessages: selectors.getHasMessages(state),
+    hasValidProfile: state.data.hasValidProfile,
+    isLoggedin: state.user.isLoggedin,
   }),
   component: MainTabs
 });
