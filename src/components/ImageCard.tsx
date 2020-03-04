@@ -1,5 +1,5 @@
 import { IonCard, IonSlides, IonSlide, IonButton } from "@ionic/react";
-import React, { useEffect } from 'react'
+import React, { useEffect, EventHandler } from 'react'
 import { Image } from "../models/Image";
 import { useState, useRef, DOMElement } from "react";
 import Lightbox from "react-image-lightbox";
@@ -39,20 +39,10 @@ const ImageCard: React.FC<ImageCardProps> = ({
 
   useEffect(() => {
     if (slides.current) {
-      console.log('update width');
       const swiper = slides.current.swiper();
-      console.log(images)
       swiper.update();
     }
   }, [width, height]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      console.log('late update');
-      const swiper = slides.current.swiper();
-      swiper.update();
-    }, 50);
-  }, []);
 
   return (
     <>
@@ -72,6 +62,8 @@ const ImageCard: React.FC<ImageCardProps> = ({
             effect: 'flip',
             navigation: false,
             grabCursor: true,
+            observer: true,
+        
           }
         }
           style={{ width: '100%', height: '100%' }}>
