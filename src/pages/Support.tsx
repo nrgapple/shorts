@@ -43,7 +43,7 @@ const Support: React.FC<SupportProps> = () => {
       <IonContent>
 
         <div className="login-logo" onClick={()=> setShowAlert(true)}>
-          <img src="assets/img/appicon.svg" alt="Ionic logo" />
+          <img src="assets/icon/shorts-512.png" alt="Ionic logo" />
         </div>
 
         <form noValidate onSubmit={send}>

@@ -6,6 +6,7 @@ import { connect } from '../data/connect';
 import { RouteComponentProps, useHistory, useLocation } from 'react-router';
 import { postReset, getVerify } from '../data/dataApi';
 import queryString from 'query-string';
+import img from '../../public/assets/icon/shorts-512.png'
 
 interface OwnProps extends RouteComponentProps { }
 
@@ -112,7 +113,7 @@ const Reset: React.FC<ResetProps> = ({
       <IonContent>
 
         <div className="login-logo">
-          <img src="assets/img/appicon.svg" alt="Ionic logo" />
+          <img src="assets/icon/shorts-512.png" alt="Ionic logo" />
         </div>
         {
           validToken === undefined ? (
