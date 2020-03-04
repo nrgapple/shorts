@@ -43,6 +43,7 @@ import ProfileDetail from './pages/ProfileDetail';
 import { Client } from '@stomp/stompjs';
 import Connections from './components/Connections';
 import Forgot from './pages/Forgot';
+import Reset from './pages/Reset';
 
 const App: React.FC = () => {
   return (
@@ -137,6 +138,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/profile" component={UserProfile} />
             <Route path="/tutorial" component={Tutorial} />
             <Route path="/forgot" component={Forgot} />
+            <Route path="/reset" component={Reset} />
             <Route path="/logout" render={() => {
               setIsLoggedIn(false);
               setUsername(undefined);

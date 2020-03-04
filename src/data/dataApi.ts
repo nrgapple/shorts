@@ -194,9 +194,8 @@ export const getVerify = async (
       url: `${vars().env.API_URL}/public/credentials/verify/${token}`,
       method: 'GET',
     });
-    const { data } = response;
-    console.log(data);
-    return data;
+    console.log(response);
+    return response;
   } catch (e) {
     const {data} = e.response;
     throw data
