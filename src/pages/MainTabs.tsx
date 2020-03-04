@@ -1,3 +1,4 @@
+import React  from 'react';
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
 import { home, heart, chatboxes } from 'ionicons/icons';
