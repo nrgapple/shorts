@@ -12,7 +12,7 @@ import {
   IonToolbar,
   IonToggle
 } from '@ionic/react';
-import { home, hammer, help, informationCircle, logIn, logOut, person, personAdd, heart, chatboxes } from 'ionicons/icons';
+import { home, help, informationCircle, logIn, logOut, person, personAdd } from 'ionicons/icons';
 import React, { useState } from 'react';
 import { connect } from '../data/connect';
 import { RouteComponentProps, withRouter } from 'react-router';
@@ -21,8 +21,6 @@ import { setDarkMode } from '../data/user/user.actions';
 const routes = {
   appPages: [
     { title: 'Home', path: '/tabs/home', icon: home },
-    { title: 'Matches', path: '/tabs/matches', icon: heart },
-    { title: 'Chats', path: '/tabs/chats', icon: chatboxes },
   ],
   loggedInPages: [
     { title: 'Account', path: '/account', icon: person },
@@ -54,8 +52,8 @@ interface DispatchProps {
 
 interface MenuProps extends RouteComponentProps, StateProps, DispatchProps { }
 
-const Menu: React.FC<MenuProps> = ({ darkMode, history, isAuthenticated, setDarkMode }) => {
-  const [disableMenu, setDisableMenu] = useState(false);
+const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) => {
+  const [disableMenu] = useState(false);
 
   function renderlistItems(list: Pages[]) {
     return list
@@ -79,7 +77,6 @@ const Menu: React.FC<MenuProps> = ({ darkMode, history, isAuthenticated, setDark
       </IonHeader>
       <IonContent class="outer-content">
         <IonList>
-          <IonListHeader>Navigate</IonListHeader>
           {renderlistItems(routes.appPages)}
         </IonList>
         <IonList>
