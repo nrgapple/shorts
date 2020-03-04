@@ -1,4 +1,3 @@
-import React, { useEffect }  from 'react';
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonBadge } from '@ionic/react';
 import { Route, Redirect } from 'react-router';
 import { home, heart, chatboxes } from 'ionicons/icons';
@@ -8,7 +7,6 @@ import ChatsList from './ChatsList';
 import ProfileDetail from './ProfileDetail';
 import {connect} from '../data/connect';
 import * as selectors from '../data/selectors';
-import { RouteComponentProps } from 'react-router-dom';
 
 interface StateProps {
   hasMessages: boolean,
@@ -23,9 +21,6 @@ const MainTabs: React.FC<MainTabsProps> = ({
   hasValidProfile,
   isLoggedin,
 }) => {
-
-  useEffect(() => {console.log(isLoggedin)}, [isLoggedin])
-
   return (
     <IonTabs>
       <IonRouterOutlet>
@@ -43,20 +38,15 @@ const MainTabs: React.FC<MainTabsProps> = ({
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
-        {
-          isLoggedin && hasValidProfile &&
-          <>
-          <IonTabButton tab="matches" href="/tabs/matches">
-            <IonIcon icon={heart} />
-            <IonLabel>Matches</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="chats" href="/tabs/chats">
-            {hasMessages && <IonBadge><IonIcon icon={heart}/></IonBadge>}
-            <IonIcon icon={chatboxes} />
-            <IonLabel>Chats</IonLabel>
-          </IonTabButton>
-          </>
-        }
+        <IonTabButton tab="matches" href="/tabs/matches" hidden={!isLoggedin || !hasValidProfile}>
+          <IonIcon icon={heart} />
+          <IonLabel>Matches</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="chats" href="/tabs/chats" hidden={!isLoggedin || !hasValidProfile}>
+          {hasMessages && <IonBadge><IonIcon icon={heart}/></IonBadge>}
+          <IonIcon icon={chatboxes} />
+          <IonLabel>Chats</IonLabel>
+        </IonTabButton>
       </IonTabBar>
     </IonTabs>
   );

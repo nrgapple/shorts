@@ -127,8 +127,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
           <Connections />
           <IonRouterOutlet id="main">
             <Route path="/tabs" render={() => {
-                console.log("tabs tabs tabs");
-                return <MainTabs hasMessages={false}/>
+                return <MainTabs hasMessages={false} />
               }}
             />
             <Route path="/account" component={Account} />
