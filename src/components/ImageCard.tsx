@@ -41,9 +41,18 @@ const ImageCard: React.FC<ImageCardProps> = ({
     if (slides.current) {
       console.log('update width');
       const swiper = slides.current.swiper();
+      console.log(images)
       swiper.update();
     }
   }, [width, height]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log('late update');
+      const swiper = slides.current.swiper();
+      swiper.update();
+    }, 50);
+  }, []);
 
   return (
     <>
