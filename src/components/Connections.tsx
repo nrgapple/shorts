@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { configureClient, subscribeToChatNotifications, subscribeToMatchNotifications, createChat, subscribeToUnmatchNotifications } from '../data/dataApi';
 import { Profile } from '../models/Profile';
-import { Client } from '@stomp/stompjs';
-import { setClient, setIsClientConnected } from '../data/user/user.actions';
+import { Client, StompSubscription } from '@stomp/stompjs';
+import { setClient, setIsClientConnected, setIsLoggedIn } from '../data/user/user.actions';
 import { replaceChat, removeChat, removeMatch } from '../data/sessions/sessions.actions';
 import { connect } from '../data/connect';
 import { IonModal, IonButton, IonContent, IonHeader, IonToolbar, IonButtons, IonText, IonTitle, IonProgressBar, IonRow, IonIcon } from '@ionic/react';
@@ -19,6 +19,7 @@ interface StateProps {
   isClientConnected: boolean,
   chats?: Chat[],
   matches?: Profile[],
+  isLoggedIn: boolean,
 }
 
 interface DispatchProps {
@@ -43,30 +44,35 @@ const Connections: React.FC<ConnectionProps> = ({
   removeMatch,
   chats,
   matches,
+  isLoggedIn,
 }) => {
   const history = useHistory();
   const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [match, setMatch] = useState<Profile | undefined>(undefined);
   const [creatingChat, setIsCreatingChat] = useState(false);
+  const [wasLoggedInAndSubbed, setWasLoggedInAndSubbed] = useState(false);
+  var subs = useRef<StompSubscription[]>([]);
 
   const configure = () => {
+    console.log(`token: ${token} | client: ${client}`)
     if (token && client) {
+      console.log(`calling configure`)
       configureClient(
         token,
         client,
         () => {
           setIsClientConnected(true);
           console.log(`Connected to socket`);
-          subscribeToChatNotifications(
+          subs.current = [...subs.current, subscribeToChatNotifications(
             client,
             (chat) => {
               chat.lastMessage && console.log(`New message from ${chat.recipient.firstName}: ${chat.lastMessage.content}`);
               replaceChat(chat);
             },
             `notify-chat-${userProfile!.userId}`,
-          );
-          subscribeToMatchNotifications(
+          )];
+          subs.current = [...subs.current, subscribeToMatchNotifications(
             client,
             (profile) => {
               console.log(`MATCH!!`);
@@ -76,8 +82,8 @@ const Connections: React.FC<ConnectionProps> = ({
               setShowModal(true);
             },
             `notify-match-${userProfile!.userId}`,
-          );
-          subscribeToUnmatchNotifications(
+          )];
+          subs.current = [...subs.current, subscribeToUnmatchNotifications(
             client,
             (userId) => {
               console.log(`Unmatched with: ${userId}`);
@@ -96,7 +102,8 @@ const Connections: React.FC<ConnectionProps> = ({
               }
             },
             `notify-ummatch-${userProfile!.userId}`,
-          );
+          )];
+          setWasLoggedInAndSubbed(true);
         },
         () => {
           console.log(`Client disconnected`);
@@ -107,6 +114,13 @@ const Connections: React.FC<ConnectionProps> = ({
         }
       );
     }
+  }
+
+  const disconnect = () => {
+    console.log(`dissconnect`);
+    if (client)
+      client.deactivate();
+    setIsClientConnected(false);
   }
 
   const onCreateChat = async () => {
@@ -126,8 +140,13 @@ const Connections: React.FC<ConnectionProps> = ({
 
   useEffect(() => {
     console.log(token);
-    setClient(new Client());
-  }, [token])
+    if (isLoggedIn && !wasLoggedInAndSubbed ) {
+      console.log(`setting client: ${JSON.stringify(client)}`)
+      setClient(new Client());
+    } else if (!isLoggedIn && wasLoggedInAndSubbed) {
+      disconnect();
+    }
+  }, [token, isLoggedIn])
 
   useEffect(() => {
     console.log(`client changed: ${client}`);
@@ -135,7 +154,7 @@ const Connections: React.FC<ConnectionProps> = ({
     if (!client || isClientConnected || !userProfile) return;
     console.log(`Now time to configure`);
     configure();
-  }, [client, userProfile])
+  }, [client, userProfile, isClientConnected])
 
   return (
     <>
@@ -200,6 +219,7 @@ export default connect<{}, StateProps, DispatchProps>({
     isClientConnected: state.user.isClientConnected,
     chats: state.data.chats,
     matches: state.data.matches,
+    isLoggedIn: state.user.isLoggedin,
   }),
   mapDispatchToProps: {
     setClient,
