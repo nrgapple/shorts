@@ -6,7 +6,7 @@ export const getTimestamp = (date: Date) => {
   if (duration.asWeeks() > 1)
     return currMoment.format('dddd, MMMM Do YYYY');
   else if (duration.asDays() > 1)
-    return currMoment.format('"ddd, h a"');
+    return currMoment.format('ddd, h a');
   else
     return currMoment.format('h:mm a');
 }
