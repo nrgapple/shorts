@@ -5,6 +5,7 @@ import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions'
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
+import { useFacebookLogin, FaceBookLoginProps } from "react-use-fb-login";
 import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
 import { postLogin } from '../data/dataApi';
 
@@ -27,6 +28,16 @@ const Login: React.FC<LoginProps> = ({
   loadAllInfo: loadAllInfoAction,
 }) => {
 
+  const facebookProps = {
+    appId: "813979112446734",
+    language: "EN",
+    version: "3.1",
+    fields: ["id", "email", "name"],
+    onFailure: error => {
+      console.log(error);
+    }
+  } as FaceBookLoginProps;
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -35,8 +46,11 @@ const Login: React.FC<LoginProps> = ({
   const [validationError, setValidationError] = useState(false);
   const [tokenError, setTokenError] = useState(false);
   const apiURL = 'https://doctornelson.herokuapp.com';
+  const [{ loaded, currentUser, isLoggedIn }, login, logout] = useFacebookLogin(
+    facebookProps
+  );
 
-  const login = async (e: React.FormEvent) => {
+  const loginOG = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormSubmitted(true);
     if(!username) {
@@ -85,7 +99,7 @@ const Login: React.FC<LoginProps> = ({
           <img src="assets/icon/shorts-512.png" alt="Ionic logo" />
         </div>
 
-        <form noValidate onSubmit={login}>
+        <form noValidate onSubmit={loginOG}>
           <IonList>
             <IonItem>
               {formSubmitted && validationError && <IonText color="danger">
@@ -128,6 +142,15 @@ const Login: React.FC<LoginProps> = ({
               <IonButton routerLink="/signup" color="light" expand="block">Signup</IonButton>
             </IonCol>
           </IonRow>
+        </form>
+
+        <form onSubmit={login}>
+          <IonCol>
+            <p className="ion-padding-start">
+              Login in with
+            </p>
+            <IonButton type="submit" >Facebook</IonButton>
+          </IonCol>
         </form>
 
       </IonContent>

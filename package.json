@@ -29,6 +29,7 @@
     "react-router": "^5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.2.0",
+    "react-use-fb-login": "^1.0.7",
     "reselect": "^4.0.0",
     "xstate": "^4.7.8"
   },
