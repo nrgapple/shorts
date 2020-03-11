@@ -5,7 +5,7 @@ import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions'
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
-import { useFacebookLogin, FaceBookLoginProps } from "react-use-fb-login";
+// import { useFacebookLogin, FaceBookLoginProps } from "react-use-fb-login";
 import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
 import { postLogin } from '../data/dataApi';
 
@@ -28,15 +28,15 @@ const Login: React.FC<LoginProps> = ({
   loadAllInfo: loadAllInfoAction,
 }) => {
 
-  const facebookProps = {
-    appId: "813979112446734",
-    language: "EN",
-    version: "3.1",
-    fields: ["id", "email", "name"],
-    onFailure: error => {
-      console.log(error);
-    }
-  } as FaceBookLoginProps;
+  // const facebookProps = {
+  //   appId: "813979112446734",
+  //   language: "EN",
+  //   version: "3.1",
+  //   fields: ["id", "email", "name"],
+  //   onFailure: error => {
+  //     console.log(error);
+  //   }
+  // } as FaceBookLoginProps;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -46,9 +46,9 @@ const Login: React.FC<LoginProps> = ({
   const [validationError, setValidationError] = useState(false);
   const [tokenError, setTokenError] = useState(false);
   const apiURL = 'https://doctornelson.herokuapp.com';
-  const [{ loaded, currentUser, isLoggedIn }, login, logout] = useFacebookLogin(
-    facebookProps
-  );
+  // const [{ loaded, currentUser, isLoggedIn }, login, logout] = useFacebookLogin(
+  //   facebookProps
+  // );
 
   const loginOG = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,8 +143,8 @@ const Login: React.FC<LoginProps> = ({
             </IonCol>
           </IonRow>
         </form>
-
-        <form onSubmit={login}>
+ 
+        <form action="https://selfconnect.dev/signin/facebook" method="POST">
           <IonCol>
             <p className="ion-padding-start">
               Login in with
