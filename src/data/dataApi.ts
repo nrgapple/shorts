@@ -169,6 +169,10 @@ export const postLoginFB = async (
     const response = await Axios.request({
       url: `${vars().env.API_URL}/signin/facebook`,
       method: 'POST',
+      headers: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     });
     const {data} = response;
     return data;
