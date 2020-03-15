@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, useIonViewDidEnter } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -14,6 +14,7 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import { getTimestamp } from '../util/util';
 import { chatMachine } from '../machines/chatDetailMachines';
 import { useMachine } from '@xstate/react';
+import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 interface OwnProps extends RouteComponentProps { };
 
@@ -47,6 +48,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [lastRead, setLastRead] = useState<number>(0);
+  const [rendered, setRendered] = useState<boolean>(false);
   const content = useRef(null);
   const value = useRef(null);
   var subs = useRef<StompSubscription[]>([]);
@@ -295,6 +297,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
+    if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
 
@@ -307,6 +310,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   
     return subscription.unsubscribe;
   }, [chatService]); // note: service should never change
+
+  // the component finished rendering.
+  useIonViewDidEnter(() => {
+    if (messages) scrollToTheBottom();
+    setRendered(true);
+  })
 
   return (
     <>
