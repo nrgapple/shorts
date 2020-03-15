@@ -60,7 +60,8 @@ const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) =
       .filter(route => !!route.path)
       .map(p => (
         <IonMenuToggle key={p.title} auto-hide="false">
-          <IonItem button routerLink={p.path} routerDirection="forward">
+          <IonItem button routerLink={p.path} 
+            routerDirection="none">
             <IonIcon slot="start" icon={p.icon} />
             <IonLabel>{p.title}</IonLabel>
           </IonItem>
