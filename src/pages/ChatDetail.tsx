@@ -272,10 +272,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         client && 
         isClientConnected && 
         userProfile &&
+        rendered &&
         chatState.matches({init: 'wait'})) {
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected]);
+  }, [token, chat, client, userProfile, isClientConnected, rendered]);
 
   // Get dependencies once we have our token.
   useEffect(() => {
@@ -313,7 +314,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // the component finished rendering.
   useIonViewDidEnter(() => {
-    if (messages) scrollToTheBottom();
     setRendered(true);
   })
 
