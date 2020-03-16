@@ -223,19 +223,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }, 200);
   }
 
-  const getProgress = () => {
-    if (chatState.matches({init: 'wait'}))
-      return .4;
-    else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
-      return .9;
-    else if (chatState.matches({init: {fetchMessages: 'getUnreadMessages'}}))
-      return .95;
-    else if (chatState.matches('subscribe'))
-      return .98;
-    else if (chatState.matches('ready'))
-      return 1;
-  }
-
   const unSub = (client: Client, chatId: number) => {
     console.log(`Unsubscribing to chat`);
     publishTypingForClient(client, chatId, false);
@@ -340,7 +327,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               <>
               {
               !chatState.matches('ready')? (
-                <IonProgressBar type="determinate" value={getProgress()}/>
+                <IonProgressBar type="indeterminate" />
               ) : (
                   <IonList>
                     { messages &&
