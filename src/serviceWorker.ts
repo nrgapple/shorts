@@ -155,8 +155,7 @@ function subscribeUser(registration: ServiceWorkerRegistration) {
   })
   .then(function(subscription: PushSubscription) {
     const subJson = subscription.toJSON();
-      // Get public key and user auth from the subscription object
-    // CANNOT FIGURE THIS OUT!!!!!!!!!!!!!!!!!!!
+    // Get public key and user auth from the subscription object
     addDevice(subJson.keys!.p256dh as string, subJson.keys!.auth as string, subscription.endpoint, localStorage.getItem("_cap_token") as string);
   })
   .catch(function(err: Error) {
