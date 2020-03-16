@@ -1,11 +1,13 @@
 // This optional code is used to register a service worker.
 // register() is not called by default.
-import { addDevice } from './data/dataApi';
 // This lets the app load faster on subsequent visits in production, and gives
 // it offline capabilities. However, it also means that developers (and users)
 // will only see deployed updates on subsequent visits to a page, after all the
 // existing tabs open on the page have been closed, since previously cached
 // resources are updated in the background.
+
+import { postDevice } from "./data/dataApi";
+import { vars } from "./data/env";
 
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
@@ -105,7 +107,7 @@ function registerValidSW(swUrl: string, config?: Config) {
           .then((subscription) => {
             const isSubscribed = !(subscription === null);
             if (isSubscribed) {
-              console.log('subbed')
+              console.log('user is subbed to push notifications');
             } else {
               subscribeUser(registration);
             }
@@ -148,15 +150,27 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
 }
 
 function subscribeUser(registration: ServiceWorkerRegistration) {
-  const applicationServerKey = urlB64ToUint8Array('BNuteCIG906sEz67jaqhSAhMuyE2Gff-cjoCy8YIrkSaKK5sIynvmiL9ySN1E0zbI57R2uF1QVhW-Hr3h1TSZ-4');
+  const applicationServerKey = urlB64ToUint8Array(vars().env.APP_SERVER_KEY);
   registration.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: applicationServerKey
   })
   .then(function(subscription: PushSubscription) {
     const subJson = subscription.toJSON();
-    // Get public key and user auth from the subscription object
-    addDevice(subJson.keys!.p256dh as string, subJson.keys!.auth as string, subscription.endpoint, localStorage.getItem("_cap_token") as string);
+    const key = subJson.keys!.p256dh as string;
+    const auth = subJson.keys!.auth as string;
+    const endpoint = subJson.endpoint as string;
+    const token = localStorage.getItem("_cap_token");
+    // Get public key, user auth and push endpoint from the subscription object.
+    // If the user is logged in, add the device. 
+    // Otherwise store in local storage and add after login.
+    if (token) {
+      postDevice(key, auth, endpoint, token);
+    } else {
+      localStorage.setItem("push_key", key);
+      localStorage.setItem("push_auth", auth);
+      localStorage.setItem("push_endpoint", endpoint);
+    }
   })
   .catch(function(err: Error) {
     console.log('Failed to subscribe the user: ', err);

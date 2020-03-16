@@ -542,12 +542,12 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
-export const addDevice = async (key: string, auth: string, endpoint: string, token: string) => {
+export const postDevice = async (key: string, auth: string, endpoint: string, token: string) => {
   console.log(key && auth && endpoint && token);
   if (key && auth && endpoint && token) {
     try {
       console.log('sending add device')
-      const addDeviceResponse = await Axios.request({
+      const postDeviceResponse = await Axios.request({
         url: `${vars().env.API_URL}/secure/device/add`,
         method: 'POST',
         headers: {
@@ -562,7 +562,7 @@ export const addDevice = async (key: string, auth: string, endpoint: string, tok
           deviceType: 'DESKTOP'
         }
       });
-      const { data } = addDeviceResponse;
+      const { data } = postDeviceResponse;
       console.log(data);
     } catch(e) {
       const { data } = e;

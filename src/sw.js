@@ -18,7 +18,51 @@ self.addEventListener('push', (event) => {
         image: 'assets/icon/shorts-180.png',
         data: push.url,
     };
-    event.waitUntil(self.registration.showNotification(title, options));
+    
+    event.waitUntil(
+      clients.matchAll({
+          includeUncontrolled: true
+      }).then(c => {
+          if (c.length === 0) {
+              self.registration.showNotification(title, options)
+          } else {
+              const client = c.find(c => c.visibilityState === "visible");
+              if (client !== undefined) {
+                  console.log('on application');
+              } else {
+                  self.registration.showNotification(title, options)
+              }
+          }
+      })
+  );
+});
+
+self.addEventListener('notificationclick', function(event) {
+  console.log('[Service Worker] Notification click Received.');
+  const urlToOpen = new URL(self.location.origin).href;
+  const promiseChain = clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+  }).then((windowClients) => {
+      let matchingClient = null;
+
+      for (let i = 0; i < windowClients.length; i++) {
+          const windowClient = windowClients[i];
+          if (windowClient.url.includes(urlToOpen)) {
+            matchingClient = windowClient;
+            break;
+          }
+      }
+
+      if (matchingClient) {
+          return matchingClient.focus();
+      } else {
+          return clients.openWindow(urlToOpen);
+      }
+  });
+
+  event.waitUntil(promiseChain);
+  event.notification.close();
 });
 
 workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);

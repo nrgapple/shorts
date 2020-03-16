@@ -5,8 +5,9 @@ import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions'
 import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import { loadNearMe } from '../data/sessions/sessions.actions';
-import { postUserLocation, postSignup } from '../data/dataApi';
+import { postUserLocation, postSignup, postDevice } from '../data/dataApi';
 import { GeoPoint } from '../models/GeoPoint';
+import { da } from 'date-fns/locale';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -74,6 +75,15 @@ const Login: React.FC<LoginProps> = ({
         setUsernameAction(username);
         if (point)
           await postUserLocation(point, data.token);
+        const key = localStorage.getItem("push_key");
+        const auth = localStorage.getItem("push_auth");
+        const endpoint = localStorage.getItem("push_endpoint");
+        if (key && auth && endpoint) {
+          await postDevice(key, auth, endpoint, data.token);
+          localStorage.removeItem("push_key");
+          localStorage.removeItem("push_auth");
+          localStorage.removeItem("push_endpoint");
+        }
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         console.log(`Error signing up: ${e}`);
