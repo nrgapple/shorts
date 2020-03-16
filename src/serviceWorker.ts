@@ -154,13 +154,10 @@ function subscribeUser(registration: ServiceWorkerRegistration) {
     applicationServerKey: applicationServerKey
   })
   .then(function(subscription: PushSubscription) {
+    const subJson = subscription.toJSON();
       // Get public key and user auth from the subscription object
-    var key = subscription.getKey('p256dh');
-    var auth = subscription.getKey('auth');
     // CANNOT FIGURE THIS OUT!!!!!!!!!!!!!!!!!!!
-    console.log(`key: ${String.fromCharCode.apply(String, new Int32Array(key!))}`);
-    console.log(`token: ${localStorage.getItem("_cap_token")}`)
-    addDevice(key, auth, subscription.endpoint, localStorage.getItem("_cap_token") as string);
+    addDevice(subJson.keys!.p256dh as string, subJson.keys!.auth as string, subscription.endpoint, localStorage.getItem("_cap_token") as string);
   })
   .catch(function(err: Error) {
     console.log('Failed to subscribe the user: ', err);

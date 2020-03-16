@@ -542,7 +542,7 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
-export const addDevice = async (key: any, auth: any, endpoint: string, token: string) => {
+export const addDevice = async (key: string, auth: string, endpoint: string, token: string) => {
   console.log(key && auth && endpoint && token);
   if (key && auth && endpoint && token) {
     try {
