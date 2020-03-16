@@ -1,6 +1,6 @@
 // This optional code is used to register a service worker.
 // register() is not called by default.
-
+import { addDevice } from './data/dataApi';
 // This lets the app load faster on subsequent visits in production, and gives
 // it offline capabilities. However, it also means that developers (and users)
 // will only see deployed updates on subsequent visits to a page, after all the
@@ -99,6 +99,18 @@ function registerValidSW(swUrl: string, config?: Config) {
           }
         };
       };
+
+      if ('PushManager' in window) {
+        registration.pushManager.getSubscription()
+          .then((subscription) => {
+            const isSubscribed = !(subscription === null);
+            if (isSubscribed) {
+              console.log('subbed')
+            } else {
+              subscribeUser(registration);
+            }
+          })
+      }
     })
     .catch(error => {
       console.error('Error during service worker registration:', error);
@@ -134,6 +146,39 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
       );
     });
 }
+
+function subscribeUser(registration: ServiceWorkerRegistration) {
+  const applicationServerKey = urlB64ToUint8Array('BNuteCIG906sEz67jaqhSAhMuyE2Gff-cjoCy8YIrkSaKK5sIynvmiL9ySN1E0zbI57R2uF1QVhW-Hr3h1TSZ-4');
+  registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: applicationServerKey
+  })
+  .then(function(subscription: PushSubscription) {
+      // Get public key and user auth from the subscription object
+    var key = subscription.getKey('p256dh');
+    var auth = subscription.getKey('auth');
+    // CANNOT FIGURE THIS OUT!!!!!!!!!!!!!!!!!!!
+    console.log(`key: ${String.fromCharCode.apply(String, new Int32Array(key!))}`);
+    console.log(`token: ${localStorage.getItem("_cap_token")}`)
+    addDevice(key, auth, subscription.endpoint, localStorage.getItem("_cap_token") as string);
+  })
+  .catch(function(err: Error) {
+    console.log('Failed to subscribe the user: ', err);
+  });
+}
+
+function urlB64ToUint8Array(base64String: string) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+};
 
 export function unregister() {
   if ('serviceWorker' in navigator) {

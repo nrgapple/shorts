@@ -542,6 +542,35 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
+export const addDevice = async (key: any, auth: any, endpoint: string, token: string) => {
+  console.log(key && auth && endpoint && token);
+  if (key && auth && endpoint && token) {
+    try {
+      console.log('sending add device')
+      const addDeviceResponse = await Axios.request({
+        url: `${vars().env.API_URL}/secure/device/add`,
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        data: {
+          endPoint: endpoint,
+          key: key,
+          auth: auth,
+          deviceType: 'DESKTOP'
+        }
+      });
+      const { data } = addDeviceResponse;
+      console.log(data);
+    } catch(e) {
+      const { data } = e;
+      throw data;
+    }
+  }
+}
+
 export const configureClient = (
   token: string | undefined, 
   client: Client | undefined,
