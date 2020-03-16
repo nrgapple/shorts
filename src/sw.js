@@ -9,11 +9,16 @@ workbox.routing.registerRoute(
 );
 
 self.addEventListener('push', (event) => {
-  const title = 'Get Started With Workbox';
-  const options = {
-    body: event.data.text()
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
+    const push = JSON.parse(event.data.text());
+    const title = `New Message from ${push.username}`;
+    const options = {
+        body: push.message,
+        icon: 'assets/icon/shorts-180.png',
+        badge: 'assets/icon/shorts-180.png',
+        image: 'assets/icon/shorts-180.png',
+        data: push.url,
+    };
+    event.waitUntil(self.registration.showNotification(title, options));
 });
 
 workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
