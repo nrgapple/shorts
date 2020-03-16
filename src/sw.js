@@ -1,11 +1,19 @@
-import {precacheAndRoute} from 'workbox-precaching';
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.0.0/workbox-sw.js');
 
-precacheAndRoute(self.__WB_MANIFEST);
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
 
-self.addEventListener('push', function(event) {
-    if (event.data) {
-      console.log('This push event has data: ', event.data.text());
-    } else {
-      console.log('This push event has no data.');
-    }
+workbox.routing.registerRoute(
+  new RegExp('https://hacker-news.firebaseio.com'),
+  new workbox.strategies.StaleWhileRevalidate()
+);
+
+self.addEventListener('push', (event) => {
+  const title = 'Get Started With Workbox';
+  const options = {
+    body: event.data.text()
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
 });
+
+workbox.precaching.precacheAndRoute(self.__WB_MANIFEST);
