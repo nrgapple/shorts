@@ -26,7 +26,9 @@ self.addEventListener('push', (event) => {
           if (c.length === 0) {
               self.registration.showNotification(title, options)
           } else {
-              const client = c.find(c => c.visibilityState === "visible");
+              const client = c.find(c => { 
+                  return c.visibilityState === "visible"
+                });
               if (client !== undefined) {
                   console.log('on application');
               } else {

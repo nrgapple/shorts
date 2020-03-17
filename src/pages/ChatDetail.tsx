@@ -25,6 +25,7 @@ interface StateProps {
   loading?: boolean,
   client?: Client,
   isClientConnected: boolean,
+  visibility?: string,
 };
 
 interface DispatchProps {
@@ -44,6 +45,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loadChats,
   loadProfile,
   replaceChat,
+  visibility,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -188,10 +190,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
   });
   
-  useEffect(() => {
-    console.log(history);
-  }, [history])
-  
   const onKeyPressed = (event: any) => {
     
     //@ts-ignore
@@ -232,7 +230,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
 
   useEffect(() => {
-    console.log(location);
     if (!chat)
       return;
     
@@ -250,7 +247,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
   }, [location, chat, client])
 
-
   // Wait for all dependencies.
   useEffect(() => {
     console.log(isClientConnected);
@@ -263,7 +259,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         chatState.matches({init: 'wait'})) {
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected, rendered]);
+  }, [token, chat, client, userProfile, isClientConnected, rendered, visibility]);
 
   // Get dependencies once we have our token.
   useEffect(() => {
@@ -282,6 +278,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   },[]);
+
+  useEffect(() => {
+    console.log(visibility);
+    if (visibility && visibility === "visible") {
+      // we need to fetch the messages and resub
+      chatSend('DEPENDENCIES_LOADED');
+    }
+  }, [visibility])
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
@@ -424,6 +428,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     loading: state.data.loading,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
+    visibility: state.user.visibility,
   }),
   mapDispatchToProps: {
     loadChats,

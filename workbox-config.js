@@ -1,3 +1,5 @@
+// to generate the public sw run - workbox injectManifest
+// ps: make sure you have the workbox cli installed
 module.exports = {
   "globDirectory": "public/",
   "globPatterns": [
