@@ -97,10 +97,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
 }) => {
 
   useEffect(() => {
-
-    document.addEventListener("visibilitychange", () => {
-      setVisibility(document.visibilityState);
-    });
+    document.addEventListener("visibilitychange", loadVisibility);
 
     loadUserData();
     loadCurrentLocation();
@@ -111,9 +108,13 @@ const IonicApp: React.FC<IonicAppProps> = ({
         setClient(undefined);
         setIsClientConnected(false);
       }
-
+      document.removeEventListener("visibilitychange", loadVisibility)
     }
   }, []);
+
+  const loadVisibility = () => {
+    setVisibility(document.visibilityState);
+  }
 
   useEffect(() => {
     console.log(token);
