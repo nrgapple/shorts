@@ -7,7 +7,6 @@ import { RouteComponentProps } from 'react-router';
 import { loadNearMe } from '../data/sessions/sessions.actions';
 import { postUserLocation, postSignup, postDevice } from '../data/dataApi';
 import { GeoPoint } from '../models/GeoPoint';
-import { da } from 'date-fns/locale';
 
 interface OwnProps extends RouteComponentProps {}
 

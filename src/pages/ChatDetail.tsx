@@ -259,7 +259,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         chatState.matches({init: 'wait'})) {
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected, rendered, visibility]);
+  }, [token, chat, client, userProfile, isClientConnected, rendered]);
 
   // Get dependencies once we have our token.
   useEffect(() => {
