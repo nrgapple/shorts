@@ -12,6 +12,7 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, postProfileInfo, deleteImage } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
+import ImageUploader from 'react-images-upload';
 import { userInfo } from 'os';
 const apiURL = 'https://doctornelson.herokuapp.com';
 
@@ -107,6 +108,7 @@ const About: React.FC<UserProfileProps> = ({
           setImages([...images, imageInfo]);
           setToastText('Image Uploaded Successfully');
           setShowToast(true);
+          setInputImage(undefined);
         }
       } catch (e) {
         console.log(`Error uploading image: ${e}`);
@@ -136,8 +138,8 @@ const About: React.FC<UserProfileProps> = ({
     }
   }
 
-  const handeChange = (event: any) => {
-    const file = event.target.files[0] as File;
+  const handeChange = (files: File[]) => {
+    const file = files[0];
     setInputImage(file);
   }
 
@@ -199,7 +201,15 @@ const About: React.FC<UserProfileProps> = ({
                             <>
                               <IonCol size="12" size-md="6">
                                 <IonCard>
-                                  <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
+                                  <ImageUploader
+                                    withIcon={true}
+                                    withPreview={true}
+                                    buttonText="Choose Image"
+                                    onChange={handeChange}
+                                    imgExtension={['.jpg', '.jpeg', '.png']}
+                                    maxFileSize={5242880}
+                                    singleImage={true}
+                                  />
                                   {
                                     inputImage && (
                                       <IonButton onClick={uploadImage}>
