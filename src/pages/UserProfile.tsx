@@ -60,7 +60,7 @@ const About: React.FC<UserProfileProps> = ({
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
-    aspect: 9/16,
+    aspect: 1,
     width: 30
   });
   const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
