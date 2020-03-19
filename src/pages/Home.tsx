@@ -10,6 +10,7 @@ import { postSwipe, getNearMe } from '../data/dataApi';
 import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
 import { close, heart, send } from 'ionicons/icons';
 import { homeMachine, swipeMachine } from '../machines/homeMachines';
+import { Swipeable, direction } from 'react-deck-swiper';
 
 interface OwnProps {
   token?: string;
@@ -191,7 +192,12 @@ const Home: React.FC<HomeProps> = ({
               </IonCol>
             ) : homeState.matches('matches') ? (
               <>
-              {swipeState.matches('idle') && <ProfileCard profile={profile} swiped={(choice: boolean) => swipeSend(choice?'SWIPED_RIGHT':'SWIPED_LEFT')} />}
+              {
+                swipeState.matches('idle') && 
+                  <Swipeable onSwipe={(choice: direction) => swipeSend(choice === direction.RIGHT?'SWIPED_RIGHT':'SWIPED_LEFT')}>
+                    <ProfileCard profile={profile} swiped={(choice: boolean) => swipeSend(choice?'SWIPED_RIGHT':'SWIPED_LEFT')} />
+                  </Swipeable>
+                }
               </>
             ) : homeState.matches('loading') ? (
               <ProfileCard profile={undefined} swiped={swipe} />

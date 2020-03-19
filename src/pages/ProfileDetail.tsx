@@ -54,7 +54,7 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
           <IonButtons slot="start">
             <IonBackButton defaultHref="/tabs/home"></IonBackButton>
           </IonButtons>
-          <IonTitle>{profile&&`${profile.firstName} ${profile.lastName}`}</IonTitle>
+          <IonTitle>Profile</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -64,9 +64,15 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
           ) : (
             <>
             <IonRow>
-              <ImageCard areDeletable={false} images={profile.images}/>
+              <IonCol size="12" size-md="6">
+                <ImageCard areDeletable={false} images={profile.images}/>
+              </IonCol>
             </IonRow>
-            <InfoCard profile={profile}/>
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <InfoCard profile={profile}/>
+              </IonCol>
+            </IonRow>
           </>
           )
         }
