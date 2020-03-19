@@ -14,3 +14,9 @@ export const getTimestamp = (date: Date) => {
 export const calculateAge = (dob: Date) => {
   return moment().diff(dob, 'years');
 }
+
+export const blobToFile = (blob: Blob, fileName: string): File => {
+ const b: any = blob;
+ b.lastModifiedDate = new Date();
+ return new File([blob], fileName);
+}
