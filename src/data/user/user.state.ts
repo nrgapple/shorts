@@ -11,4 +11,5 @@ export interface UserState {
   location?: GeoPoint;
   client?: Client;
   isClientConnected: boolean;
+  visibility?: string;
 };

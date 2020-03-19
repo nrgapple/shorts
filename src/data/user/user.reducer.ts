@@ -23,5 +23,7 @@ export function userReducer(state: UserState, action: UserActions): UserState {
       return { ...state, client: action.client };
     case 'set-current-location':
       return { ...state, location: action.point};
+    case 'set-visibility':
+      return { ...state, visibility: action.visibility };
   }
 }

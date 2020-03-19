@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider } from '@ionic/react';
 import './UserProfile.scss';
 import { calendar, pin, more, body, close, male, female } from 'ionicons/icons';
@@ -12,8 +12,10 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, postProfileInfo, deleteImage } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
-import { userInfo } from 'os';
-const apiURL = 'https://doctornelson.herokuapp.com';
+import ImageUploader from 'react-images-upload';
+import ReactCrop, { Crop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { blobToFile } from '../util/util';
 
 interface OwnProps {
   userProfile?: Profile;
@@ -55,6 +57,15 @@ const About: React.FC<UserProfileProps> = ({
   const [inputImage, setInputImage] = useState<File | undefined>(undefined);
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
+  const [src, setSrc] = useState<string | undefined>(undefined);
+  const [crop, setCrop] = useState<Crop>({
+    unit: '%',
+    aspect: 1,
+    width: 30
+  });
+  const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
+  const [croppedImageUrl, setCroppedImageUrl] = useState<string | undefined>(undefined);
+  const [fileName, setFileName] = useState<string>('default');
 
   const presentPopover = (e: React.MouseEvent) => {
     setPopoverEvent(e.nativeEvent);
@@ -107,6 +118,11 @@ const About: React.FC<UserProfileProps> = ({
           setImages([...images, imageInfo]);
           setToastText('Image Uploaded Successfully');
           setShowToast(true);
+          //clear state
+          setInputImage(undefined);
+          setCroppedImageUrl(undefined);
+          setFileName('default');
+          setSrc(undefined);
         }
       } catch (e) {
         console.log(`Error uploading image: ${e}`);
@@ -128,7 +144,6 @@ const About: React.FC<UserProfileProps> = ({
       images.length < 2 ?
         setImages(oldImages => [] as Image[]) :
         setImages(oldImages => [...oldImages.slice(0, index), ...oldImages.slice(index + 1)]);
-      console.log(images);
       setToastText('Image removed successfully');
       setShowToast(true);
     } catch (e) {
@@ -136,14 +151,72 @@ const About: React.FC<UserProfileProps> = ({
     }
   }
 
-  const handeChange = (event: any) => {
-    const file = event.target.files[0] as File;
-    setInputImage(file);
+  const handeChange = (files: File[]) => {
+    const file = files[0];
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.addEventListener('load', () => setSrc(reader.result as string))
+    reader.readAsDataURL(file);
+  }
+
+  const handleCropChange = (crop: Crop) => {
+    setCrop(crop);
+  }
+
+  const onImageLoaded = (image: HTMLImageElement) => {
+    setImage(image);
+  };
+
+  const onCropComplete = (crop: Crop) => {
+    makeClientCrop(crop);
+  };
+
+  const makeClientCrop = (crop: Crop) => {
+    if (image && crop.width && crop.height) {
+      getCroppedImg(
+        image,
+        crop,
+        `${fileName}.png`
+      );
+    }
+  }
+
+  const getCroppedImg = (image: HTMLImageElement , crop: Crop, fileName: string) => {
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width as number;
+    canvas.height = crop.height as number;
+    const ctx = canvas.getContext('2d');
+
+    if (ctx) {
+      ctx.drawImage(
+        image,
+        crop.x as number * scaleX,
+        crop.y  as number* scaleY,
+        crop.width as number * scaleX,
+        crop.height as number * scaleY,
+        0,
+        0,
+        crop.width as number,
+        crop.height as number
+      );
+    }
+
+    canvas.toBlob((blob) => {
+        if (!blob) {
+          //reject(new Error('Canvas is empty'));
+          console.error('Canvas is empty');
+          return '';
+        }
+        setInputImage(blobToFile(blob, fileName));
+        window.URL.revokeObjectURL(croppedImageUrl as string);
+        const fileUrl = window.URL.createObjectURL(blob);
+        setCroppedImageUrl(fileUrl);
+      }, 'image/png');
   }
 
   const setValues = () => {
-    console.log('currentUserProfile');
-    console.log(userProfile);
     setAbout(userProfile && userProfile.about ? userProfile.about : 'empty');
     setHeight(userProfile && userProfile.height ? userProfile.height : 0);
     setGenderPref(userProfile && userProfile.genderPref ? userProfile.genderPref : 'male');
@@ -199,12 +272,37 @@ const About: React.FC<UserProfileProps> = ({
                             <>
                               <IonCol size="12" size-md="6">
                                 <IonCard>
-                                  <input type="file" accept="image/png, image/jpeg" name="image-upload" onChange={handeChange}></input>
+                                  {
+                                    !src &&
+                                    <ImageUploader
+                                      withIcon={true}
+                                      buttonText="Choose Image"
+                                      onChange={handeChange}
+                                      imgExtension={['.jpg', '.jpeg', '.png']}
+                                      maxFileSize={5242880}
+                                      singleImage={true}
+                                    />
+                                  }
+                                  {
+                                    src &&
+                                      <ReactCrop
+                                        src={src}
+                                        crop={crop}
+                                        ruleOfThirds
+                                        onImageLoaded={onImageLoaded}
+                                        onComplete={onCropComplete}
+                                        onChange={handleCropChange}
+                                      />
+                                  }
+                                  {
+                                    croppedImageUrl &&
+                                    <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl}></img>
+                                  }
                                   {
                                     inputImage && (
-                                      <IonButton onClick={uploadImage}>
+                                      <IonButton expand="block" onClick={uploadImage}>
                                         Upload
-                                  </IonButton>
+                                      </IonButton>
                                     )
                                   }
                                 </IonCard>
@@ -216,8 +314,8 @@ const About: React.FC<UserProfileProps> = ({
 
                     </IonCol>
 
-                      <IonCol size="12" size-md="6">
-                        <form noValidate onSubmit={updateProfile}>
+                    <IonCol size="12" size-md="6">
+                      <form noValidate onSubmit={updateProfile}>
                         <IonCard>
                           <IonCardHeader translucent>
                             <IonCardTitle>
@@ -332,32 +430,32 @@ const About: React.FC<UserProfileProps> = ({
                                 </IonLabel>
                                 </IonItemDivider>
                                 <IonItem>
-                                  <IonTextarea 
-                                    value={about} 
-                                    onIonChange={e => setAbout(e.detail.value!)} 
-                                    autoGrow 
+                                  <IonTextarea
+                                    value={about}
+                                    onIonChange={e => setAbout(e.detail.value!)}
+                                    autoGrow
                                     spellCheck={true}
                                     rows={4}
                                   ></IonTextarea>
                                 </IonItem>
                               </IonList>
                           }
-                        {
-                          isEditing &&
-                          <>
-                            <IonButton type="submit" expand="block">Update</IonButton>
-                            <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
-                          </>
-                        }
-                        {
-                          !isEditing &&
+                          {
+                            isEditing &&
+                            <>
+                              <IonButton type="submit" expand="block">Update</IonButton>
+                              <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
+                            </>
+                          }
+                          {
+                            !isEditing &&
                             <IonButton expand="block" onClick={() => setIsEditing(true)}>Edit</IonButton>
-                        }
+                          }
                         </IonCard>
-                        </form>
-                      </IonCol>
+                      </form>
+                    </IonCol>
 
-                    
+
                   </IonRow>
                 </>
             }

@@ -27,7 +27,7 @@ import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
 import { loadAllInfo, replaceChat } from './data/sessions/sessions.actions';
-import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
+import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient, setVisibility } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -61,6 +61,7 @@ interface StateProps {
   location?: GeoPoint,
   client?: Client,
   isClientConnected: boolean,
+  visibility?: string,
 }
 
 interface DispatchProps {
@@ -73,6 +74,7 @@ interface DispatchProps {
   setIsClientConnected: typeof setIsClientConnected,
   setClient: typeof setClient,
   replaceChat: typeof replaceChat,
+  setVisibility: typeof setVisibility,
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
@@ -90,12 +92,14 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setToken, 
   loadUserData, 
   loadCurrentLocation, 
-  setIsClientConnected
+  setIsClientConnected,
+  setVisibility,
 }) => {
 
   useEffect(() => {
+    document.addEventListener("visibilitychange", loadVisibility);
+
     loadUserData();
-    console.log("here");
     loadCurrentLocation();
     // eslint-disable-next-line
     return () => {
@@ -104,8 +108,13 @@ const IonicApp: React.FC<IonicAppProps> = ({
         setClient(undefined);
         setIsClientConnected(false);
       }
+      document.removeEventListener("visibilitychange", loadVisibility)
     }
   }, []);
+
+  const loadVisibility = () => {
+    setVisibility(document.visibilityState);
+  }
 
   useEffect(() => {
     console.log(token);
@@ -177,6 +186,7 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     loadAllInfo,
     setClient,
     replaceChat,
+    setVisibility,
   },
   component: IonicApp
 });

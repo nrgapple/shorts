@@ -25,6 +25,7 @@ interface StateProps {
   loading?: boolean,
   client?: Client,
   isClientConnected: boolean,
+  visibility?: string,
 };
 
 interface DispatchProps {
@@ -44,6 +45,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   loadChats,
   loadProfile,
   replaceChat,
+  visibility,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -188,10 +190,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }
   });
   
-  useEffect(() => {
-    console.log(history);
-  }, [history])
-  
   const onKeyPressed = (event: any) => {
     
     //@ts-ignore
@@ -223,19 +221,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }, 200);
   }
 
-  const getProgress = () => {
-    if (chatState.matches({init: 'wait'}))
-      return .4;
-    else if (chatState.matches({init: {fetchMessages: 'loadMessages'}}))
-      return .9;
-    else if (chatState.matches({init: {fetchMessages: 'getUnreadMessages'}}))
-      return .95;
-    else if (chatState.matches('subscribe'))
-      return .98;
-    else if (chatState.matches('ready'))
-      return 1;
-  }
-
   const unSub = (client: Client, chatId: number) => {
     console.log(`Unsubscribing to chat`);
     publishTypingForClient(client, chatId, false);
@@ -245,7 +230,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
 
   useEffect(() => {
-    console.log(location);
     if (!chat)
       return;
     
@@ -262,7 +246,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   }, [location, chat, client])
-
 
   // Wait for all dependencies.
   useEffect(() => {
@@ -295,6 +278,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       }
     }
   },[]);
+
+  useEffect(() => {
+    console.log(visibility);
+    if (visibility && visibility === "visible") {
+      // we need to fetch the messages and resub
+      chatSend('DEPENDENCIES_LOADED');
+    }
+  }, [visibility])
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
@@ -340,7 +331,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               <>
               {
               !chatState.matches('ready')? (
-                <IonProgressBar type="determinate" value={getProgress()}/>
+                <IonProgressBar type="indeterminate" />
               ) : (
                   <IonList>
                     { messages &&
@@ -437,6 +428,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     loading: state.data.loading,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
+    visibility: state.user.visibility,
   }),
   mapDispatchToProps: {
     loadChats,
