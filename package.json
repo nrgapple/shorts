@@ -23,6 +23,7 @@
     "node-sass": "^4.13.0",
     "query-string": "^6.11.1",
     "react": "^16.9.0",
+    "react-deck-swiper": "^1.0.8",
     "react-dom": "^16.9.0",
     "react-dynamic-swiper": "^2.0.2",
     "react-image-lightbox": "^5.1.1",
