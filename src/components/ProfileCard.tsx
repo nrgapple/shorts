@@ -5,6 +5,7 @@ import { Profile } from '../models/Profile';
 import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 import ImageCard from './ImageCard';
+import { useHistory } from 'react-router';
 
 interface ProfileCardProps {
   profile?: Profile;
@@ -26,6 +27,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<HTMLIonSlidesElement>(null);
+  const history = useHistory();
 
   useEffect(() => {
     console.log(profile);
@@ -45,7 +47,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
         profile ?
           <>
             <IonCol size="12" size-md="6">
-              <ImageCard images={profile.images} areDeletable={false} />
+            <IonCard className="home-card">
+              <img
+                src={profile.images[0].imageUrl}
+                alt="no img"
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+                onClick={() => {
+                    history.push(`/more/${profile.userId}`)
+                  }
+                }
+              />
+              </IonCard>
             </IonCol>
             <IonCol size="12" size-md="6">
               <IonCard className="home-card">
