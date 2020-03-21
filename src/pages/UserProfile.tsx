@@ -292,6 +292,7 @@ const About: React.FC<UserProfileProps> = ({
                                         onImageLoaded={onImageLoaded}
                                         onComplete={onCropComplete}
                                         onChange={handleCropChange}
+                                        keepSelection={true}
                                       />
                                   }
                                   {
