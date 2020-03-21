@@ -1,3 +1,5 @@
+Chat with us on discord: https://discord.gg/dczVsZS
+
 # Shorts Dating App
 
 Shorts is a project to create a dating app using ionic and react
