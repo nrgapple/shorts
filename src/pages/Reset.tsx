@@ -81,7 +81,6 @@ const Reset: React.FC<ResetProps> = ({
   // get token from query.
   useEffect(() => {
     if (location) {
-      console.log(queryString.parse(location.search));
       setForgotPwToken(queryString.parse(location.search).token as string);
     }
   }, [location]);

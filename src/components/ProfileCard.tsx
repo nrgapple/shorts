@@ -6,6 +6,7 @@ import Lightbox from 'react-image-lightbox';
 import 'react-image-lightbox/style.css'; // This only needs to be imported once in your app
 import ImageCard from './ImageCard';
 import { useHistory } from 'react-router';
+import { findHeightString } from '../util/util';
 
 interface ProfileCardProps {
   profile?: Profile;
@@ -30,13 +31,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
   const history = useHistory();
 
   useEffect(() => {
-    console.log(profile);
     if (profile && slides.current) {
       (async () => {
         if (!slides.current)
           return;
         await slides.current.update();
-        console.log('slides should have updated');
       })();
     }
   }, [profile])
@@ -76,7 +75,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
                       <IonChip color="secondary" outline>
                         <IonIcon icon={body} />
                         <IonLabel>
-                          {profile.height}
+                          {findHeightString(profile.height!)}
                         </IonLabel>
                       </IonChip>
                     </span>

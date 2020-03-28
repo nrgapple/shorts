@@ -22,7 +22,6 @@ export const loadAllInfo = (token: string | undefined) => async (dispatch: React
   } catch (e) {
     console.log(e);
     if (e.code === 400) {
-      console.log('invalid profile');
       dispatch(setHasValidProfile(false))
     } 
   } finally {
@@ -45,8 +44,6 @@ export const loadProfile = (token: string | undefined) => async (dispatch: React
   try {
     dispatch(setLoading(true));
     const profile = await getUserProfile(token);
-    console.log('setting data in load profile');
-    console.log(profile);
     dispatch(setData({userProfile: profile}));
     dispatch(setLoading(false));
   } catch (e) {
@@ -56,7 +53,6 @@ export const loadProfile = (token: string | undefined) => async (dispatch: React
 
 export const loadNearMe = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   try {
-    console.log(`loading nearme`);
     dispatch(setLoading(true));
     const nearMe = await getNearMe(token);
     dispatch(setHasValidProfile(true));
@@ -64,7 +60,6 @@ export const loadNearMe = (token: string | undefined) => async (dispatch: React.
   } catch (e) {
     console.log(e);
     if (e.code === "400") {
-      console.log('invalid profile');
       dispatch(setHasValidProfile(false))
     }
   } finally {
@@ -107,8 +102,6 @@ export const setHasValidProfile = (isValid: boolean) => ({
 
 export const setData = (data: Partial<SessionsState>) => 
 {
-  console.log('setdata');
-  console.log(data);
   return ({
     type: 'set-conf-data',
     data

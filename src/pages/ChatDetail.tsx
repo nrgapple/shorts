@@ -61,25 +61,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       loadMessages: async () => {
         if (chat && token) {
           try {
-            console.log('starting to load');
             const data = await getMessages(chat.chatId, token);
             if (data) {
               const messages = [...data.messages];
               messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
-              console.log(data.lastReadMessageId);
               setMessages(messages);
               setLastRead(data.lastReadMessageId);
               chatSend('SUCCESS');
-            } else {
-              console.log(`No messages found`);
             }
           } catch (e) {
             console.log(`Error loading messages: ${e}`);
           }
-          console.log('loaded messages');
           
-        } else {
-          console.error(`should not get here: chat: ${chat}`);
         }
       },
     },
@@ -97,12 +90,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         publishTypingForClient(client!, chat!.chatId, true);
       },
       resetTypingTimout: () => {
-        console.log('setting timeout');
         if (typingTimeout)
           clearTimeout(typingTimeout);
         setTypingTimeout(undefined);
         setTypingTimeout(setTimeout(() => {
-          console.log(`You stopped typing.`);
           chatSend('USER_STOPPED');
         }, 5000));
       },
@@ -114,7 +105,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       scrollToTheBottom: () => {
         setTimeout(() => {
-          console.log('scroll to bottom');
           scrollToTheBottom();
         }, 200);
       },
@@ -123,7 +113,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!, 
           chat!.chatId,
           (msg: Message) => {
-            console.log(msg);
             setMessages(oldMessages => [...oldMessages, msg]
               .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
             if (msg.fromUserId !== userProfile!.userId)
@@ -131,7 +120,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           },
           `chat-${userProfile!.userId}`,
         )];
-        console.log(subs.current);
         chatSend('SUB_CHAT_SUCCESS');
       },
       subToTyping: () => {
@@ -140,11 +128,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           chat!.chatId,
           (isTyping: boolean) => {
             chatSend(isTyping?'REC_TYPED':'REC_STOPPED');
-            console.log(`isTyping is ${isTyping}`);
           },
           `typing-${userProfile!.userId}`,
         )];
-        console.log(subs.current);
         chatSend("SUB_TYPING_SUCCESS");
       },
       subToRead: () => {
@@ -152,8 +138,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (msgId: number) => {
-            console.log('recipient read a message');
-            console.log(msgId);
             chatSend({type: 'REC_READ', data: msgId});
           },
           `read-${userProfile!.userId}`,
@@ -162,7 +146,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         chatSend({type: 'SUB_READ_SUCCESS', data: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
       },
       getUnreadMessages: () => {
-        console.log('getting unread');
         if (chat!.hasUnreadMessages) {
           replaceChat({...chat!, hasUnreadMessages: false})
         }
@@ -170,7 +153,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       sendRead: (context, event) => {
         // TODO: update latread.
-        console.log(`sendRead: ${event.data}`);
         if (event.data) {
           publishReadForClient(
             client!,
@@ -181,7 +163,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       updateLastRead: (context, event) => {
         // TODO: update the read message in messages.
-        console.log(`updateLastRead: ${event.data}`);
         if (event.data) {
           setLastRead(event.data);
         }
@@ -200,7 +181,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         }
       } 
       else if (chatState.matches({ready: {user: 'idle'}}) || chatState.matches({ready: {user: 'typing'}})) {
-        console.log('setting typing');
         chatSend('USER_TYPED');
       }
     //@ts-ignore
@@ -222,9 +202,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }
 
   const unSub = (client: Client, chatId: number) => {
-    console.log(`Unsubscribing to chat`);
     publishTypingForClient(client, chatId, false);
-    console.log(subs.current);
     subs.current.forEach(s => s.unsubscribe());
     subs.current = [];
   }
@@ -240,7 +218,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       chatSend('LEFT');
     }
     else if (location.pathname === `/chat/${chat.chatId}`) {
-      console.log(`Went back into the chat`);
       if (chatState.matches('notInView')) {
         chatSend('REENTERED');
       }
@@ -249,7 +226,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Wait for all dependencies.
   useEffect(() => {
-    console.log(isClientConnected);
     if (token && 
         chat && 
         client && 
@@ -280,7 +256,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   },[]);
 
   useEffect(() => {
-    console.log(visibility);
     if (visibility && visibility === "visible") {
       // we need to fetch the messages and resub
       chatSend('DEPENDENCIES_LOADED');
@@ -296,8 +271,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   // Log the states.
   useEffect(() => {
     const subscription = chatService.subscribe(state => {
-      // simple state logging
-      console.log(state);
     });
   
     return subscription.unsubscribe;

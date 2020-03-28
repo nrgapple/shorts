@@ -13,7 +13,7 @@ import ImageCard from '../components/ImageCard';
 import ImageUploader from 'react-images-upload';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { blobToFile } from '../util/util';
+import { blobToFile, findHeightString } from '../util/util';
 import HeightSelect from '../components/HeightSelect';
 let fixRotation = require('fix-image-rotation')
 
@@ -78,7 +78,6 @@ const About: React.FC<UserProfileProps> = ({
 
   const updateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.trace('updating profile submit');
     try {
       const updatedProfile = await postProfileInfo(
         token,
@@ -88,7 +87,6 @@ const About: React.FC<UserProfileProps> = ({
         height,
         distance,
       ) as Profile;
-      console.log(updatedProfile);
       setUserProfile(updatedProfile);
       setHasValidProfile(true);
       setIsEditing(false);
@@ -131,7 +129,6 @@ const About: React.FC<UserProfileProps> = ({
     }
     try {
       const index = images.findIndex(x => x.imageId === imageId);
-      console.log(images.length);
       await deleteImage(imageId, token);
       images.length < 2 ?
         setImages(oldImages => [] as Image[]) :
@@ -203,7 +200,6 @@ const About: React.FC<UserProfileProps> = ({
         }
 
         const orientedImage = await fixRotation.fixRotation(blob) as Blob;
-        console.log(orientedImage);
         setInputImage(blobToFile(orientedImage, fileName));
         window.URL.revokeObjectURL(croppedImageUrl as string);
         const fileUrl = window.URL.createObjectURL(orientedImage);
@@ -226,7 +222,6 @@ const About: React.FC<UserProfileProps> = ({
   }, [userProfile])
 
   useEffect(() => {
-    console.log('start about');
     try {
       loadProfile(token);
     } catch (e) {
@@ -333,7 +328,7 @@ const About: React.FC<UserProfileProps> = ({
                                   <IonChip color="secondary" outline>
                                     <IonIcon icon={body} />
                                     <IonLabel>
-                                      {userProfile.height}
+                                      {findHeightString(userProfile.height!)}
                                     </IonLabel>
                                   </IonChip>
                                   <IonChip color="primary" outline>

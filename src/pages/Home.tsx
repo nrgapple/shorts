@@ -8,7 +8,6 @@ import { Profile } from '../models/Profile';
 import ProfileCard from '../components/ProfileCard';
 import { postSwipe, getNearMe } from '../data/dataApi';
 import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
-import { close, heart, send } from 'ionicons/icons';
 import { homeMachine, swipeMachine } from '../machines/homeMachines';
 import { Swipeable, direction } from 'react-deck-swiper';
 
@@ -49,7 +48,6 @@ const Home: React.FC<HomeProps> = ({
   const [homeState, homeSend, homeService] = useMachine(homeMachine, {
     actions: {
       fetchData: () => {
-        console.log('transition with fetching data');
         loadNearMe(token)
       },
     }
@@ -66,7 +64,6 @@ const Home: React.FC<HomeProps> = ({
         }, 200);
       },
       next: () => {
-        console.log(`checking next profile ${profile}`);
         if (!profile) {
           homeSend('RESET');
           init();
@@ -78,13 +75,11 @@ const Home: React.FC<HomeProps> = ({
   const init = () => {
     if (!homeState.matches('start'))
       homeSend('RESET');
-    console.log(homeState.value);
     if (!isLoggedin) {
       homeSend('NOT_LOGGED_IN');
       return;
     }
     if (token && userProfile && homeSend) {
-      console.log('move to loading');
       homeSend('LOAD');
     }
   }
@@ -94,23 +89,17 @@ const Home: React.FC<HomeProps> = ({
   }, [userProfile, isLoggedin, token, homeSend, hasValidProfile]);
 
   useEffect(() => {
-    console.log(`Home state: ${homeState.value}`)
     if (homeState.matches('loading')) {
       if (loading === true) {
-        console.log('loading still');
         return;
       }
-      console.log('in loading state');
       if (!hasValidProfile) {
-        console.log('hasValidProfile')
         homeSend('FOUND_NO_USER_PROFILES');
         return;
       }
       if (nearMeCount > 0) {
-        console.log('matches!')
         homeSend('LOADED_MATCHES'); 
       } else {
-        console.log('no matches');
         homeSend('LOADED_NOTHING');
       }
     }
@@ -118,38 +107,29 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     const subscription = homeService.subscribe(state => {
-      // simple state logging
-      console.log(state);
     });
   
     return subscription.unsubscribe;
   }, [homeService]); // note: service should never change
 
   const swipe = async (liked: boolean) => {
-    console.log(`Handling swipe`);
     if (!profile) {
-      console.log(`No user to like`);
       return;
     }
 
     try {
       const isMatch = await postSwipe(profile.userId, liked, token);
       if (!isMatch === undefined) {
-        console.log(`incorrect data returned.`);
         swipeSend('SUCCESS');
       }
       if (isMatch) {
-        console.log(`You got a match!`);
         setCurrentMatch(profile);
         swipeSend('GOT_MATCH');
       } else {
-        console.log(`No match yet cuz isMatch: ${isMatch}`);
         swipeSend('SUCCESS')
       }
     } catch (e) {
-      console.log(e);
       if (e.message === "Already swiped user") {
-        console.log(`Already swiped this user. Moving to the next.`);
         incrementProfileIndexAction();
       }
     }
@@ -168,7 +148,6 @@ const Home: React.FC<HomeProps> = ({
       <IonContent className="">
         <IonRefresher slot="fixed"
           onIonRefresh={(event: any) => {
-            console.log('here man')
             homeSend({type: 'LOAD', action: 'fetchData'});
             setTimeout(() => {
               event.detail.complete();
