@@ -23,6 +23,7 @@
     "ionicons": "^4.6.3",
     "moment": "^2.24.0",
     "node-sass": "^4.13.0",
+    "pwa-install-handler": "^2.0.6",
     "query-string": "^6.11.1",
     "react": "^16.9.0",
     "react-deck-swiper": "^1.0.8",

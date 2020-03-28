@@ -1,9 +1,9 @@
 export const vars = () => ({
   "env": {
     //routes
-    "SOCKET_URL": "wss://selfconnect.dev/ws",
-    // "API_URL": "https://selfconnect.dev",
-    "API_URL": "/api",
+    "SOCKET_URL": "wss://shorts.center/api/ws",
+    "API_URL": "https://shorts.center/api",
+    // "API_URL": "/api",
     "CHAT": "/topic/chat-",
     "TYPE": "/user/queue/typing-",
     "READ": "/user/queue/read-",
