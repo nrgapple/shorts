@@ -7,13 +7,14 @@ import { Image } from "../models/Image";
 import { connect } from '../data/connect';
 import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
-import { postImage, postProfileInfo, deleteImage } from '../data/dataApi';
+import { postImage, postProfileInfo, deleteImage, getCurrentLocation, postUserLocation } from '../data/dataApi';
 import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
 import ImageUploader from 'react-images-upload';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { blobToFile } from '../util/util';
+import HeightSelect from '../components/HeightSelect';
 let fixRotation = require('fix-image-rotation')
 
 interface OwnProps {
@@ -233,6 +234,10 @@ const About: React.FC<UserProfileProps> = ({
     }
 
   }, []);
+  
+  const onHeightChange = (value: number) => {
+    setHeight(value);
+  }
 
   return (
     <IonPage id="about-page">
@@ -267,7 +272,7 @@ const About: React.FC<UserProfileProps> = ({
                                   {
                                     !src &&
                                     <ImageUploader
-                                      withIcon={true}
+                                      withIcon={false}
                                       buttonText="Choose Image"
                                       onChange={handeChange}
                                       imgExtension={['.jpg', '.jpeg', '.png']}
@@ -374,15 +379,7 @@ const About: React.FC<UserProfileProps> = ({
                                 </IonLabel>
                                 </IonItemDivider>
                                 <IonItem>
-                                  <IonInput
-                                    type="number"
-                                    value={height.toString()}
-                                    inputMode="numeric"
-                                    min="30"
-                                    max="50"
-                                    step="1"
-                                    onIonChange={e => setHeight(Number.parseInt(e.detail.value ? e.detail.value : '0'))}>
-                                  </IonInput>
+                                  <HeightSelect height={height} onSelect={onHeightChange} />
                                 </IonItem>
                                 <IonItemDivider>
                                   <IonLabel>
@@ -412,9 +409,9 @@ const About: React.FC<UserProfileProps> = ({
                                 </IonLabel>
                                 </IonItemDivider>
                                 <IonItem>
-                                  <IonRange step={5} min={1} max={1000} pin value={distance} onIonChange={e => setDistance(e.detail.value as number)}>
+                                  <IonRange step={1} min={1} max={100} pin value={distance} onIonChange={e => setDistance(e.detail.value as number)}>
                                     <IonLabel slot="start">1</IonLabel>
-                                    <IonLabel slot="end">1000</IonLabel>
+                                    <IonLabel slot="end">100</IonLabel>
                                   </IonRange>
                                 </IonItem>
                                 <IonItemDivider>
@@ -433,6 +430,11 @@ const About: React.FC<UserProfileProps> = ({
                                 </IonItem>
                               </IonList>
                           }
+                          { !isEditing && <IonButton onClick={async() => {
+                            const position = await getCurrentLocation();
+                            const point = {lat: position?position.coords.latitude:0, lng: position?position.coords.longitude:0};
+                            point && postUserLocation(point, token);
+                          }}>Set Location</IonButton>}
                           {
                             isEditing &&
                             <>

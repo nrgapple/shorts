@@ -83,8 +83,6 @@ interface IonicAppProps extends StateProps, DispatchProps { }
 const IonicApp: React.FC<IonicAppProps> = ({ 
   darkMode, 
   token, 
-  userProfile, 
-  location, 
   client,
   loadAllInfo, 
   setIsLoggedIn, 
@@ -92,7 +90,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setClient,
   setToken, 
   loadUserData, 
-  loadCurrentLocation, 
   setIsClientConnected,
   setVisibility,
 }) => {
@@ -101,8 +98,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
     document.addEventListener("visibilitychange", loadVisibility);
 
     loadUserData();
-    loadCurrentLocation();
-    // eslint-disable-next-line
     return () => {
       if (client) {
         client.deactivate();
@@ -118,16 +113,8 @@ const IonicApp: React.FC<IonicAppProps> = ({
   }
 
   useEffect(() => {
-    console.log(token);
     loadAllInfo(token);
-    console.log(userProfile);
   }, [token])
-
-  useEffect(() => {
-    console.log(`About post location: token: ${token} -- ${location?location.lat:null}`);
-    if (location)
-      postUserLocation(location, token);
-  }, [location])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>

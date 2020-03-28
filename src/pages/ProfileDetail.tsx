@@ -34,9 +34,6 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
   token,
 }) => {
 
-  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
-  const [showImage, setShowImage] = useState(false);
-
   useEffect(() => {
     if (token)
     {

@@ -96,7 +96,6 @@ export const getUserProfile = async (token: string | undefined) => {
         },
       });
       const { data: userProfileData } = userProfileResponse;
-      console.log(userProfileData);
       const userProfile = {
         userId: userProfileData.userId as number, 
         firstName: userProfileData.firstName as string,
@@ -116,8 +115,6 @@ export const getUserProfile = async (token: string | undefined) => {
         }),
         searchMiles: userProfileData.miles,
       } as Profile;
-      console.log('api call data');
-      console.log(userProfile);
       return userProfile;
     } catch (e) {
       const {data} = e.response;
@@ -128,9 +125,7 @@ export const getUserProfile = async (token: string | undefined) => {
 
 export const getCurrentLocation = async () => {
   try {
-    console.log("getting current location");
     const geoPostion = Geolocation.getCurrentPosition();
-    console.log(geoPostion);
     return geoPostion;
   } catch (e) {
     console.error(e);
@@ -155,7 +150,6 @@ export const postLogin = async (
       }
     });
     const { data } = response;
-    console.log(data);
     return data;
   } catch (e) {
     const {data} = e.response;
