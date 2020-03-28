@@ -268,6 +268,7 @@ const About: React.FC<UserProfileProps> = ({
                                     !src &&
                                     <ImageUploader
                                       withIcon={false}
+                                      withLabel={false}
                                       buttonText="Choose Image"
                                       onChange={handeChange}
                                       imgExtension={['.jpg', '.jpeg', '.png']}
