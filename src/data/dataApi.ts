@@ -71,6 +71,8 @@ export const getNearMe = async (token: string | undefined) => {
           }),
           gender: Profile.gender? Profile.gender.toLowerCase(): undefined,
           genderPref: Profile.genderPref? Profile.genderPref.toLowerCase(): undefined,
+          displayAddress: Profile.displayAddress,
+          distance: Profile.distance,
         }
       }) as Profile[];
       return nearMe;

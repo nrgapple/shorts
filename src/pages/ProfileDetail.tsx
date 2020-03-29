@@ -45,29 +45,24 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
   }, [token]);
 
   return (
-    <IonPage id="session-detail-page">
-      <IonCard>
-
-      <IonCardHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/tabs/home"></IonBackButton>
-          </IonButtons>
-          <IonTitle>Profile</IonTitle>
-        </IonToolbar>
-      </IonCardHeader>
+    <IonPage style={{overflow: 'scroll'}}>
+      <IonContent>
+        <IonHeader>
+          <IonToolbar>
+            <IonButtons slot="start">
+              <IonBackButton defaultHref="/tabs/home"></IonBackButton>
+            </IonButtons>
+            <IonTitle>Profile</IonTitle>
+          </IonToolbar>
+        </IonHeader>
         {
-          !profile ? (
-            <IonProgressBar type="indeterminate" />
-          ) : (
-            <IonCardContent>
-              <ImageCard areDeletable={false} images={profile.images}/>
-              <InfoCard profile={profile}/>
-            </IonCardContent>
-
-          )
+        !profile ? (
+          <IonProgressBar type="indeterminate" />
+        ) : (
+          <InfoCard profile={profile}/>
+        )
         }
-      </IonCard>
+      </IonContent>
     </IonPage>
   )
 };

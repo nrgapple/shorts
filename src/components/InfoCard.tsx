@@ -1,10 +1,11 @@
-import { IonCard, IonCardContent, IonChip, IonIcon, IonLabel, IonCardHeader, IonCardTitle } from "@ionic/react";
-import React from 'react'
+import { IonCard, IonCardContent, IonChip, IonIcon, IonLabel, IonCardHeader, IonCardTitle, useIonViewDidEnter, useIonViewWillLeave } from "@ionic/react";
+import React, { useState } from 'react'
 import 'react-dynamic-swiper/lib/styles.css';
 import { Profile } from "../models/Profile";
 import { calendar, body, pin, paperPlane } from "ionicons/icons";
 import { calculateAge, findHeightString } from "../util/util";
 import '../pages/Home.scss';
+import ImageCard from "./ImageCard";
 
 interface InfoCardProps {
   profile: Profile;
@@ -14,7 +15,6 @@ const InfoCard: React.FC<InfoCardProps> = ({
   profile,
 }) => {
   return (
-    <>
       <IonCard className="home-card">
         <IonCardHeader translucent>
           <IonCardTitle>
@@ -22,6 +22,7 @@ const InfoCard: React.FC<InfoCardProps> = ({
           </IonCardTitle>
         </IonCardHeader>
         <IonCardContent class="outer-content">
+          <ImageCard areDeletable={false} images={profile.images}/>
           <IonChip color="secondary" outline>
             <IonIcon icon={calendar} />
             <IonLabel>
@@ -53,7 +54,6 @@ const InfoCard: React.FC<InfoCardProps> = ({
           </p>
         </IonCardContent>
       </IonCard>
-    </>
   );
 }
 
