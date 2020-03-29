@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider, IonFabList } from '@ionic/react';
 import './UserProfile.scss';
-import { calendar, pin, more, body, male, female, options, close, person, colorWand, checkmark, locate } from 'ionicons/icons';
+import { calendar, pin, body, male, female, options, close, checkmark, locate, colorWand } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
