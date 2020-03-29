@@ -5,10 +5,9 @@ import { calendar, pin, more, body, male, female, options, close, person, colorW
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
-import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile } from '../data/sessions/sessions.actions';
+import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile, setLoading } from '../data/sessions/sessions.actions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, postProfileInfo, deleteImage, getCurrentLocation, postUserLocation } from '../data/dataApi';
-import Lightbox from 'react-image-lightbox';
 import ImageCard from '../components/ImageCard';
 import ImageUploader from 'react-images-upload';
 import ReactCrop, { Crop } from 'react-image-crop';
@@ -55,8 +54,6 @@ const About: React.FC<UserProfileProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [images, setImages] = useState(userProfile && userProfile.images ? userProfile.images : [])
   const [inputImage, setInputImage] = useState<File | undefined>(undefined);
-  const [showImage, setShowImage] = useState(false);
-  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [crop, setCrop] = useState<Crop>({
     unit: '%',
@@ -250,45 +247,52 @@ const About: React.FC<UserProfileProps> = ({
       {
         isloggedin && userProfile ? (
           <IonContent>
-            <IonFab activated={isEditing} horizontal='end' slot='fixed'>
-              <IonFabButton>
-                <IonIcon icon={options} />
-              </IonFabButton>
-              {
-                !isEditing
-                  ?
-                    <IonFabList>
-                      <IonFabButton type='button' onClick={() => setIsEditing(true)}>
-                        <IonIcon icon={colorWand} />
-                      </IonFabButton>
-                    </IonFabList>
-                  :
-                    <IonFabList>
-                      <IonFabButton type="button" onClick={() => setIsEditing(false)}>
-                        <IonIcon icon={close} />
-                      </IonFabButton>
-                      <IonFabButton type='button' onClick={updateProfile}>
-                        <IonIcon icon={checkmark} />
-                      </IonFabButton>
-                    </IonFabList>
-                }
-
+          <IonFab activated={isEditing} horizontal='end' slot='fixed'>
+            <IonFabButton>
+              <IonIcon icon={options} />
+            </IonFabButton>
+            {
+              !isEditing
+                ?
+                  <IonFabList>
+                    <IonFabButton type='button' onClick={() => setIsEditing(true)}>
+                      <IonIcon icon={colorWand} />
+                    </IonFabButton>
+                  </IonFabList>
+                :
+                  <IonFabList>
+                    <IonFabButton type="button" onClick={() => setIsEditing(false)}>
+                      <IonIcon icon={close} />
+                    </IonFabButton>
+                    <IonFabButton type='button' onClick={updateProfile}>
+                      <IonIcon icon={checkmark} />
+                    </IonFabButton>
+                  </IonFabList>
+              }
             </IonFab>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center'
+            }}>
             {
               loading || !userProfile ?
                 <IonProgressBar type="indeterminate"></IonProgressBar>
                 :
-                  <IonRow>
-                    <IonCol size="12" size-md="4">
-                      <ImageCard
-                        images={images}
-                        areDeletable={isEditing}
-                        onDelete={removeImage}
-                      />
+                  <IonCard style={{ width: '85%'}}>
+                    <IonCardHeader translucent>
+                        <IonCardTitle>
+                          {userProfile.firstName}
+                        </IonCardTitle>
+                            
+                    </IonCardHeader>                      
+                    <ImageCard
+                      images={images}
+                      areDeletable={isEditing}
+                      onDelete={removeImage}
+                    />
                         {
                           isEditing && (
-                              <IonCol size="12" size-md="6">
-                                <IonCard>
+                                <Fragment>
                                   {
                                     !src &&
                                     <ImageUploader
@@ -315,7 +319,7 @@ const About: React.FC<UserProfileProps> = ({
                                   }
                                   {
                                     croppedImageUrl &&
-                                    <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl}></img>
+                                    <img alt="Crop" style={{ width: '50%' }} src={croppedImageUrl}></img>
                                   }
                                   {
                                     inputImage && (
@@ -324,23 +328,12 @@ const About: React.FC<UserProfileProps> = ({
                                       </IonButton>
                                     )
                                   }
-                                </IonCard>
-                              </IonCol>
+                                </Fragment>
                           )
                         }
-                    </IonCol>
-
-                    <IonCol size="12" size-md="6">
                       <form noValidate onSubmit={updateProfile}>
-                        <IonCard>
-                          <IonCardHeader translucent>
-                            <IonCardTitle>
-                              {userProfile.firstName}
-                            </IonCardTitle>
-                          </IonCardHeader>
                           {
                             !isEditing ?
-                              <Fragment>
                                 <IonCardContent class="outer-content">
                                   <IonChip color="primary" outline>
                                     <IonIcon icon={calendar} />
@@ -382,13 +375,10 @@ const About: React.FC<UserProfileProps> = ({
                                       {userProfile.displayAddress}
                                     </IonLabel>
                                   </IonChip>
-                                </IonCardContent>
-                                <IonCardContent>
-                                  <p className="ion-padding-start ion-padding-end">
+                                  <p style={{height: '200px'}}>
                                     {userProfile.about}
                                   </p>
                                 </IonCardContent>
-                              </Fragment>
                               :
                               <IonList lines="none">
                                 <IonItemDivider>
@@ -449,17 +439,24 @@ const About: React.FC<UserProfileProps> = ({
                               </IonList>
                           }
                           { !isEditing && <IonButton onClick={async() => {
+                            setLoading(true);
                             const position = await getCurrentLocation();
                             const point = {lat: position?position.coords.latitude:0, lng: position?position.coords.longitude:0};
-                            point && postUserLocation(point, token);
+                            if (point) {
+                              const updatedUserProfile = await postUserLocation(point, token) as Profile;
+                              setUserProfile(updatedUserProfile);
+                              setToastText('Location has been updated');
+                              setShowToast(true);
+                            } else {
+                              setToastText('Error: please ensure location is enabled');
+                              setShowToast(true);             
+                            }
+                            setLoading(false);
                           }}><IonIcon icon={locate} /></IonButton>}
-                        </IonCard>
                       </form>
-                    </IonCol>
-
-
-                  </IonRow>
+                  </IonCard>
             }
+            </div>
           </IonContent>
         ) : (
             <IonContent>
@@ -482,14 +479,6 @@ const About: React.FC<UserProfileProps> = ({
         duration={3000}
         message={toastText}
         onDidDismiss={() => setShowToast(false)} />
-      {
-        showImage && (
-          <Lightbox
-            mainSrc={bigImage ? bigImage : ''}
-            onCloseRequest={() => setShowImage(false)}
-          />
-        )
-      }
     </IonPage>
   );
 };

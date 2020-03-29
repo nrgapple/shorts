@@ -17,9 +17,9 @@ const ImageCard: React.FC<ImageCardProps> = ({
   onDelete,
   children,
 }) => {
-  const [showImage, setShowImage] = useState(false);
-  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<any>(null);
+  const [showImage, setShowImage] = useState<boolean>(false);
+  const [bigImage, setBigImage] = useState<string>();
 
   useIonViewWillEnter(() => {
     if (slides.current) {
@@ -40,14 +40,17 @@ const ImageCard: React.FC<ImageCardProps> = ({
     <Fragment>
           {
             images.length > 0 &&
-            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
+            <IonSlides style={{height: '300px', width: '300px'}} ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
               {
                 images.map((image, idx) => (
                   <IonSlide key={idx} style={{ position: 'relative'}}>
                     <img
                       src={image.imageUrl}
-                      style={{ height: '100%', width: '100%'}}
-                      onClick={() => {setBigImage(image.imageUrl); setShowImage(true)}}
+                      style={{ height: '100%', width: '100%', borderRadius: '5px'}}
+                      onClick={() => { 
+                        setBigImage(image.imageUrl); 
+                        setShowImage(true); 
+                      }}
                     />
                   </IonSlide>
                 ))
@@ -61,14 +64,13 @@ const ImageCard: React.FC<ImageCardProps> = ({
             </IonButton>
         }
         {children}
-      {
-        showImage && (
-          <Lightbox
-            mainSrc={bigImage ? bigImage : ''}
-            onCloseRequest={() => setShowImage(false)}
-          />
-        )
-      }
+        {
+          showImage &&
+            <Lightbox
+              mainSrc={bigImage as string}
+              onCloseRequest={() => setShowImage(false)}
+            />
+        }
     </Fragment>
   );
 }

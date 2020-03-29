@@ -60,5 +60,6 @@ export const heights = [
 ];
 
 export const findHeightString = (inches: number): string | undefined => {
-  return heights.find(height => height.value === inches)!.text;
+  const height = heights.find(height => height.value === inches);
+  return height ? height.text : "0'0"
 };
