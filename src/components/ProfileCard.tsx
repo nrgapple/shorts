@@ -51,19 +51,21 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
                   <IonCardTitle>{profile.firstName}</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
+                  <div style={{ display: 'flex', justifyContent: 'center'}}>
+                    <img
+                        src={profile.images[0].imageUrl}
+                        alt="no img"
+                        style={{
+                          height: "300px",
+                          width: "300px",
+                        }}
+                        onClick={() => {
+                            history.push(`/more/${profile.userId}`)
+                          }
+                        }
+                      />
+                  </div>
 
-                <img
-                  src={profile.images[0].imageUrl}
-                  alt="no img"
-                  style={{
-                    height: "300px",
-                    width: "300px",
-                  }}
-                  onClick={() => {
-                      history.push(`/more/${profile.userId}`)
-                    }
-                  }
-                />
                     <IonChip color="secondary" outline>
                       <IonIcon icon={calendar} />
                       <IonLabel>

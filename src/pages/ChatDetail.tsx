@@ -301,7 +301,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
             </IonToolbar>
           </IonHeader>
             <IonContent scrollEvents={true} ref={content} >
-              <>
               {
               !chatState.matches('ready')? (
                 <IonProgressBar type="indeterminate" />
@@ -355,7 +354,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     }
                   </IonList>
               )}
-              </>
             </IonContent>
             {
               chatState.matches('ready') &&

@@ -166,27 +166,25 @@ const Connections: React.FC<ConnectionProps> = ({
             !match ? (
               <IonProgressBar type="indeterminate" />
             ) : (
-              <>
-                <IonRow>
-                  <ImageCard areDeletable={false} images={match.images} />
-                </IonRow>
-                <InfoCard profile={match} />
-                {
-                  !creatingChat && <IonButton
-                    fill="solid" 
-                    color="success"
-                    expand="block"
-                    onClick={() => {
-                      onCreateChat();
-                      setTimeout(() => {
-                        setShowModal(false);
-                      }, 500);
-                    }}
-                  >
-                    Start Chatting
-                  </IonButton>
-                }
-              </>
+                <div>
+                  <InfoCard profile={match} />
+                  {
+                    !creatingChat && <IonButton
+                      fill="solid" 
+                      color="success"
+                      expand="block"
+                      onClick={() => {
+                        onCreateChat();
+                        setTimeout(() => {
+                          setShowModal(false);
+                        }, 500);
+                      }}
+                    >
+                      Start Chatting
+                    </IonButton>
+                  }
+                </div>
+
             )
           }
         </IonContent>

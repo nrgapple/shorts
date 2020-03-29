@@ -40,13 +40,13 @@ const ImageCard: React.FC<ImageCardProps> = ({
     <Fragment>
           {
             images.length > 0 &&
-            <IonSlides style={{height: '300px', width: '300px'}} ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
+            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
               {
                 images.map((image, idx) => (
                   <IonSlide key={idx} style={{ position: 'relative'}}>
                     <img
                       src={image.imageUrl}
-                      style={{ height: '100%', width: '100%', borderRadius: '5px'}}
+                      style={{ height: '300px', width: '300px', borderRadius: '5px'}}
                       onClick={() => { 
                         setBigImage(image.imageUrl); 
                         setShowImage(true); 
