@@ -1,15 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonIcon, IonText, IonList, IonItem, IonLabel, IonTitle, IonProgressBar, IonRow, IonCol, IonCard, IonCardHeader, IonCardContent } from '@ionic/react';
+import React, { useEffect } from 'react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonTitle, IonProgressBar } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
-import { body, calendar, pin } from 'ionicons/icons';
 import './ProfileDetail.scss';
 import { loadNearMe, loadMatches } from '../data/sessions/sessions.actions';
 import { Profile } from '../models/Profile';
-import { calculateAge } from '../util/util';
-import Lightbox from 'react-image-lightbox';
-import ImageCard from '../components/ImageCard';
 import InfoCard from '../components/InfoCard';
 
 

@@ -49,7 +49,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [lastRead, setLastRead] = useState<number>(0);
-  const [rendered, setRendered] = useState<boolean>(false);
   const content = useRef(null);
   const value = useRef(null);
   const scroller = useRef<any>();
@@ -231,11 +230,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         client && 
         isClientConnected && 
         userProfile &&
-        rendered &&
         chatState.matches({init: 'wait'})) {
+          console.log(client);
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected, rendered]);
+  }, [token, chat, client, userProfile, isClientConnected]);
 
   // Get dependencies once we have our token.
   useEffect(() => {
@@ -264,7 +263,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
-    if (!rendered) return;
+    //if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
 
@@ -277,9 +276,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   }, [chatService]); // note: service should never change
 
   // the component finished rendering.
-  useIonViewDidEnter(() => {
-    setRendered(true);
-  })
+  // useIonViewDidEnter(() => {
+  //   setRendered(true);
+  // })
 
   return (
     <>
