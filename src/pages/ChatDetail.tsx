@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, useIonViewDidEnter } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, useIonViewDidEnter, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -11,10 +11,9 @@ import { Chat } from '../models/Chat';
 import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient, subscribeToChatRead, publishReadForClient } from '../data/dataApi';
 import { loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
 import { Client, StompSubscription } from '@stomp/stompjs';
-import { getTimestamp } from '../util/util';
 import { chatMachine } from '../machines/chatDetailMachines';
 import { useMachine } from '@xstate/react';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
+import MessageList from '../components/MessageList';
 
 interface OwnProps extends RouteComponentProps { };
 
@@ -53,6 +52,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [rendered, setRendered] = useState<boolean>(false);
   const content = useRef(null);
   const value = useRef(null);
+  const scroller = useRef<any>();
   var subs = useRef<StompSubscription[]>([]);
   const location = useLocation();
   const history = useHistory();
@@ -300,59 +300,32 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               }
             </IonToolbar>
           </IonHeader>
-            <IonContent scrollEvents={true} ref={content} >
+            <IonContent ref={content} >
               {
               !chatState.matches('ready')? (
                 <IonProgressBar type="indeterminate" />
               ) : (
+                <>
+                  <IonInfiniteScroll ref={scroller} position="top" onIonInfinite={() => {console.log('hello'); scroller.current.complete()}}>
+                    <IonInfiniteScrollContent>
+                    </IonInfiniteScrollContent>
+                  </IonInfiniteScroll>
                   <IonList>
-                    { messages &&
-                      messages.map((message: Message, key) => {
-                        const timestamp = getTimestamp(message.createdAt);
-                        return (
-                        <div key={key}>
-                        {
-                        message.fromUserId === userProfile!.userId? (<>
-                          <IonText>
-                          
-                        </IonText>
-                          <div className="chat-bubble send" slot="end">
-                            <p>
-                              {message.content}
-                            </p>
-                            <p>
-                              <i>{timestamp}</i>
-                            </p>
-                            {
-                              lastRead === message.messageId &&
-                              <p className="read">
-                                Read 
-                              </p>
-                            }
-                          </div>
-                              </>
-                        ) : (
-                          <div slot="start" className="chat-bubble received">
-                            <p>
-                              {message.content}
-                            </p>
-                            <p>
-                              <i>{timestamp}</i>
-                            </p>
-                          </div>
-                        )}
+                        { messages &&
+                          messages.map((message: Message, key) =>
+                            <MessageList key={key} message={message} lastRead={lastRead} userProfile={userProfile!} /> 
+                          )
+                        }
+                      {
+                        chatState.matches({ready: {recipientTyping: 'typing'}}) && 
+                        <div slot="start" color="white" className="chat-bubble typing">
+                          <p>
+                            Typing...
+                          </p>
                         </div>
-                        )})
-                    }
-                    {
-                      chatState.matches({ready: {recipientTyping: 'typing'}}) && 
-                      <div slot="start" color="white" className="chat-bubble typing">
-                        <p>
-                          Typing...
-                        </p>
-                      </div>
-                    }
+                      }
                   </IonList>
+                </>
               )}
             </IonContent>
             {

@@ -18,9 +18,6 @@ const Download: React.FC<DownloadProps> = ({
     const [isInstallable, setIsInstallable] = useState<boolean | undefined>(undefined);
 
     useIonViewDidEnter(() => {
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            history.push('/tabs/home', { direction: 'forward'})
-        }
         pwaInstallHandler.addListener(canIstallListen);
     })
 
@@ -39,7 +36,7 @@ const Download: React.FC<DownloadProps> = ({
     }
 
   return (
-    <IonPage id="login-page">
+    <IonPage id="download-page">
       <IonHeader>
         <IonToolbar>
           <IonTitle>Download</IonTitle>
