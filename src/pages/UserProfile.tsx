@@ -375,7 +375,7 @@ const About: React.FC<UserProfileProps> = ({
                                       {userProfile.displayAddress}
                                     </IonLabel>
                                   </IonChip>
-                                  <p style={{height: '200px'}}>
+                                  <p>
                                     {userProfile.about}
                                   </p>
                                 </IonCardContent>

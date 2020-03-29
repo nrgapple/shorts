@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonIcon, IonText, IonList, IonItem, IonLabel, IonTitle, IonProgressBar, IonRow, IonCol, IonCard } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonIcon, IonText, IonList, IonItem, IonLabel, IonTitle, IonProgressBar, IonRow, IonCol, IonCard, IonCardHeader, IonCardContent } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -46,34 +46,28 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
 
   return (
     <IonPage id="session-detail-page">
-      <IonHeader>
+      <IonCard>
+
+      <IonCardHeader>
         <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/tabs/home"></IonBackButton>
           </IonButtons>
           <IonTitle>Profile</IonTitle>
         </IonToolbar>
-      </IonHeader>
-      <IonContent>
+      </IonCardHeader>
         {
           !profile ? (
             <IonProgressBar type="indeterminate" />
           ) : (
-            <>
-            <IonRow>
-              <IonCol size="12" size-md="6">
-                <ImageCard areDeletable={false} images={profile.images}/>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol size="12" size-md="6">
-                <InfoCard profile={profile}/>
-              </IonCol>
-            </IonRow>
-          </>
+            <IonCardContent>
+              <ImageCard areDeletable={false} images={profile.images}/>
+              <InfoCard profile={profile}/>
+            </IonCardContent>
+
           )
         }
-      </IonContent>
+      </IonCard>
     </IonPage>
   )
 };
