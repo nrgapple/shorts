@@ -25,81 +25,34 @@ const ImageCard: React.FC<ImageCardProps> = ({
   const [showImage, setShowImage] = useState(false);
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<any>(null);
-  const [width, height] = useWindowSize();
-
 
   const onClick = async () => {
     if (slides.current) {
-      const swiper = slides.current.swiper()
-      console.log(swiper.realIndex);
+      const swiper = await slides.current.getSwiper();
       if (onDelete)
         await onDelete(images[swiper.realIndex] ? images[swiper.realIndex].imageId : undefined);
     }
   }
 
-  useEffect(() => {
-    if (slides.current) {
-      setTimeout(() => {
-        const swiper = slides.current.swiper();
-        swiper.update();
-      }, 200)
-    }
-  }, [width, height]);
-
   return (
     <>
       <IonCard className="home-card">
-        <Swiper ref={slides} 
-        scrollBar 
-        navigation={false}
-        swiperOptions={
           {
-            slidesPerView: 1,
-            slidesPerColumn: 1,
-            slidesPerGroup: 1,
-            spaceBetween: 0,
-            autoHeight: true,
-            centeredSlides: true,
-            pagination: false,
-            effect: 'flip',
-            navigation: false,
-            grabCursor: true,
-            observer: true,
-        
+            images.length > 0 &&
+            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'flip'}}>
+              {
+                images.map((image, idx) => (
+                  <IonSlide key={idx}>
+                    <img
+                      src={image.imageUrl}
+                      style={{ height: '100%', width: '100%'}}
+                      onClick={() => {setBigImage(image.imageUrl); setShowImage(true)}}
+                    />
+                  </IonSlide>
+                ))
+              }
+            </IonSlides>
           }
-        }
-          style={{ width: '100%', height: '100%' }}>
-          {
-            images.length > 0 ?
-            images.map((img, key) => (
-              <Slide key={key}>
-                <img key={img.imageId}
-                  src={img.imageUrl}
-                  alt="no img"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                  onClick={() => {
-                    setShowImage(true); setBigImage(img.imageUrl);
-                  }
-                  }
-                />
-              </Slide>
-            )) : (
-              <Slide>
-                <img 
-                  src="https://via.placeholder.com/150?text=No+Image"
-                  alt="no img"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                />
-              </Slide>
-            )
-          }
-        </Swiper>
         {
           areDeletable &&
             <IonButton expand="block" color="danger" onClick={  () => onClick()}>
