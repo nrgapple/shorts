@@ -1,14 +1,9 @@
-import { IonCard, IonSlides, IonSlide, IonButton } from "@ionic/react";
-import React, { useEffect, EventHandler } from 'react'
+import { IonCard, IonSlides, IonSlide, IonButton, useIonViewDidEnter, useIonViewWillEnter } from "@ionic/react";
+import React, { Fragment } from 'react'
 import { Image } from "../models/Image";
 import { useState, useRef, DOMElement } from "react";
 import Lightbox from "react-image-lightbox";
 //@ts-ignore
-import {Swiper, Slide} from 'react-dynamic-swiper';
-import 'react-dynamic-swiper/lib/styles.css';
-import {
-  useWindowSize,
-} from '@react-hook/window-size/throttled'
 
 interface ImageCardProps {
   images: Image[];
@@ -26,23 +21,29 @@ const ImageCard: React.FC<ImageCardProps> = ({
   const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<any>(null);
 
+  useIonViewWillEnter(() => {
+    if (slides.current) {
+      slides.current.update();
+    }
+  })
+
   const onClick = async () => {
     if (slides.current) {
       const swiper = await slides.current.getSwiper();
       if (onDelete)
         await onDelete(images[swiper.realIndex] ? images[swiper.realIndex].imageId : undefined);
+        slides.current.update();
     }
   }
 
   return (
-    <>
-      <IonCard className="home-card">
+    <Fragment>
           {
             images.length > 0 &&
-            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'flip'}}>
+            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
               {
                 images.map((image, idx) => (
-                  <IonSlide key={idx}>
+                  <IonSlide key={idx} style={{ position: 'relative'}}>
                     <img
                       src={image.imageUrl}
                       style={{ height: '100%', width: '100%'}}
@@ -60,7 +61,6 @@ const ImageCard: React.FC<ImageCardProps> = ({
             </IonButton>
         }
         {children}
-      </IonCard>
       {
         showImage && (
           <Lightbox
@@ -69,7 +69,7 @@ const ImageCard: React.FC<ImageCardProps> = ({
           />
         )
       }
-    </>
+    </Fragment>
   );
 }
 

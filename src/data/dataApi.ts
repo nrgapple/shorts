@@ -263,6 +263,7 @@ export const postProfileInfo = async (
         }
       }),
       searchMiles: data.miles,
+      displayAddress: data.displayAddress,
     } as Profile;
     return updatedProfile;
   } catch (e) {

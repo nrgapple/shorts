@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider } from '@ionic/react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider, IonFabList } from '@ionic/react';
 import './UserProfile.scss';
-import { calendar, pin, more, body, close, male, female, chatboxes } from 'ionicons/icons';
+import { calendar, pin, more, body, male, female, options, close, person, colorWand, checkmark, locate } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
@@ -31,6 +31,7 @@ interface DispatchProps {
   loadProfile: typeof loadProfile,
   loadNearMe: typeof loadNearMe,
   setHasValidProfile: typeof setHasValidProfile,
+  setUserProfile: typeof setUserProfile
 };
 
 interface UserProfileProps extends OwnProps, StateProps, DispatchProps { };
@@ -42,6 +43,7 @@ const About: React.FC<UserProfileProps> = ({
   loadProfile,
   isloggedin,
   setHasValidProfile,
+  setUserProfile,
 }) => {
   const [about, setAbout] = useState(userProfile && userProfile.about ? userProfile.about : 'empty');
   const [height, setHeight] = useState(userProfile && userProfile.height ? userProfile.height : 0);
@@ -93,13 +95,14 @@ const About: React.FC<UserProfileProps> = ({
       setToastText('Profile Updated Successfully');
       setShowToast(true);
     } catch (e) {
-      const { data } = await e.response;
-      console.error(`Error updating profile`);
-      console.error(data);
       setToastText('Error Updating Profile');
       setShowToast(true);
     }
   }
+
+  useEffect(() => {
+    console.log(userProfile)
+  }, [userProfile])
 
   const uploadImage = async () => {
     if (inputImage) {
@@ -247,21 +250,43 @@ const About: React.FC<UserProfileProps> = ({
       {
         isloggedin && userProfile ? (
           <IonContent>
+            <IonFab activated={isEditing} horizontal='end' slot='fixed'>
+              <IonFabButton>
+                <IonIcon icon={options} />
+              </IonFabButton>
+              {
+                !isEditing
+                  ?
+                    <IonFabList>
+                      <IonFabButton type='button' onClick={() => setIsEditing(true)}>
+                        <IonIcon icon={colorWand} />
+                      </IonFabButton>
+                    </IonFabList>
+                  :
+                    <IonFabList>
+                      <IonFabButton type="button" onClick={() => setIsEditing(false)}>
+                        <IonIcon icon={close} />
+                      </IonFabButton>
+                      <IonFabButton type='button' onClick={updateProfile}>
+                        <IonIcon icon={checkmark} />
+                      </IonFabButton>
+                    </IonFabList>
+                }
+
+            </IonFab>
             {
               loading || !userProfile ?
                 <IonProgressBar type="indeterminate"></IonProgressBar>
                 :
-                <>
                   <IonRow>
                     <IonCol size="12" size-md="4">
                       <ImageCard
                         images={images}
                         areDeletable={isEditing}
                         onDelete={removeImage}
-                      >
+                      />
                         {
                           isEditing && (
-                            <>
                               <IonCol size="12" size-md="6">
                                 <IonCard>
                                   {
@@ -301,11 +326,8 @@ const About: React.FC<UserProfileProps> = ({
                                   }
                                 </IonCard>
                               </IonCol>
-                            </>
                           )
                         }
-                      </ImageCard>
-
                     </IonCol>
 
                     <IonCol size="12" size-md="6">
@@ -318,7 +340,7 @@ const About: React.FC<UserProfileProps> = ({
                           </IonCardHeader>
                           {
                             !isEditing ?
-                              <>
+                              <Fragment>
                                 <IonCardContent class="outer-content">
                                   <IonChip color="primary" outline>
                                     <IonIcon icon={calendar} />
@@ -366,7 +388,7 @@ const About: React.FC<UserProfileProps> = ({
                                     {userProfile.about}
                                   </p>
                                 </IonCardContent>
-                              </>
+                              </Fragment>
                               :
                               <IonList lines="none">
                                 <IonItemDivider>
@@ -430,25 +452,13 @@ const About: React.FC<UserProfileProps> = ({
                             const position = await getCurrentLocation();
                             const point = {lat: position?position.coords.latitude:0, lng: position?position.coords.longitude:0};
                             point && postUserLocation(point, token);
-                          }}>Set Location</IonButton>}
-                          {
-                            isEditing &&
-                            <>
-                              <IonButton type="submit" expand="block">Update</IonButton>
-                              <IonButton onClick={() => { setIsEditing(false); }} color="light" expand="block">Cancel</IonButton>
-                            </>
-                          }
-                          {
-                            !isEditing &&
-                            <IonButton expand="block" onClick={() => setIsEditing(true)}>Edit</IonButton>
-                          }
+                          }}><IonIcon icon={locate} /></IonButton>}
                         </IonCard>
                       </form>
                     </IonCol>
 
 
                   </IonRow>
-                </>
             }
           </IonContent>
         ) : (
@@ -495,6 +505,7 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     loadProfile,
     loadNearMe,
     setHasValidProfile,
+    setUserProfile,
   },
   component: About
 });

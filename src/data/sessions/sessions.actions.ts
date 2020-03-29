@@ -3,7 +3,6 @@ import { ActionType } from '../../util/types';
 import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 import { Chat } from '../../models/Chat';
-import { Message } from '@stomp/stompjs';
 
 export const loadAllInfo = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
   var profile = undefined;
@@ -35,6 +34,7 @@ export const loadAllInfo = (token: string | undefined) => async (dispatch: React
 }
 
 export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispatch<any>) => {
+  console.log('profile')
   dispatch(setLoading(true));
   dispatch(setData({userProfile: profile}));
   dispatch(setLoading(false));
