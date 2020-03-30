@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, useIonViewDidEnter, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, IonInfiniteScroll, IonInfiniteScrollContent, useIonViewDidEnter } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -112,8 +112,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!, 
           chat!.chatId,
           (msg: Message) => {
-            setMessages(oldMessages => [...oldMessages, msg]
-              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+            setMessages(oldMessages => [...oldMessages, msg]);
             if (msg.fromUserId !== userProfile!.userId)
               chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
           },
@@ -231,19 +230,18 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         isClientConnected && 
         userProfile &&
         chatState.matches({init: 'wait'})) {
-          console.log(client);
           chatSend('DEPENDENCIES_LOADED');
         }
   }, [token, chat, client, userProfile, isClientConnected]);
 
   // Get dependencies once we have our token.
-  useEffect(() => {
+  useIonViewDidEnter(() => {
     if (token)
     {
       if (!userProfile) loadProfile(token);
       loadChats(token);
     }
-  }, [token]);
+  });
 
   // Clean up subs.
   useEffect(() => {
@@ -266,19 +264,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     //if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
-
-  // Log the states.
-  useEffect(() => {
-    const subscription = chatService.subscribe(state => {
-    });
-  
-    return subscription.unsubscribe;
-  }, [chatService]); // note: service should never change
-
-  // the component finished rendering.
-  // useIonViewDidEnter(() => {
-  //   setRendered(true);
-  // })
 
   return (
     <>
@@ -305,26 +290,27 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                 <IonProgressBar type="indeterminate" />
               ) : (
                 <>
-                  <IonInfiniteScroll ref={scroller} position="top" onIonInfinite={() => {console.log('hello'); scroller.current.complete()}}>
-                    <IonInfiniteScrollContent>
-                    </IonInfiniteScrollContent>
-                  </IonInfiniteScroll>
-                  <IonList>
-                        { messages &&
-                          messages.map((message: Message, key) =>
-                            <MessageList key={key} message={message} lastRead={lastRead} userProfile={userProfile!} /> 
-                          )
+                    <div>
+                      <IonInfiniteScroll ref={scroller} position="top" onIonInfinite={() => {console.log('hello'); scroller.current.complete()}}>
+                        <IonInfiniteScrollContent></IonInfiniteScrollContent>
+                      </IonInfiniteScroll>
+                    </div>
+                    <IonList>
+                          { messages &&
+                            messages.map((message: Message, key) =>
+                              <MessageList key={key} message={message} lastRead={lastRead} userProfile={userProfile!} /> 
+                            )
+                          }
+                        {
+                          chatState.matches({ready: {recipientTyping: 'typing'}}) && 
+                          <div slot="start" color="white" className="chat-bubble typing">
+                            <p>
+                              Typing...
+                            </p>
+                          </div>
                         }
-                      {
-                        chatState.matches({ready: {recipientTyping: 'typing'}}) && 
-                        <div slot="start" color="white" className="chat-bubble typing">
-                          <p>
-                            Typing...
-                          </p>
-                        </div>
-                      }
-                  </IonList>
-                </>
+                    </IonList>
+                  </>
               )}
             </IonContent>
             {

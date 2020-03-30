@@ -646,7 +646,6 @@ export const subscribeToChatNotifications = (
   onNotification: (chat: Chat) => void,
   subId: string,
 ) => {
-  console.log(client.webSocket.readyState);
   return client.subscribe(vars().env.CHAT_NOTIFY, response => {
     const data = JSON.parse(response.body);
     if (data) {

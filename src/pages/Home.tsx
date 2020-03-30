@@ -179,7 +179,8 @@ const Home: React.FC<HomeProps> = ({
                 }
               </>
             ) : homeState.matches('loading') ? (
-              <ProfileCard profile={undefined} swiped={swipe} />
+              <div></div>
+              // <ProfileCard profile={undefined} swiped={swipe} />
             ) : homeState.matches('noMatches') ? (
               <IonCol size="12" size-md="6">
                 <IonCard>
