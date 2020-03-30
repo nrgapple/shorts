@@ -50,11 +50,10 @@ export const fillProfiles = async () => {
       );
       console.log(data);
       if (localProfile.location) {
-        await postUserLocation(localProfile.location, data.token);
+        await postUserLocation(localProfile.location);
       }
       //await new Promise(resolve => setTimeout(resolve, 1000));
       const updatedProfile = await postProfileInfo(
-        data.token,
         localProfile.about? localProfile.about: "",
         localProfile.gender? localProfile.gender: "male",
         localProfile.genderPref? localProfile.genderPref: "female",

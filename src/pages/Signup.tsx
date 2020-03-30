@@ -62,7 +62,6 @@ const Login: React.FC<LoginProps> = ({
           lastName,
           email
         );
-        console.log(data);
         if (!data.token)
         {
           setTokenError(true);
@@ -73,12 +72,12 @@ const Login: React.FC<LoginProps> = ({
         setTokenAction(data.token);
         setUsernameAction(username);
         if (point)
-          await postUserLocation(point, data.token);
+          await postUserLocation(point);
         const key = localStorage.getItem("push_key");
         const auth = localStorage.getItem("push_auth");
         const endpoint = localStorage.getItem("push_endpoint");
         if (key && auth && endpoint) {
-          await postDevice(key, auth, endpoint, data.token);
+          await postDevice(key, auth, endpoint);
           localStorage.removeItem("push_key");
           localStorage.removeItem("push_auth");
           localStorage.removeItem("push_endpoint");

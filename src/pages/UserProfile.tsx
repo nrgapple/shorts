@@ -18,7 +18,6 @@ let fixRotation = require('fix-image-rotation')
 
 interface OwnProps {
   userProfile?: Profile;
-  token?: string;
 };
 
 interface StateProps {
@@ -38,7 +37,6 @@ interface UserProfileProps extends OwnProps, StateProps, DispatchProps { };
 const About: React.FC<UserProfileProps> = ({
   userProfile,
   loading,
-  token,
   loadProfile,
   isloggedin,
   setHasValidProfile,
@@ -79,7 +77,6 @@ const About: React.FC<UserProfileProps> = ({
     e.preventDefault();
     try {
       const updatedProfile = await postProfileInfo(
-        token,
         about,
         gender,
         genderPref,
@@ -104,7 +101,7 @@ const About: React.FC<UserProfileProps> = ({
   const uploadImage = async () => {
     if (inputImage) {
       try {
-        const imageInfo = await postImage(inputImage, token);
+        const imageInfo = await postImage(inputImage);
         if (imageInfo) {
           setImages([...images, imageInfo]);
           setToastText('Image Uploaded Successfully');
@@ -129,7 +126,7 @@ const About: React.FC<UserProfileProps> = ({
     }
     try {
       const index = images.findIndex(x => x.imageId === imageId);
-      await deleteImage(imageId, token);
+      await deleteImage(imageId);
       images.length < 2 ?
         setImages(oldImages => [] as Image[]) :
         setImages(oldImages => [...oldImages.slice(0, index), ...oldImages.slice(index + 1)]);
@@ -223,7 +220,7 @@ const About: React.FC<UserProfileProps> = ({
 
   useEffect(() => {
     try {
-      loadProfile(token);
+      loadProfile();
     } catch (e) {
       console.log(`Error loading the user profile ${e}`);
     }
@@ -443,7 +440,7 @@ const About: React.FC<UserProfileProps> = ({
                             const position = await getCurrentLocation();
                             const point = {lat: position?position.coords.latitude:0, lng: position?position.coords.longitude:0};
                             if (point) {
-                              const updatedUserProfile = await postUserLocation(point, token) as Profile;
+                              const updatedUserProfile = await postUserLocation(point) as Profile;
                               setUserProfile(updatedUserProfile);
                               setToastText('Location has been updated');
                               setShowToast(true);
@@ -487,7 +484,6 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     userProfile: state.data.userProfile,
     loading: state.data.loading,
-    token: state.user.token,
     isloggedin: state.user.isLoggedin,
   }),
   mapDispatchToProps: {

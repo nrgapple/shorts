@@ -13,7 +13,6 @@ interface OwnProps extends RouteComponentProps { };
 
 interface StateProps {
   profile?: Profile;
-  token?: string;
 };
 
 interface DispatchProps {
@@ -27,18 +26,14 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
   loadNearMe,
   loadMatches,
   profile,
-  token,
 }) => {
 
   useEffect(() => {
-    if (token)
-    {
-      if (profile)
-        return; 
-      loadMatches(token);
-      loadNearMe(token);
-    }
-  }, [token]);
+    if (profile)
+      return; 
+    loadMatches();
+    loadNearMe();
+  }, []);
 
   return (
     <IonPage style={{overflow: 'scroll'}}>
@@ -66,7 +61,6 @@ const ProfileDetail: React.FC<ProfileDetailProps> = ({
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state, OwnProps) => ({
     profile: selectors.getProfile(state, OwnProps),
-    token: state.user.token,
   }),
   mapDispatchToProps: {
     loadNearMe,

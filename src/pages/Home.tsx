@@ -12,7 +12,6 @@ import { homeMachine, swipeMachine } from '../machines/homeMachines';
 import { Swipeable, direction } from 'react-deck-swiper';
 
 interface OwnProps {
-  token?: string;
 };
 
 interface StateProps {
@@ -33,7 +32,6 @@ interface HomeProps extends OwnProps, StateProps, DispatchProps { };
 
 const Home: React.FC<HomeProps> = ({
   profile,
-  token,
   incrementProfileIndex: incrementProfileIndexAction,
   nearMeCount,
   loadNearMe,
@@ -48,7 +46,7 @@ const Home: React.FC<HomeProps> = ({
   const [homeState, homeSend, homeService] = useMachine(homeMachine, {
     actions: {
       fetchData: () => {
-        loadNearMe(token)
+        loadNearMe()
       },
     }
   });
@@ -79,14 +77,14 @@ const Home: React.FC<HomeProps> = ({
       homeSend('NOT_LOGGED_IN');
       return;
     }
-    if (token && userProfile && homeSend) {
+    if (userProfile && homeSend) {
       homeSend('LOAD');
     }
   }
 
   useEffect(() => {
     init();
-  }, [userProfile, isLoggedin, token, homeSend, hasValidProfile]);
+  }, [userProfile, isLoggedin, homeSend, hasValidProfile]);
 
   useEffect(() => {
     if (homeState.matches('loading')) {
@@ -118,7 +116,7 @@ const Home: React.FC<HomeProps> = ({
     }
 
     try {
-      const isMatch = await postSwipe(profile.userId, liked, token);
+      const isMatch = await postSwipe(profile.userId, liked);
       if (!isMatch === undefined) {
         swipeSend('SUCCESS');
       }
@@ -180,7 +178,6 @@ const Home: React.FC<HomeProps> = ({
               </>
             ) : homeState.matches('loading') ? (
               <div></div>
-              // <ProfileCard profile={undefined} swiped={swipe} />
             ) : homeState.matches('noMatches') ? (
               <IonCol size="12" size-md="6">
                 <IonCard>
@@ -212,7 +209,6 @@ const Home: React.FC<HomeProps> = ({
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     profile: selectors.getCurrentProfile(state),
-    token: state.user.token,
     nearMeCount: state.data.nearMe ? state.data.nearMe.length : -1,
     isLoggedin: state.user.isLoggedin,
     hasValidProfile: state.data.hasValidProfile,

@@ -4,19 +4,19 @@ import { SessionsState } from './sessions.state';
 import { Profile } from '../../models/Profile';
 import { Chat } from '../../models/Chat';
 
-export const loadAllInfo = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+export const loadAllInfo = () => async (dispatch: React.Dispatch<any>) => {
   var profile = undefined;
   var matches = undefined;
   var nearMe = undefined;
   try {
     dispatch(setLoading(true));
-    profile = await getUserProfile(token);
-    matches = await getMatches(token);
+    profile = await getUserProfile();
+    matches = await getMatches();
   } catch (e) {
     console.log(e);
   }
   try {
-    nearMe = await getNearMe(token); 
+    nearMe = await getNearMe(); 
     dispatch(setHasValidProfile(true));
   } catch (e) {
     console.log(e);
@@ -40,10 +40,10 @@ export const setUserProfile = (profile: Profile) => async (dispatch: React.Dispa
   dispatch(setLoading(false));
 };
 
-export const loadProfile = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+export const loadProfile = () => async (dispatch: React.Dispatch<any>) => {
   try {
     dispatch(setLoading(true));
-    const profile = await getUserProfile(token);
+    const profile = await getUserProfile();
     dispatch(setData({userProfile: profile}));
     dispatch(setLoading(false));
   } catch (e) {
@@ -51,10 +51,10 @@ export const loadProfile = (token: string | undefined) => async (dispatch: React
   }
 }
 
-export const loadNearMe = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+export const loadNearMe = () => async (dispatch: React.Dispatch<any>) => {
   try {
     dispatch(setLoading(true));
-    const nearMe = await getNearMe(token);
+    const nearMe = await getNearMe();
     dispatch(setHasValidProfile(true));
     dispatch(setData({nearMe: nearMe}));
   } catch (e) {
@@ -67,16 +67,16 @@ export const loadNearMe = (token: string | undefined) => async (dispatch: React.
   }
 }
 
-export const loadMatches = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+export const loadMatches = () => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
-  const matches = await getMatches(token);
+  const matches = await getMatches();
   dispatch(setData({matches: matches}));
   dispatch(setLoading(false));
 }
 
-export const loadChats = (token: string | undefined) => async (dispatch: React.Dispatch<any>) => {
+export const loadChats = () => async (dispatch: React.Dispatch<any>) => {
   dispatch(setLoading(true));
-  const chats = await getChats(token) as Chat[] | undefined;
+  const chats = await getChats() as Chat[] | undefined;
   if (chats) {
     chats.sort((a: Chat,b: Chat) => {
       if (a.lastMessage === undefined)

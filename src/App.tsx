@@ -113,7 +113,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
   }
 
   useEffect(() => {
-    loadAllInfo(token);
+    loadAllInfo();
   }, [token])
 
   return (
@@ -142,11 +142,11 @@ const IonicApp: React.FC<IonicAppProps> = ({
               setToken(undefined);
               return <Redirect to="/tabs" />
             }} />
-            <Route path="/chat/:id" component={ChatDetail} />
-            <Route path="/more/:id" component={ProfileDetail} />
             <Route path="/" component={HomeOrLogin} exact />
           </IonRouterOutlet>
         </IonSplitPane>
+        <Route path="/chat/:id" component={ChatDetail} />
+          <Route path="/more/:id" component={ProfileDetail} />
       </IonReactRouter>
     </IonApp>
   )

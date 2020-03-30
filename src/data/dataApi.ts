@@ -26,11 +26,11 @@ export const getUserData = async () => {
     Storage.get({ key: USERNAME }),
     Storage.get({ key: TOKEN }),
     Storage.get({ key: DARK_MODE })]);
-  const isLoggedin = await response[0].value === 'true';
-  const hasSeenTutorial = await response[1].value === 'true';
-  const username = await response[2].value || undefined;
-  const token = await response[3].value || undefined;
-  const darkMode = await response[4].value === 'true';
+  const isLoggedin = response[0].value === 'true';
+  const hasSeenTutorial = response[1].value === 'true';
+  const username = response[2].value || undefined;
+  const token = response[3].value || undefined;
+  const darkMode = response[4].value === 'true';
   const data = {
     isLoggedin,
     hasSeenTutorial,
@@ -41,7 +41,8 @@ export const getUserData = async () => {
   return data;
 }
 
-export const getNearMe = async (token: string | undefined) => {
+export const getNearMe = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const nearMeResponse = await Axios.request({
@@ -83,7 +84,8 @@ export const getNearMe = async (token: string | undefined) => {
   } 
 }
 
-export const getUserProfile = async (token: string | undefined) => {
+export const getUserProfile = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const userProfileResponse = await Axios.request({
@@ -220,13 +222,13 @@ export const postReset = async (
 }
 
 export const postProfileInfo = async (
-  token: string | undefined,
   about: string,
   gender: string,
   genderPref: string,
   height: number,
   miles: number,
 ) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (!token) {
     return
   } 
@@ -306,8 +308,9 @@ export const postSignup = async (
   }
 }
 
-export const postUserLocation = async (point: GeoPoint, token: string | undefined) =>
+export const postUserLocation = async (point: GeoPoint) =>
 {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token)
   {
     try {
@@ -331,7 +334,8 @@ export const postUserLocation = async (point: GeoPoint, token: string | undefine
   }
 } 
 
-export const postSwipe = async (userId: number, liked: boolean, token: string | undefined) => {
+export const postSwipe = async (userId: number, liked: boolean) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const swipeResponse = await Axios.request({
@@ -357,7 +361,8 @@ export const postSwipe = async (userId: number, liked: boolean, token: string | 
   }
 }
 
-export const getMatches = async (token: string | undefined) => {
+export const getMatches = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const matchesResponse = await Axios.request({
@@ -378,7 +383,8 @@ export const getMatches = async (token: string | undefined) => {
   }
 }
 
-export const postImage = async (image:File, token:string | undefined) => {
+export const postImage = async (image:File) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       var formData = new FormData();
@@ -400,7 +406,8 @@ export const postImage = async (image:File, token:string | undefined) => {
   }
 }
 
-export const deleteImage = async (imageId: number, token: string | undefined) => {
+export const deleteImage = async (imageId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const deleteResponse = await Axios.request({
@@ -419,7 +426,8 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
   }
 }
 
-export const deleteMatch = async (userId: number, token: string | undefined) => {
+export const deleteMatch = async (userId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const deleteResponse = await Axios.request({
@@ -437,7 +445,8 @@ export const deleteMatch = async (userId: number, token: string | undefined) => 
   }
 }
 
-export const getMessages = async (chatId: number, token: string | undefined) => {
+export const getMessages = async (chatId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const messagesResponse = await Axios.request({
@@ -472,7 +481,8 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   }
 }
 
-export const createChat = async (userId: number, token: string | undefined) => {
+export const createChat = async (userId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const chatsResponse = await Axios.request({
@@ -496,7 +506,8 @@ export const createChat = async (userId: number, token: string | undefined) => {
   }
 }
 
-export const getChats = async (token: string | undefined) => {
+export const getChats = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const chatsResponse = await Axios.request({
@@ -528,7 +539,8 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
-export const postDevice = async (key: string, auth: string, endpoint: string, token: string) => {
+export const postDevice = async (key: string, auth: string, endpoint: string) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (key && auth && endpoint && token) {
     try {
       const postDeviceResponse = await Axios.request({
@@ -554,15 +566,15 @@ export const postDevice = async (key: string, auth: string, endpoint: string, to
   }
 }
 
-export const configureClient = (
-  token: string | undefined, 
+export const configureClient = async (
+  token: string | undefined,
   client: Client | undefined,
   onConnect: ()=> void,
   onDisconnect: () => void,
   onWebSocketClose: () => void,
   onWebSocketError: () => void,
   ) => {
-  if (!token || !client) 
+    if (!token || !client) 
     return;
   if (client.connected)
     return;

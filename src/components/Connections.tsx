@@ -54,7 +54,7 @@ const Connections: React.FC<ConnectionProps> = ({
   var subs = useRef<StompSubscription[]>([]);
 
   const configure = () => {
-    if (token && client) {
+    if (client) {
       configureClient(
         token,
         client,
@@ -114,10 +114,10 @@ const Connections: React.FC<ConnectionProps> = ({
   }
 
   const onCreateChat = async () => {
-    if (token && match) {
+    if (match) {
       try {
         setIsCreatingChat(true);
-        const chat = await createChat(match.userId, token);
+        const chat = await createChat(match.userId);
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -133,7 +133,7 @@ const Connections: React.FC<ConnectionProps> = ({
     } else if (!isLoggedIn && wasLoggedInAndSubbed) {
       disconnect();
     }
-  }, [token, isLoggedIn])
+  }, [isLoggedIn])
 
   useEffect(() => {
     if (!client || isClientConnected || !userProfile) return;
@@ -195,13 +195,13 @@ const Connections: React.FC<ConnectionProps> = ({
 
 export default connect<{}, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
-    token: state.user.token,
     userProfile: state.data.userProfile,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
     chats: state.data.chats,
     matches: state.data.matches,
     isLoggedIn: state.user.isLoggedin,
+    token: state.user.token,
   }),
   mapDispatchToProps: {
     setClient,

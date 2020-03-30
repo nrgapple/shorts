@@ -20,7 +20,6 @@ interface OwnProps extends RouteComponentProps { };
 interface StateProps {
   userProfile?: Profile,
   chat?: Chat,
-  token?: string,
   loading?: boolean,
   client?: Client,
   isClientConnected: boolean,
@@ -38,7 +37,6 @@ type ChatDetailProps = OwnProps & StateProps & DispatchProps;
 const ChatDetail: React.FC<ChatDetailProps> = ({
   userProfile, 
   chat, 
-  token, 
   client,
   isClientConnected,
   loadChats,
@@ -58,9 +56,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
-        if (chat && token) {
+        if (chat) {
           try {
-            const data = await getMessages(chat.chatId, token);
+            const data = await getMessages(chat.chatId);
             if (data) {
               const messages = [...data.messages];
               messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
@@ -224,7 +222,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Wait for all dependencies.
   useEffect(() => {
-    if (token && 
+    if (
         chat && 
         client && 
         isClientConnected && 
@@ -232,20 +230,15 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         chatState.matches({init: 'wait'})) {
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected]);
-
-  // Get dependencies once we have our token.
-  useIonViewDidEnter(() => {
-    if (token)
-    {
-      if (!userProfile) loadProfile(token);
-      loadChats(token);
-    }
-  });
+  }, [chat, client, userProfile, isClientConnected]);
 
   // Clean up subs.
   useEffect(() => {
+    console.log('mount')
+    if (!userProfile) loadProfile();
+    loadChats();
     return () => {
+      console.log('unmount')
       if (client && chat) {
         unSub(client, chat.chatId);
       }
@@ -289,7 +282,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               !chatState.matches('ready')? (
                 <IonProgressBar type="indeterminate" />
               ) : (
-                <>
+                <div>
                     <div>
                       <IonInfiniteScroll ref={scroller} position="top" onIonInfinite={() => {console.log('hello'); scroller.current.complete()}}>
                         <IonInfiniteScrollContent></IonInfiniteScrollContent>
@@ -310,7 +303,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                           </div>
                         }
                     </IonList>
-                  </>
+                  </div>
               )}
             </IonContent>
             {
@@ -353,7 +346,6 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state, OwnProps) => ({
     chat: selectors.getChat(state, OwnProps),
     userProfile: state.data.userProfile,
-    token: state.user.token,
     loading: state.data.loading,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
