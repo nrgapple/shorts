@@ -227,8 +227,9 @@ export const postProfileInfo = async (
   genderPref: string,
   height: number,
   miles: number,
+  token?: string,
 ) => {
-  const token = (await Storage.get({key: TOKEN})).value;
+  if (!token) token = (await Storage.get({key: TOKEN})).value as string | undefined;
   if (!token) {
     return
   } 
@@ -308,9 +309,9 @@ export const postSignup = async (
   }
 }
 
-export const postUserLocation = async (point: GeoPoint) =>
+export const postUserLocation = async (point: GeoPoint, token?: string) =>
 {
-  const token = (await Storage.get({key: TOKEN})).value;
+  if (!token) token = (await Storage.get({key: TOKEN})).value as string | undefined;
   if (token)
   {
     try {

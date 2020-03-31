@@ -7,7 +7,7 @@ import './Home.scss';
 import { Profile } from '../models/Profile';
 import ProfileCard from '../components/ProfileCard';
 import { postSwipe, getNearMe } from '../data/dataApi';
-import { incrementProfileIndex, loadNearMe } from '../data/sessions/sessions.actions';
+import { incrementProfileIndex, loadNearMe, resetIncrementor } from '../data/sessions/sessions.actions';
 import { homeMachine, swipeMachine } from '../machines/homeMachines';
 import { Swipeable, direction } from 'react-deck-swiper';
 
@@ -21,10 +21,12 @@ interface StateProps {
   hasValidProfile: boolean;
   userProfile?: Profile;
   loading?: boolean;
+  index: number;
 };
 
 interface DispatchProps {
   incrementProfileIndex: typeof incrementProfileIndex;
+  resetIncrementor: typeof resetIncrementor;
   loadNearMe: typeof loadNearMe;
 };
 
@@ -39,6 +41,7 @@ const Home: React.FC<HomeProps> = ({
   hasValidProfile,
   userProfile,
   loading,
+  resetIncrementor,
 }) => {
 
   const [currentMatch, setCurrentMatch] = useState(profile);
@@ -46,7 +49,9 @@ const Home: React.FC<HomeProps> = ({
   const [homeState, homeSend, homeService] = useMachine(homeMachine, {
     actions: {
       fetchData: () => {
+        console.log(`fetching data`);
         loadNearMe()
+
       },
     }
   });
@@ -65,6 +70,7 @@ const Home: React.FC<HomeProps> = ({
         if (!profile) {
           homeSend('RESET');
           init();
+          resetIncrementor();
         }
       }
     }
@@ -105,8 +111,9 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     const subscription = homeService.subscribe(state => {
+      console.log(state);
     });
-  
+    
     return subscription.unsubscribe;
   }, [homeService]); // note: service should never change
 
@@ -146,7 +153,7 @@ const Home: React.FC<HomeProps> = ({
       <IonContent className="">
         <IonRefresher slot="fixed"
           onIonRefresh={(event: any) => {
-            homeSend({type: 'LOAD', action: 'fetchData'});
+            homeSend('RESET');
             setTimeout(() => {
               event.detail.complete();
             }, 1000);
@@ -214,10 +221,12 @@ export default connect<OwnProps, StateProps, DispatchProps>({
     hasValidProfile: state.data.hasValidProfile,
     userProfile: state.data.userProfile,
     loading: state.data.loading,
+    index: state.data.currentProfileIndex,
   }),
   mapDispatchToProps: {
     incrementProfileIndex,
     loadNearMe,
+    resetIncrementor,
   },
   component: Home
 });

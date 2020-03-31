@@ -50,7 +50,7 @@ export const fillProfiles = async () => {
       );
       console.log(data);
       if (localProfile.location) {
-        await postUserLocation(localProfile.location);
+        await postUserLocation(localProfile.location, data.token);
       }
       //await new Promise(resolve => setTimeout(resolve, 1000));
       const updatedProfile = await postProfileInfo(
@@ -59,6 +59,7 @@ export const fillProfiles = async () => {
         localProfile.genderPref? localProfile.genderPref: "female",
         localProfile.height? localProfile.height: 50,
         localProfile.searchMiles? localProfile.searchMiles: 500,
+        data.token,
       );
       console.log(updatedProfile);
     }

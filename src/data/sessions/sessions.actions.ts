@@ -157,6 +157,10 @@ export const incrementProfileIndex = () => ({
   type: 'increment-profile-index',
 } as const)
 
+export const resetIncrementor = () => ({
+  type: 'reset-incrementor',
+} as const)
+
 export type SessionsActions =
   | ActionType<typeof setLoading>
   | ActionType<typeof setData>
@@ -171,3 +175,4 @@ export type SessionsActions =
   | ActionType<typeof incrementProfileIndex>
   | ActionType<typeof setHasValidProfile>
   | ActionType<typeof replaceChat>
+  | ActionType<typeof resetIncrementor>
