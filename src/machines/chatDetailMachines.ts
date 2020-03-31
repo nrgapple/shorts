@@ -201,10 +201,11 @@ export const chatMachine = Machine({
       }
     },
     notInView: {
+      entry: ['unSub'],
       on: {
         REENTERED: {
-          target: 'subscribe',
-          actions: ['scrollToTheBottom'],
+          target: 'init',
+          actions: ['scrollToTheBottom', 'bypass'],
         }
       }
     }

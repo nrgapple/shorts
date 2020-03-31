@@ -163,10 +163,24 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           setLastRead(event.data);
         }
         chatSend('READ_UPDATE_SUCCESS');
+      },
+      unSub: () => {
+        onUnsub();
+      },
+      bypass: () => {
+        console.log(`checking dependencies: ${chatState.matches({init: 'wait'})}`);
+        chatSend('DEPENDENCIES_LOADED');
       }
     }
   });
   
+  const onUnsub = () => {
+    console.log("unSubbing");
+    publishTypingForClient(client!, chat!.chatId, false);
+    subs.current.forEach(s => s.unsubscribe());
+    subs.current = [];
+  }
+
   const onKeyPressed = (event: any) => {
     
     //@ts-ignore
@@ -197,12 +211,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     }, 200);
   }
 
-  const unSub = (client: Client, chatId: number) => {
-    publishTypingForClient(client, chatId, false);
-    subs.current.forEach(s => s.unsubscribe());
-    subs.current = [];
-  }
-
   useEffect(() => {
     if (!chat)
       return;
@@ -210,7 +218,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     if (location.pathname !== `/chat/${chat.chatId}` &&
         subs && subs.current.length > 0 &&
         client) {
-      unSub(client, chat.chatId);
       chatSend('LEFT');
     }
     else if (location.pathname === `/chat/${chat.chatId}`) {
@@ -240,7 +247,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     return () => {
       console.log('unmount')
       if (client && chat) {
-        unSub(client, chat.chatId);
+        onUnsub();
       }
     }
   },[]);
@@ -248,7 +255,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     if (visibility && visibility === "visible") {
       // we need to fetch the messages and resub
-      chatSend('DEPENDENCIES_LOADED');
+      console.log("visible");
+      chatSend('REENTERED');
+    } else if (visibility && visibility === "hidden") {
+      console.log("hidden");
+      chatSend('LEFT');
     }
   }, [visibility])
 
@@ -257,6 +268,16 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     //if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
+
+  // debugging
+  useEffect(() => {
+    const subscription = chatService.subscribe(state => {
+      // simple state logging
+      console.log(state);
+    });
+  
+    return subscription.unsubscribe;
+  }, [chatService]); // note: service should never change
 
   return (
     <>
