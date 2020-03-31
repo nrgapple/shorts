@@ -47,7 +47,6 @@ const Connections: React.FC<ConnectionProps> = ({
   isLoggedIn,
 }) => {
   const history = useHistory();
-  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
   const [match, setMatch] = useState<Profile | undefined>(undefined);
   const [creatingChat, setIsCreatingChat] = useState(false);
@@ -55,15 +54,12 @@ const Connections: React.FC<ConnectionProps> = ({
   var subs = useRef<StompSubscription[]>([]);
 
   const configure = () => {
-    console.log(`token: ${token} | client: ${client}`)
-    if (token && client) {
-      console.log(`calling configure`)
+    if (client) {
       configureClient(
         token,
         client,
         () => {
           setIsClientConnected(true);
-          console.log(`Connected to socket`);
           subs.current = [...subs.current, subscribeToChatNotifications(
             client,
             (chat) => {
@@ -75,9 +71,6 @@ const Connections: React.FC<ConnectionProps> = ({
           subs.current = [...subs.current, subscribeToMatchNotifications(
             client,
             (profile) => {
-              console.log(`MATCH!!`);
-              console.log(profile);
-              //history.push(`/more/${profile.userId}`);
               setMatch(profile);
               setShowModal(true);
             },
@@ -86,9 +79,7 @@ const Connections: React.FC<ConnectionProps> = ({
           subs.current = [...subs.current, subscribeToUnmatchNotifications(
             client,
             (userId) => {
-              console.log(`Unmatched with: ${userId}`);
               if (chats) {
-                console.log(chats);
                 const chat = chats.find(x => x.recipient.userId === userId);
                 if (chat) {
                   removeChat(chat);
@@ -117,18 +108,16 @@ const Connections: React.FC<ConnectionProps> = ({
   }
 
   const disconnect = () => {
-    console.log(`dissconnect`);
     if (client)
       client.deactivate();
     setIsClientConnected(false);
   }
 
   const onCreateChat = async () => {
-    if (token && match) {
+    if (match) {
       try {
         setIsCreatingChat(true);
-        const chat = await createChat(match.userId, token);
-        //console.log(history);
+        const chat = await createChat(match.userId);
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -139,20 +128,15 @@ const Connections: React.FC<ConnectionProps> = ({
   }
 
   useEffect(() => {
-    console.log(token);
     if (isLoggedIn && !wasLoggedInAndSubbed ) {
-      console.log(`setting client: ${JSON.stringify(client)}`)
       setClient(new Client());
     } else if (!isLoggedIn && wasLoggedInAndSubbed) {
       disconnect();
     }
-  }, [token, isLoggedIn])
+  }, [isLoggedIn])
 
   useEffect(() => {
-    console.log(`client changed: ${client}`);
-    console.log(userProfile);
     if (!client || isClientConnected || !userProfile) return;
-    console.log(`Now time to configure`);
     configure();
   }, [client, userProfile, isClientConnected])
 
@@ -182,27 +166,25 @@ const Connections: React.FC<ConnectionProps> = ({
             !match ? (
               <IonProgressBar type="indeterminate" />
             ) : (
-              <>
-                <IonRow>
-                  <ImageCard areDeletable={false} images={match.images} />
-                </IonRow>
-                <InfoCard profile={match} />
-                {
-                  !creatingChat && <IonButton
-                    fill="solid" 
-                    color="success"
-                    expand="block"
-                    onClick={() => {
-                      onCreateChat();
-                      setTimeout(() => {
-                        setShowModal(false);
-                      }, 500);
-                    }}
-                  >
-                    Start Chatting
-                  </IonButton>
-                }
-              </>
+                <div>
+                  <InfoCard profile={match} />
+                  {
+                    !creatingChat && <IonButton
+                      fill="solid" 
+                      color="success"
+                      expand="block"
+                      onClick={() => {
+                        onCreateChat();
+                        setTimeout(() => {
+                          setShowModal(false);
+                        }, 500);
+                      }}
+                    >
+                      Start Chatting
+                    </IonButton>
+                  }
+                </div>
+
             )
           }
         </IonContent>
@@ -213,13 +195,13 @@ const Connections: React.FC<ConnectionProps> = ({
 
 export default connect<{}, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
-    token: state.user.token,
     userProfile: state.data.userProfile,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
     chats: state.data.chats,
     matches: state.data.matches,
     isLoggedIn: state.user.isLoggedin,
+    token: state.user.token,
   }),
   mapDispatchToProps: {
     setClient,

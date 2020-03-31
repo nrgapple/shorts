@@ -27,7 +27,7 @@ import MainTabs from './pages/MainTabs';
 import { connect } from './data/connect';
 import { AppContextProvider } from './data/AppContext';
 import { loadAllInfo, replaceChat } from './data/sessions/sessions.actions';
-import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient } from './data/user/user.actions';
+import { setIsLoggedIn, setUsername, loadUserData, setToken, loadCurrentLocation, setIsClientConnected, setClient, setVisibility } from './data/user/user.actions';
 import Account from './pages/Account';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -44,6 +44,7 @@ import { Client } from '@stomp/stompjs';
 import Connections from './components/Connections';
 import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';
+import Download from './pages/Download';
 
 const App: React.FC = () => {
   return (
@@ -61,6 +62,7 @@ interface StateProps {
   location?: GeoPoint,
   client?: Client,
   isClientConnected: boolean,
+  visibility?: string,
 }
 
 interface DispatchProps {
@@ -73,6 +75,7 @@ interface DispatchProps {
   setIsClientConnected: typeof setIsClientConnected,
   setClient: typeof setClient,
   replaceChat: typeof replaceChat,
+  setVisibility: typeof setVisibility,
 }
 
 interface IonicAppProps extends StateProps, DispatchProps { }
@@ -80,8 +83,6 @@ interface IonicAppProps extends StateProps, DispatchProps { }
 const IonicApp: React.FC<IonicAppProps> = ({ 
   darkMode, 
   token, 
-  userProfile, 
-  location, 
   client,
   loadAllInfo, 
   setIsLoggedIn, 
@@ -89,35 +90,31 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setClient,
   setToken, 
   loadUserData, 
-  loadCurrentLocation, 
-  setIsClientConnected
+  setIsClientConnected,
+  setVisibility,
 }) => {
 
   useEffect(() => {
+    document.addEventListener("visibilitychange", loadVisibility);
+
     loadUserData();
-    console.log("here");
-    loadCurrentLocation();
-    // eslint-disable-next-line
     return () => {
       if (client) {
         client.deactivate();
         setClient(undefined);
         setIsClientConnected(false);
       }
+      document.removeEventListener("visibilitychange", loadVisibility)
     }
   }, []);
 
-  useEffect(() => {
-    console.log(token);
-    loadAllInfo(token);
-    console.log(userProfile);
-  }, [token])
+  const loadVisibility = () => {
+    setVisibility(document.visibilityState);
+  }
 
   useEffect(() => {
-    console.log(`About post location: token: ${token} -- ${location?location.lat:null}`);
-    if (location)
-      postUserLocation(location, token);
-  }, [location])
+    loadAllInfo();
+  }, [token])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
@@ -138,17 +135,18 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/tutorial" component={Tutorial} />
             <Route path="/forgot" component={Forgot} />
             <Route path="/reset" component={Reset} />
+            <Route path="/download" component={Download} />
             <Route path="/logout" render={() => {
               setIsLoggedIn(false);
               setUsername(undefined);
               setToken(undefined);
               return <Redirect to="/tabs" />
             }} />
-            <Route path="/chat/:id" component={ChatDetail} />
-            <Route path="/more/:id" component={ProfileDetail} />
             <Route path="/" component={HomeOrLogin} exact />
           </IonRouterOutlet>
         </IonSplitPane>
+        <Route path="/chat/:id" component={ChatDetail} />
+          <Route path="/more/:id" component={ProfileDetail} />
       </IonReactRouter>
     </IonApp>
   )
@@ -177,6 +175,7 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     loadAllInfo,
     setClient,
     replaceChat,
+    setVisibility,
   },
   component: IonicApp
 });

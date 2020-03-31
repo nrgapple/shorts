@@ -1,7 +1,9 @@
 export const vars = () => ({
   "env": {
-    "SOCKET_URL": "wss://selfconnect.dev/ws",
-    "API_URL": "https://selfconnect.dev",
+    //routes
+    "SOCKET_URL": "wss://shorts.center/api/ws",
+    "API_URL": "https://shorts.center/api",
+    // "API_URL": "/api",
     "CHAT": "/topic/chat-",
     "TYPE": "/user/queue/typing-",
     "READ": "/user/queue/read-",
@@ -11,7 +13,8 @@ export const vars = () => ({
     "PUBLISH_MESSAGE": "/app/message",
     "PUBLISH_TYPING": "/app/typing",
     "PUBLISH_READ": "/app/read",
-
+    // keys
+    "APP_SERVER_KEY": "BNuteCIG906sEz67jaqhSAhMuyE2Gff-cjoCy8YIrkSaKK5sIynvmiL9ySN1E0zbI57R2uF1QVhW-Hr3h1TSZ-4"
   }
 });
 

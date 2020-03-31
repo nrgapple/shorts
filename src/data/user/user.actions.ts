@@ -59,8 +59,6 @@ export const setClient = (client?: Client) => async (dispatch: React.Dispatch<an
   } as const)
 };
 
-
-
 export const setUsername = (username?: string) => async (dispatch: React.Dispatch<any>) => {
   await setUsernameData(username);
   return ({
@@ -69,10 +67,14 @@ export const setUsername = (username?: string) => async (dispatch: React.Dispatc
   } as const);
 };
 
-export const setCurrentLocation = (point?: GeoPoint) => {
-  console.log(`setting the current location in starage`);
-  console.log(point);
-  
+export const setVisibility = (visibility?: string) => async (dispatch: React.Dispatch<any>) => {
+  return ({
+    type: 'set-visibility',
+    visibility
+  } as const); 
+}
+
+export const setCurrentLocation = (point?: GeoPoint) => {  
   return ({
     type: 'set-current-location',
     point
@@ -115,3 +117,4 @@ export type UserActions =
   | ActionType<typeof setHasSeenTutorial>
   | ActionType<typeof setDarkMode>
   | ActionType<typeof setCurrentLocation>
+  | ActionType<typeof setVisibility>

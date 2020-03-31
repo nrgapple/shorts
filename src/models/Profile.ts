@@ -15,4 +15,5 @@ export interface Profile {
     location?: GeoPoint;
     displayAddress?: string;
     searchMiles?: number;
+    distance?: number;
 }

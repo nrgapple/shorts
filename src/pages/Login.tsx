@@ -6,7 +6,7 @@ import { connect } from '../data/connect';
 import { RouteComponentProps } from 'react-router';
 import axios from 'axios';
 import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
-import { postLogin } from '../data/dataApi';
+import { postLogin, postDevice } from '../data/dataApi';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -59,6 +59,15 @@ const Login: React.FC<LoginProps> = ({
         setIsLoggedIn(true);
         setTokenAction(data.token);
         setUsernameAction(username);
+        const key = localStorage.getItem("push_key");
+        const auth = localStorage.getItem("push_auth");
+        const endpoint = localStorage.getItem("push_endpoint");
+        if (key && auth && endpoint) {
+          await postDevice(key, auth, endpoint);
+          localStorage.removeItem("push_key");
+          localStorage.removeItem("push_auth");
+          localStorage.removeItem("push_endpoint");
+        }
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {
         if (e.message === "Invalid Credentials") {
