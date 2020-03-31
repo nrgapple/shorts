@@ -54,7 +54,7 @@ const Connections: React.FC<ConnectionProps> = ({
   var subs = useRef<StompSubscription[]>([]);
 
   const configure = () => {
-    if (client) {
+    if (client && client.connected === false) {
       configureClient(
         token,
         client,
