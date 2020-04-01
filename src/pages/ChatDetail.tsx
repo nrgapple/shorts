@@ -112,11 +112,12 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           (msg: Message) => {
             setMessages(oldMessages => [...oldMessages, msg]);
             if (msg.fromUserId !== userProfile!.userId)
-              chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
+              chatSend({type: 'REC_INCOMING_MSG', data: msg});
           },
           `chat-${userProfile!.userId}`,
         )];
-        chatSend('SUB_CHAT_SUCCESS');
+        const lastReadMessageFromRecipient = messages.slice(-1)[0];
+        chatSend({type:'SUB_CHAT_SUCCESS', data: lastReadMessageFromRecipient});
       },
       subToTyping: () => {
         subs.current = [...subs.current, subscribeToTypingForClient(
@@ -138,8 +139,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           },
           `read-${userProfile!.userId}`,
         )];
-        const lastReadMessageFromRecipient = messages.slice().reverse().find(x => x.fromUserId === chat!.recipient!.userId);
-        chatSend({type: 'SUB_READ_SUCCESS', data: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
+        chatSend('SUB_READ_SUCCESS');
       },
       getUnreadMessages: () => {
         if (chat!.hasUnreadMessages) {
@@ -148,12 +148,24 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         chatSend('SUCCESS');
       },
       sendRead: (context, event) => {
-        // TODO: update latread.
+        // update socket.
+        var msg = event.data as Message;
         if (event.data) {
           publishReadForClient(
             client!,
-            event.data,
+            msg.messageId,
           );
+        }
+
+        // update chat to have the newest read message.
+        if (msg) {
+          console.log('here');
+          replaceChat({...chat!, 
+            hasUnreadMessages: false,
+            lastMessage: msg
+          });
+        } else {
+          console.error('no message found');
         }
         chatSend('REC_UPDATED');
       },
@@ -206,8 +218,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       return;
 
       setTimeout(() => {
-      // @ts-ignore
-      content.current.scrollToBottom(500);
+        if (content && content.current) {
+        // @ts-ignore
+        content.current.scrollToBottom(500);
+      }
     }, 200);
   }
 
@@ -242,8 +256,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   // Clean up subs.
   useEffect(() => {
     console.log('mount')
-    if (!userProfile) loadProfile();
-    loadChats();
     return () => {
       console.log('unmount')
       if (client && chat) {
@@ -268,16 +280,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     //if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
-
-  // debugging
-  useEffect(() => {
-    const subscription = chatService.subscribe(state => {
-      // simple state logging
-      console.log(state);
-    });
-  
-    return subscription.unsubscribe;
-  }, [chatService]); // note: service should never change
 
   return (
     <>

@@ -8,10 +8,12 @@ export const loadAllInfo = () => async (dispatch: React.Dispatch<any>) => {
   var profile = undefined;
   var matches = undefined;
   var nearMe = undefined;
+  var chats = undefined;
   try {
     dispatch(setLoading(true));
     profile = await getUserProfile();
     matches = await getMatches();
+    chats = await getChats();
   } catch (e) {
     console.log(e);
   }
@@ -28,6 +30,7 @@ export const loadAllInfo = () => async (dispatch: React.Dispatch<any>) => {
       userProfile: profile,
       matches: matches,
       nearMe: nearMe,
+      chats: chats,
     }));
     dispatch(setLoading(false));
   }
