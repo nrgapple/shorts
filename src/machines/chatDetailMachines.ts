@@ -22,7 +22,15 @@ export const chatMachine = Machine({
             loadMessages: {
               invoke: {
                 src: 'loadMessages',
-                onDone: 'finish',
+                onDone: 'updateChatState',
+              },
+            },
+            updateChatState: {
+              entry: ['getUnreadMessages'],
+              on: {
+                SUCCESS: {
+                  target: 'finish',
+                },
               },
             },
             finish: {
@@ -46,8 +54,14 @@ export const chatMachine = Machine({
             start: {
               entry: ['subToChat'],
               on: {
-                SUB_CHAT_SUCCESS: 'success',
+                SUB_CHAT_SUCCESS: 'sendRead',
               },
+            },
+            sendRead: {
+              entry: ['sendRead'],
+              on: {
+                REC_UPDATED: 'success',
+              }
             },
             success: { type: 'final' },
           }
@@ -70,14 +84,8 @@ export const chatMachine = Machine({
             start: {
               entry: ['subToRead'],
               on: {
-                SUB_READ_SUCCESS: 'sendRead',
+                SUB_READ_SUCCESS: 'success',
               },
-            },
-            sendRead: {
-              entry: ['sendRead'],
-              on: {
-                REC_UPDATED: 'success',
-              }
             },
             success: { type: 'final' },
           }
@@ -201,10 +209,11 @@ export const chatMachine = Machine({
       }
     },
     notInView: {
+      entry: ['unSub'],
       on: {
         REENTERED: {
-          target: 'subscribe',
-          actions: ['scrollToTheBottom'],
+          target: 'init',
+          actions: ['scrollToTheBottom', 'bypass'],
         }
       }
     }

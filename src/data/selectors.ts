@@ -116,7 +116,7 @@ export const getSpeaker = createSelector(
 
 export const getCurrentProfile = createSelector(
   getNearMe, getCurrentProfileIndex,
-  (nearMe, index) => {console.log('getCurrentProfile'); return nearMe && nearMe.length > 0?nearMe[index]:undefined;}
+  (nearMe, index) => {return nearMe && nearMe.length > 0?nearMe[index]:undefined;}
 );
 
 export const getMatchesWithoutAChat = createSelector(

@@ -26,11 +26,11 @@ export const getUserData = async () => {
     Storage.get({ key: USERNAME }),
     Storage.get({ key: TOKEN }),
     Storage.get({ key: DARK_MODE })]);
-  const isLoggedin = await response[0].value === 'true';
-  const hasSeenTutorial = await response[1].value === 'true';
-  const username = await response[2].value || undefined;
-  const token = await response[3].value || undefined;
-  const darkMode = await response[4].value === 'true';
+  const isLoggedin = response[0].value === 'true';
+  const hasSeenTutorial = response[1].value === 'true';
+  const username = response[2].value || undefined;
+  const token = response[3].value || undefined;
+  const darkMode = response[4].value === 'true';
   const data = {
     isLoggedin,
     hasSeenTutorial,
@@ -41,7 +41,8 @@ export const getUserData = async () => {
   return data;
 }
 
-export const getNearMe = async (token: string | undefined) => {
+export const getNearMe = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const nearMeResponse = await Axios.request({
@@ -54,7 +55,6 @@ export const getNearMe = async (token: string | undefined) => {
         },
       });
       const { data: nearMeData } = nearMeResponse;
-      console.log(nearMeResponse);
       const nearMe = nearMeData.map((Profile: any) : Profile => {
         return {
           userId: Profile.userId as number, 
@@ -72,6 +72,8 @@ export const getNearMe = async (token: string | undefined) => {
           }),
           gender: Profile.gender? Profile.gender.toLowerCase(): undefined,
           genderPref: Profile.genderPref? Profile.genderPref.toLowerCase(): undefined,
+          displayAddress: Profile.displayAddress,
+          distance: Profile.distance,
         }
       }) as Profile[];
       return nearMe;
@@ -82,8 +84,8 @@ export const getNearMe = async (token: string | undefined) => {
   } 
 }
 
-export const getUserProfile = async (token: string | undefined) => {
-  console.log(`trying to get the user profile, token: ${token}`);
+export const getUserProfile = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const userProfileResponse = await Axios.request({
@@ -96,7 +98,6 @@ export const getUserProfile = async (token: string | undefined) => {
         },
       });
       const { data: userProfileData } = userProfileResponse;
-      console.log(userProfileData);
       const userProfile = {
         userId: userProfileData.userId as number, 
         firstName: userProfileData.firstName as string,
@@ -116,8 +117,6 @@ export const getUserProfile = async (token: string | undefined) => {
         }),
         searchMiles: userProfileData.miles,
       } as Profile;
-      console.log('api call data');
-      console.log(userProfile);
       return userProfile;
     } catch (e) {
       const {data} = e.response;
@@ -128,9 +127,7 @@ export const getUserProfile = async (token: string | undefined) => {
 
 export const getCurrentLocation = async () => {
   try {
-    console.log("getting current location");
     const geoPostion = Geolocation.getCurrentPosition();
-    console.log(geoPostion);
     return geoPostion;
   } catch (e) {
     console.error(e);
@@ -155,7 +152,6 @@ export const postLogin = async (
       }
     });
     const { data } = response;
-    console.log(data);
     return data;
   } catch (e) {
     const {data} = e.response;
@@ -178,7 +174,6 @@ export const postForgot = async (
       },
     });
     const { data } = response;
-    console.log(data);
     return data;
   } catch (e) {
     const {data} = e.response;
@@ -194,7 +189,6 @@ export const getVerify = async (
       url: `${vars().env.API_URL}/public/credentials/verify/${token}`,
       method: 'GET',
     });
-    console.log(response);
     return response;
   } catch (e) {
     const {data} = e.response;
@@ -220,7 +214,6 @@ export const postReset = async (
       },
     });
     const { data } = response;
-    console.log(data);
     return data;
   } catch (e) {
     const {data} = e.response;
@@ -229,13 +222,14 @@ export const postReset = async (
 }
 
 export const postProfileInfo = async (
-  token: string | undefined,
   about: string,
   gender: string,
   genderPref: string,
   height: number,
   miles: number,
+  token?: string,
 ) => {
+  if (!token) token = (await Storage.get({key: TOKEN})).value as string | undefined;
   if (!token) {
     return
   } 
@@ -274,6 +268,7 @@ export const postProfileInfo = async (
         }
       }),
       searchMiles: data.miles,
+      displayAddress: data.displayAddress,
     } as Profile;
     return updatedProfile;
   } catch (e) {
@@ -314,9 +309,9 @@ export const postSignup = async (
   }
 }
 
-export const postUserLocation = async (point: GeoPoint, token: string | undefined) =>
+export const postUserLocation = async (point: GeoPoint, token?: string) =>
 {
-  console.log(`Posting current location`);
+  if (!token) token = (await Storage.get({key: TOKEN})).value as string | undefined;
   if (token)
   {
     try {
@@ -333,7 +328,6 @@ export const postUserLocation = async (point: GeoPoint, token: string | undefine
         }
       });
       const { data } = sendLocationResponse;
-      console.log(data);
       return data as Profile;
     } catch (e) {
       console.log(e);
@@ -341,7 +335,8 @@ export const postUserLocation = async (point: GeoPoint, token: string | undefine
   }
 } 
 
-export const postSwipe = async (userId: number, liked: boolean, token: string | undefined) => {
+export const postSwipe = async (userId: number, liked: boolean) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const swipeResponse = await Axios.request({
@@ -358,7 +353,6 @@ export const postSwipe = async (userId: number, liked: boolean, token: string | 
         } 
       });
       const { data } = swipeResponse;
-      console.log(data);
       return data.wasMatched as boolean
     } catch (e) {
       console.log(`Error posting swipe: ${e}`);
@@ -368,7 +362,8 @@ export const postSwipe = async (userId: number, liked: boolean, token: string | 
   }
 }
 
-export const getMatches = async (token: string | undefined) => {
+export const getMatches = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const matchesResponse = await Axios.request({
@@ -381,7 +376,6 @@ export const getMatches = async (token: string | undefined) => {
         },
       });
       const { data } = matchesResponse;
-      console.log(data);
       return data.matches as Profile[];
     } catch (e) {
       console.log(`Error posting swipe: ${e}`);
@@ -390,7 +384,8 @@ export const getMatches = async (token: string | undefined) => {
   }
 }
 
-export const postImage = async (image:File, token:string | undefined) => {
+export const postImage = async (image:File) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       var formData = new FormData();
@@ -412,7 +407,8 @@ export const postImage = async (image:File, token:string | undefined) => {
   }
 }
 
-export const deleteImage = async (imageId: number, token: string | undefined) => {
+export const deleteImage = async (imageId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const deleteResponse = await Axios.request({
@@ -431,7 +427,8 @@ export const deleteImage = async (imageId: number, token: string | undefined) =>
   }
 }
 
-export const deleteMatch = async (userId: number, token: string | undefined) => {
+export const deleteMatch = async (userId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const deleteResponse = await Axios.request({
@@ -449,7 +446,8 @@ export const deleteMatch = async (userId: number, token: string | undefined) => 
   }
 }
 
-export const getMessages = async (chatId: number, token: string | undefined) => {
+export const getMessages = async (chatId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const messagesResponse = await Axios.request({
@@ -484,7 +482,8 @@ export const getMessages = async (chatId: number, token: string | undefined) => 
   }
 }
 
-export const createChat = async (userId: number, token: string | undefined) => {
+export const createChat = async (userId: number) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const chatsResponse = await Axios.request({
@@ -497,7 +496,6 @@ export const createChat = async (userId: number, token: string | undefined) => {
         },
       });
       const { data } = chatsResponse;
-      console.log(data);
       return {
         chatId: data.chatId,
         recipient: data.recipient,
@@ -509,7 +507,8 @@ export const createChat = async (userId: number, token: string | undefined) => {
   }
 }
 
-export const getChats = async (token: string | undefined) => {
+export const getChats = async () => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const chatsResponse = await Axios.request({
@@ -522,7 +521,6 @@ export const getChats = async (token: string | undefined) => {
         },
       });
       const { data } = chatsResponse;
-      console.log(data);
       return data.map((chat: any) : Chat => ({
         chatId: chat.chatId,
         recipient: chat.recipient,
@@ -542,11 +540,10 @@ export const getChats = async (token: string | undefined) => {
   }
 }
 
-export const postDevice = async (key: string, auth: string, endpoint: string, token: string) => {
-  console.log(key && auth && endpoint && token);
+export const postDevice = async (key: string, auth: string, endpoint: string) => {
+  const token = (await Storage.get({key: TOKEN})).value;
   if (key && auth && endpoint && token) {
     try {
-      console.log('sending add device')
       const postDeviceResponse = await Axios.request({
         url: `${vars().env.API_URL}/secure/device/add`,
         method: 'POST',
@@ -563,7 +560,6 @@ export const postDevice = async (key: string, auth: string, endpoint: string, to
         }
       });
       const { data } = postDeviceResponse;
-      console.log(data);
     } catch(e) {
       const { data } = e;
       throw data;
@@ -571,15 +567,15 @@ export const postDevice = async (key: string, auth: string, endpoint: string, to
   }
 }
 
-export const configureClient = (
-  token: string | undefined, 
+export const configureClient = async (
+  token: string | undefined,
   client: Client | undefined,
   onConnect: ()=> void,
   onDisconnect: () => void,
   onWebSocketClose: () => void,
   onWebSocketError: () => void,
   ) => {
-  if (!token || !client) 
+    if (!token || !client) 
     return;
   if (client.connected)
     return;
@@ -614,11 +610,9 @@ export const subscribeToChatMessages = (
   subId: string,
 ) => {
   return client.subscribe(`${vars().env.CHAT}${chatId}`, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     
     if (data) {
-      console.log(data);
       onMessage({
         content: data.content as string,
         createdAt: moment(data.createdAt).toDate() as Date,
@@ -638,10 +632,8 @@ export const subscribeToTypingForClient = (
   subId: string,
 ) => {
   return client.subscribe(`${vars().env.TYPE}${chatId}`, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
-      console.log(data);
       onTyping(data.typing as boolean);
     }
   }, {id: subId} as StompHeaders);
@@ -654,11 +646,9 @@ export const subscribeToChatRead = (
   subId: string,
 ) => {
   return client.subscribe(`${vars().env.READ}${chatId}`, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     
     if (data) {
-      console.log(data);
       onRead(data.lastReadMessageId);
     }
   }, {id: subId} as StompHeaders);
@@ -670,11 +660,8 @@ export const subscribeToChatNotifications = (
   subId: string,
 ) => {
   return client.subscribe(vars().env.CHAT_NOTIFY, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
-      console.log(data);
-
       onNotification({
           ...data,
           lastMessage: {
@@ -695,14 +682,12 @@ export const subscribeToMatchNotifications = (
   subId: string,
 ) => {
   return client.subscribe(vars().env.MATCH_NOTIFY, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
       if (!data) {
         console.error(`no profile returned`);
         return;
       }
-      console.log(data);
       onNotification(data as Profile);
     }
   }, {id: subId} as StompHeaders);
@@ -714,14 +699,12 @@ export const subscribeToUnmatchNotifications = (
   subId: string,
 ) => {
   return client.subscribe(vars().env.UNMATCH_NOTIFY, response => {
-    console.log(response);
     const data = JSON.parse(response.body);
     if (data) {
       if (!data.userId) {
         console.error(`no id returned`);
         return;
       }
-      console.log(data);
       onNotification(data.userId as number);
     }
   }, {id: subId} as StompHeaders);
@@ -734,9 +717,7 @@ export const publishMessageForClient = (
 ) => {
   if (!chatId)
     return;
-  console.log(client);
   if (!client.connected) {
-    console.log(`client is not connected!`)
     return;
   }
   if (client.webSocket.readyState === 1) {
@@ -756,7 +737,6 @@ export const publishTypingForClient = (
   if (!chatId)
     return;
   if (!client.connected) {
-    console.log(`client is not connected!`)
     return;
   }
   if (client.webSocket.readyState === 1) {
@@ -772,9 +752,7 @@ export const publishReadForClient = (
   client: Client,
   messageId: number,
 ) => {
-  console.log(client);
   if (!client.connected) {
-    console.log(`client is not connected!`)
     return;
   }
   if (client.webSocket.readyState === 1) {
@@ -802,7 +780,6 @@ export const setUsernameData = async (username: string | undefined) => {
 }
 
 export const setLocationData = async (point: GeoPoint | undefined) => {
-  console.log("setting location data");
   if (!point) {
     await Storage.remove({ key: LOCATION});
   } else {

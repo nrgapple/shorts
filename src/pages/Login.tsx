@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = ({
         const auth = localStorage.getItem("push_auth");
         const endpoint = localStorage.getItem("push_endpoint");
         if (key && auth && endpoint) {
-          await postDevice(key, auth, endpoint, data.token);
+          await postDevice(key, auth, endpoint);
           localStorage.removeItem("push_key");
           localStorage.removeItem("push_auth");
           localStorage.removeItem("push_endpoint");

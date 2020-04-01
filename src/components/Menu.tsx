@@ -70,7 +70,7 @@ const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) =
   }
 
   return (
-    <IonMenu type="overlay" disabled={disableMenu} contentId="main">
+    <IonMenu type="overlay" disabled={disableMenu} swipeGesture={false} contentId="main">
       <IonHeader>
         <IonToolbar>
           <IonTitle>Menu</IonTitle>

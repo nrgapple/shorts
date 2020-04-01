@@ -9,7 +9,6 @@ import ChatItem from '../components/ChatItem';
 import { deleteMatch } from '../data/dataApi';
 
 interface OwnProps extends RouteComponentProps { 
-  token?: string;
 };
 
 interface StateProps {
@@ -26,7 +25,6 @@ interface ChatsListProps extends OwnProps, StateProps, DispatchProps { };
 
 const ChatsList: React.FC<ChatsListProps> = ({ 
   Chats: chats, 
-  token, loadChats,
   removeChat,
   removeMatch,
 }) => {
@@ -35,7 +33,7 @@ const ChatsList: React.FC<ChatsListProps> = ({
   const [IsDeletingChat, setIsDeletingChat] = useState(false);
 
   useEffect(() => {
-    loadChats(token);
+    loadChats();
   },[]);
 
   const onSelectChat = (chat: Chat) => {
@@ -44,13 +42,11 @@ const ChatsList: React.FC<ChatsListProps> = ({
   }
 
   const onDeleteChat = async () => {
-    if (token && selectedChat) {
+    if (selectedChat) {
       try {
         setIsDeletingChat(true);
         console.log(selectedChat);
-        await deleteMatch(
-          selectedChat!.recipient.userId,
-          token);
+        await deleteMatch(selectedChat!.recipient.userId);
         removeChat(selectedChat);
         removeMatch(selectedChat.recipient);
       } catch (e) {
@@ -78,7 +74,7 @@ const ChatsList: React.FC<ChatsListProps> = ({
           onIonRefresh={(event: any) => {
             setTimeout(() => {
               chats = undefined; 
-              loadChats(token);
+              loadChats();
               event.detail.complete();
             }, 1000); 
           }}
@@ -128,7 +124,6 @@ const ChatsList: React.FC<ChatsListProps> = ({
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     Chats: state.data.chats,
-    token: state.user.token,
   }),
   mapDispatchToProps: {
     loadChats,

@@ -44,6 +44,7 @@ import { Client } from '@stomp/stompjs';
 import Connections from './components/Connections';
 import Forgot from './pages/Forgot';
 import Reset from './pages/Reset';
+import Download from './pages/Download';
 
 const App: React.FC = () => {
   return (
@@ -82,8 +83,6 @@ interface IonicAppProps extends StateProps, DispatchProps { }
 const IonicApp: React.FC<IonicAppProps> = ({ 
   darkMode, 
   token, 
-  userProfile, 
-  location, 
   client,
   loadAllInfo, 
   setIsLoggedIn, 
@@ -91,7 +90,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
   setClient,
   setToken, 
   loadUserData, 
-  loadCurrentLocation, 
   setIsClientConnected,
   setVisibility,
 }) => {
@@ -100,8 +98,6 @@ const IonicApp: React.FC<IonicAppProps> = ({
     document.addEventListener("visibilitychange", loadVisibility);
 
     loadUserData();
-    loadCurrentLocation();
-    // eslint-disable-next-line
     return () => {
       if (client) {
         client.deactivate();
@@ -117,16 +113,8 @@ const IonicApp: React.FC<IonicAppProps> = ({
   }
 
   useEffect(() => {
-    console.log(token);
-    loadAllInfo(token);
-    console.log(userProfile);
+    loadAllInfo();
   }, [token])
-
-  useEffect(() => {
-    console.log(`About post location: token: ${token} -- ${location?location.lat:null}`);
-    if (location)
-      postUserLocation(location, token);
-  }, [location])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
@@ -147,17 +135,18 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/tutorial" component={Tutorial} />
             <Route path="/forgot" component={Forgot} />
             <Route path="/reset" component={Reset} />
+            <Route path="/download" component={Download} />
             <Route path="/logout" render={() => {
               setIsLoggedIn(false);
               setUsername(undefined);
               setToken(undefined);
               return <Redirect to="/tabs" />
             }} />
-            <Route path="/chat/:id" component={ChatDetail} />
-            <Route path="/more/:id" component={ProfileDetail} />
             <Route path="/" component={HomeOrLogin} exact />
           </IonRouterOutlet>
         </IonSplitPane>
+        <Route path="/chat/:id" component={ChatDetail} />
+          <Route path="/more/:id" component={ProfileDetail} />
       </IonReactRouter>
     </IonApp>
   )

@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonList, IonGrid, IonRow, IonCol, IonActionSheet, IonRefresher, IonRefresherContent, IonAlert } from '@ionic/react';
-import SpeakerItem from '../components/SpeakerItem';
-import { Speaker } from '../models/Speaker';
-import { Session } from '../models/Session';
 import { connect } from '../data/connect';
 import * as selectors from '../data/selectors';
 import './MatchesList.scss';
@@ -13,7 +10,6 @@ import { createChat, deleteMatch } from '../data/dataApi';
 import { RouteComponentProps } from 'react-router-dom';
 
 interface OwnProps extends RouteComponentProps { 
-  token?: string;
 };
 
 interface StateProps {
@@ -30,7 +26,6 @@ interface MatchesListProps extends OwnProps, StateProps, DispatchProps { };
 
 const MatchesList: React.FC<MatchesListProps> = ({ 
   matches, 
-  token, 
   loadMatches, 
   history, 
   loadChats,
@@ -42,8 +37,8 @@ const MatchesList: React.FC<MatchesListProps> = ({
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   useEffect(() => {
-    loadMatches(token);
-    loadChats(token);
+    loadMatches();
+    loadChats();
   },[])
 
   const onSelectProfile = (profile: Profile) => {
@@ -52,12 +47,10 @@ const MatchesList: React.FC<MatchesListProps> = ({
   }
 
   const onDeleteMatch = async () => {
-    if (token && selectedProfile) {
+    if (selectedProfile) {
       try {
         console.log(selectedProfile);
-        await deleteMatch(
-          selectedProfile!.userId,
-          token);
+        await deleteMatch(selectedProfile!.userId);
         removeMatch(selectedProfile);
       } catch (e) {
         console.log(`Could not remove chat: ${e}`);
@@ -68,10 +61,10 @@ const MatchesList: React.FC<MatchesListProps> = ({
   }
 
   const onCreateChat = async () => {
-    if (token && selectedProfile) {
+    if (selectedProfile) {
       try {
         setIsCreatingChat(true);
-        const chat = await createChat(selectedProfile.userId, token);
+        const chat = await createChat(selectedProfile.userId);
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -97,7 +90,7 @@ const MatchesList: React.FC<MatchesListProps> = ({
           onIonRefresh={(event: any) => {
             setTimeout(() => {
               matches = undefined; 
-              loadMatches(token);
+              loadMatches();
               event.detail.complete();
             }, 1000); 
           }}
@@ -173,7 +166,6 @@ const MatchesList: React.FC<MatchesListProps> = ({
 export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state) => ({
     matches: selectors.getMatchesWithoutAChat(state),
-    token: state.user.token,
   }),
   mapDispatchToProps: {
     loadMatches,

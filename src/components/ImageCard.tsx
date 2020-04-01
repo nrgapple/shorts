@@ -1,14 +1,9 @@
-import { IonCard, IonSlides, IonSlide, IonButton } from "@ionic/react";
-import React, { useEffect, EventHandler } from 'react'
+import { IonCard, IonSlides, IonSlide, IonButton, useIonViewDidEnter, useIonViewWillEnter } from "@ionic/react";
+import React, { Fragment } from 'react'
 import { Image } from "../models/Image";
 import { useState, useRef, DOMElement } from "react";
 import Lightbox from "react-image-lightbox";
 //@ts-ignore
-import {Swiper, Slide} from 'react-dynamic-swiper';
-import 'react-dynamic-swiper/lib/styles.css';
-import {
-  useWindowSize,
-} from '@react-hook/window-size/throttled'
 
 interface ImageCardProps {
   images: Image[];
@@ -22,84 +17,46 @@ const ImageCard: React.FC<ImageCardProps> = ({
   onDelete,
   children,
 }) => {
-  const [showImage, setShowImage] = useState(false);
-  const [bigImage, setBigImage] = useState<string | undefined>(undefined);
   const slides = useRef<any>(null);
-  const [width, height] = useWindowSize();
+  const [showImage, setShowImage] = useState<boolean>(false);
+  const [bigImage, setBigImage] = useState<string>();
 
+  useIonViewWillEnter(() => {
+    if (slides.current) {
+      slides.current.update();
+    }
+  })
 
   const onClick = async () => {
     if (slides.current) {
-      const swiper = slides.current.swiper()
-      console.log(swiper.realIndex);
+      const swiper = await slides.current.getSwiper();
       if (onDelete)
         await onDelete(images[swiper.realIndex] ? images[swiper.realIndex].imageId : undefined);
+        slides.current.update();
     }
   }
 
-  useEffect(() => {
-    if (slides.current) {
-      setTimeout(() => {
-        const swiper = slides.current.swiper();
-        swiper.update();
-      }, 200)
-    }
-  }, [width, height]);
-
   return (
-    <>
-      <IonCard className="home-card">
-        <Swiper ref={slides} 
-        scrollBar 
-        navigation={false}
-        swiperOptions={
+    <Fragment>
           {
-            slidesPerView: 1,
-            slidesPerColumn: 1,
-            slidesPerGroup: 1,
-            spaceBetween: 0,
-            autoHeight: true,
-            centeredSlides: true,
-            pagination: false,
-            effect: 'flip',
-            navigation: false,
-            grabCursor: true,
-            observer: true,
-        
+            images.length > 0 &&
+            <IonSlides ref={slides} key={images.map((image) => image.imageId).join("_")} pager={true} options={{initialSlide: 0, speed: 400, effect: 'fade'}}>
+              {
+                images.map((image, idx) => (
+                  <IonSlide key={idx} style={{ position: 'relative'}}>
+                    <img
+                      src={image.imageUrl}
+                      style={{ height: '300px', width: '300px', borderRadius: '5px'}}
+                      onClick={() => { 
+                        setBigImage(image.imageUrl); 
+                        setShowImage(true); 
+                      }}
+                    />
+                  </IonSlide>
+                ))
+              }
+            </IonSlides>
           }
-        }
-          style={{ width: '100%', height: '100%' }}>
-          {
-            images.length > 0 ?
-            images.map((img, key) => (
-              <Slide key={key}>
-                <img key={img.imageId}
-                  src={img.imageUrl}
-                  alt="no img"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                  onClick={() => {
-                    setShowImage(true); setBigImage(img.imageUrl);
-                  }
-                  }
-                />
-              </Slide>
-            )) : (
-              <Slide>
-                <img 
-                  src="https://via.placeholder.com/150?text=No+Image"
-                  alt="no img"
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                />
-              </Slide>
-            )
-          }
-        </Swiper>
         {
           areDeletable &&
             <IonButton expand="block" color="danger" onClick={  () => onClick()}>
@@ -107,16 +64,14 @@ const ImageCard: React.FC<ImageCardProps> = ({
             </IonButton>
         }
         {children}
-      </IonCard>
-      {
-        showImage && (
-          <Lightbox
-            mainSrc={bigImage ? bigImage : ''}
-            onCloseRequest={() => setShowImage(false)}
-          />
-        )
-      }
-    </>
+        {
+          showImage &&
+            <Lightbox
+              mainSrc={bigImage as string}
+              onCloseRequest={() => setShowImage(false)}
+            />
+        }
+    </Fragment>
   );
 }
 

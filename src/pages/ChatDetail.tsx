@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonText, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, useIonViewDidEnter } from '@ionic/react';
+import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, IonButton, IonIcon, IonList, IonInput, IonFooter, IonProgressBar, IonTitle, IonInfiniteScroll, IonInfiniteScrollContent, useIonViewDidEnter } from '@ionic/react';
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
@@ -11,17 +11,15 @@ import { Chat } from '../models/Chat';
 import { getMessages, publishMessageForClient, publishTypingForClient, subscribeToChatMessages, subscribeToTypingForClient, subscribeToChatRead, publishReadForClient } from '../data/dataApi';
 import { loadChats, loadProfile, replaceChat } from '../data/sessions/sessions.actions';
 import { Client, StompSubscription } from '@stomp/stompjs';
-import { getTimestamp } from '../util/util';
 import { chatMachine } from '../machines/chatDetailMachines';
 import { useMachine } from '@xstate/react';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
+import MessageList from '../components/MessageList';
 
 interface OwnProps extends RouteComponentProps { };
 
 interface StateProps {
   userProfile?: Profile,
   chat?: Chat,
-  token?: string,
   loading?: boolean,
   client?: Client,
   isClientConnected: boolean,
@@ -39,7 +37,6 @@ type ChatDetailProps = OwnProps & StateProps & DispatchProps;
 const ChatDetail: React.FC<ChatDetailProps> = ({
   userProfile, 
   chat, 
-  token, 
   client,
   isClientConnected,
   loadChats,
@@ -50,36 +47,29 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | undefined>(undefined);
   const [lastRead, setLastRead] = useState<number>(0);
-  const [rendered, setRendered] = useState<boolean>(false);
   const content = useRef(null);
   const value = useRef(null);
+  const scroller = useRef<any>();
   var subs = useRef<StompSubscription[]>([]);
   const location = useLocation();
   const history = useHistory();
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
-        if (chat && token) {
+        if (chat) {
           try {
-            console.log('starting to load');
-            const data = await getMessages(chat.chatId, token);
+            const data = await getMessages(chat.chatId);
             if (data) {
               const messages = [...data.messages];
               messages.sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime())
-              console.log(data.lastReadMessageId);
               setMessages(messages);
               setLastRead(data.lastReadMessageId);
               chatSend('SUCCESS');
-            } else {
-              console.log(`No messages found`);
             }
           } catch (e) {
             console.log(`Error loading messages: ${e}`);
           }
-          console.log('loaded messages');
           
-        } else {
-          console.error(`should not get here: chat: ${chat}`);
         }
       },
     },
@@ -97,12 +87,10 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         publishTypingForClient(client!, chat!.chatId, true);
       },
       resetTypingTimout: () => {
-        console.log('setting timeout');
         if (typingTimeout)
           clearTimeout(typingTimeout);
         setTypingTimeout(undefined);
         setTypingTimeout(setTimeout(() => {
-          console.log(`You stopped typing.`);
           chatSend('USER_STOPPED');
         }, 5000));
       },
@@ -114,7 +102,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       },
       scrollToTheBottom: () => {
         setTimeout(() => {
-          console.log('scroll to bottom');
           scrollToTheBottom();
         }, 200);
       },
@@ -123,16 +110,14 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!, 
           chat!.chatId,
           (msg: Message) => {
-            console.log(msg);
-            setMessages(oldMessages => [...oldMessages, msg]
-              .sort((a:Message, b:Message) => a.createdAt.getTime() - b.createdAt.getTime()));
+            setMessages(oldMessages => [...oldMessages, msg]);
             if (msg.fromUserId !== userProfile!.userId)
-              chatSend({type: 'REC_INCOMING_MSG', data: msg.messageId});
+              chatSend({type: 'REC_INCOMING_MSG', data: msg});
           },
           `chat-${userProfile!.userId}`,
         )];
-        console.log(subs.current);
-        chatSend('SUB_CHAT_SUCCESS');
+        const lastReadMessageFromRecipient = messages.slice(-1)[0];
+        chatSend({type:'SUB_CHAT_SUCCESS', data: lastReadMessageFromRecipient});
       },
       subToTyping: () => {
         subs.current = [...subs.current, subscribeToTypingForClient(
@@ -140,11 +125,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           chat!.chatId,
           (isTyping: boolean) => {
             chatSend(isTyping?'REC_TYPED':'REC_STOPPED');
-            console.log(`isTyping is ${isTyping}`);
           },
           `typing-${userProfile!.userId}`,
         )];
-        console.log(subs.current);
         chatSend("SUB_TYPING_SUCCESS");
       },
       subToRead: () => {
@@ -152,44 +135,64 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           client!,
           chat!.chatId,
           (msgId: number) => {
-            console.log('recipient read a message');
-            console.log(msgId);
             chatSend({type: 'REC_READ', data: msgId});
           },
           `read-${userProfile!.userId}`,
         )];
-        const lastReadMessageFromRecipient = messages.slice().reverse().find(x => x.fromUserId === chat!.recipient!.userId);
-        chatSend({type: 'SUB_READ_SUCCESS', data: lastReadMessageFromRecipient? lastReadMessageFromRecipient.messageId: -1});
+        chatSend('SUB_READ_SUCCESS');
       },
       getUnreadMessages: () => {
-        console.log('getting unread');
         if (chat!.hasUnreadMessages) {
           replaceChat({...chat!, hasUnreadMessages: false})
         }
         chatSend('SUCCESS');
       },
       sendRead: (context, event) => {
-        // TODO: update latread.
-        console.log(`sendRead: ${event.data}`);
+        // update socket.
+        var msg = event.data as Message;
         if (event.data) {
           publishReadForClient(
             client!,
-            event.data,
+            msg.messageId,
           );
+        }
+
+        // update chat to have the newest read message.
+        if (msg) {
+          console.log('here');
+          replaceChat({...chat!, 
+            hasUnreadMessages: false,
+            lastMessage: msg
+          });
+        } else {
+          console.error('no message found');
         }
         chatSend('REC_UPDATED');
       },
       updateLastRead: (context, event) => {
         // TODO: update the read message in messages.
-        console.log(`updateLastRead: ${event.data}`);
         if (event.data) {
           setLastRead(event.data);
         }
         chatSend('READ_UPDATE_SUCCESS');
+      },
+      unSub: () => {
+        onUnsub();
+      },
+      bypass: () => {
+        console.log(`checking dependencies: ${chatState.matches({init: 'wait'})}`);
+        chatSend('DEPENDENCIES_LOADED');
       }
     }
   });
   
+  const onUnsub = () => {
+    console.log("unSubbing");
+    publishTypingForClient(client!, chat!.chatId, false);
+    subs.current.forEach(s => s.unsubscribe());
+    subs.current = [];
+  }
+
   const onKeyPressed = (event: any) => {
     
     //@ts-ignore
@@ -200,7 +203,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         }
       } 
       else if (chatState.matches({ready: {user: 'idle'}}) || chatState.matches({ready: {user: 'typing'}})) {
-        console.log('setting typing');
         chatSend('USER_TYPED');
       }
     //@ts-ignore
@@ -216,17 +218,11 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       return;
 
       setTimeout(() => {
-      // @ts-ignore
-      content.current.scrollToBottom(500);
+        if (content && content.current) {
+        // @ts-ignore
+        content.current.scrollToBottom(500);
+      }
     }, 200);
-  }
-
-  const unSub = (client: Client, chatId: number) => {
-    console.log(`Unsubscribing to chat`);
-    publishTypingForClient(client, chatId, false);
-    console.log(subs.current);
-    subs.current.forEach(s => s.unsubscribe());
-    subs.current = [];
   }
 
   useEffect(() => {
@@ -236,11 +232,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     if (location.pathname !== `/chat/${chat.chatId}` &&
         subs && subs.current.length > 0 &&
         client) {
-      unSub(client, chat.chatId);
       chatSend('LEFT');
     }
     else if (location.pathname === `/chat/${chat.chatId}`) {
-      console.log(`Went back into the chat`);
       if (chatState.matches('notInView')) {
         chatSend('REENTERED');
       }
@@ -249,64 +243,43 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
 
   // Wait for all dependencies.
   useEffect(() => {
-    console.log(isClientConnected);
-    if (token && 
+    if (
         chat && 
         client && 
         isClientConnected && 
         userProfile &&
-        rendered &&
         chatState.matches({init: 'wait'})) {
           chatSend('DEPENDENCIES_LOADED');
         }
-  }, [token, chat, client, userProfile, isClientConnected, rendered]);
-
-  // Get dependencies once we have our token.
-  useEffect(() => {
-    if (token)
-    {
-      if (!userProfile) loadProfile(token);
-      loadChats(token);
-    }
-  }, [token]);
+  }, [chat, client, userProfile, isClientConnected]);
 
   // Clean up subs.
   useEffect(() => {
+    console.log('mount')
     return () => {
+      console.log('unmount')
       if (client && chat) {
-        unSub(client, chat.chatId);
+        onUnsub();
       }
     }
   },[]);
 
   useEffect(() => {
-    console.log(visibility);
     if (visibility && visibility === "visible") {
       // we need to fetch the messages and resub
-      chatSend('DEPENDENCIES_LOADED');
+      console.log("visible");
+      chatSend('REENTERED');
+    } else if (visibility && visibility === "hidden") {
+      console.log("hidden");
+      chatSend('LEFT');
     }
   }, [visibility])
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
-    if (!rendered) return;
+    //if (!rendered) return;
     scrollToTheBottom();
   }, [messages])
-
-  // Log the states.
-  useEffect(() => {
-    const subscription = chatService.subscribe(state => {
-      // simple state logging
-      console.log(state);
-    });
-  
-    return subscription.unsubscribe;
-  }, [chatService]); // note: service should never change
-
-  // the component finished rendering.
-  useIonViewDidEnter(() => {
-    setRendered(true);
-  })
 
   return (
     <>
@@ -327,62 +300,34 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
               }
             </IonToolbar>
           </IonHeader>
-            <IonContent scrollEvents={true} ref={content} >
-              <>
+            <IonContent ref={content} >
               {
               !chatState.matches('ready')? (
                 <IonProgressBar type="indeterminate" />
               ) : (
-                  <IonList>
-                    { messages &&
-                      messages.map((message: Message, key) => {
-                        const timestamp = getTimestamp(message.createdAt);
-                        return (
-                        <div key={key}>
+                <div>
+                    <div>
+                      <IonInfiniteScroll ref={scroller} position="top" onIonInfinite={() => {console.log('hello'); scroller.current.complete()}}>
+                        <IonInfiniteScrollContent></IonInfiniteScrollContent>
+                      </IonInfiniteScroll>
+                    </div>
+                    <IonList>
+                          { messages &&
+                            messages.map((message: Message, key) =>
+                              <MessageList key={key} message={message} lastRead={lastRead} userProfile={userProfile!} /> 
+                            )
+                          }
                         {
-                        message.fromUserId === userProfile!.userId? (<>
-                          <IonText>
-                          
-                        </IonText>
-                          <div className="chat-bubble send" slot="end">
+                          chatState.matches({ready: {recipientTyping: 'typing'}}) && 
+                          <div slot="start" color="white" className="chat-bubble typing">
                             <p>
-                              {message.content}
-                            </p>
-                            <p>
-                              <i>{timestamp}</i>
-                            </p>
-                            {
-                              lastRead === message.messageId &&
-                              <p className="read">
-                                Read 
-                              </p>
-                            }
-                          </div>
-                              </>
-                        ) : (
-                          <div slot="start" className="chat-bubble received">
-                            <p>
-                              {message.content}
-                            </p>
-                            <p>
-                              <i>{timestamp}</i>
+                              Typing...
                             </p>
                           </div>
-                        )}
-                        </div>
-                        )})
-                    }
-                    {
-                      chatState.matches({ready: {recipientTyping: 'typing'}}) && 
-                      <div slot="start" color="white" className="chat-bubble typing">
-                        <p>
-                          Typing...
-                        </p>
-                      </div>
-                    }
-                  </IonList>
+                        }
+                    </IonList>
+                  </div>
               )}
-              </>
             </IonContent>
             {
               chatState.matches('ready') &&
@@ -424,7 +369,6 @@ export default connect<OwnProps, StateProps, DispatchProps>({
   mapStateToProps: (state, OwnProps) => ({
     chat: selectors.getChat(state, OwnProps),
     userProfile: state.data.userProfile,
-    token: state.user.token,
     loading: state.data.loading,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,

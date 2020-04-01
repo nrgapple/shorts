@@ -165,7 +165,7 @@ function subscribeUser(registration: ServiceWorkerRegistration) {
     // If the user is logged in, add the device. 
     // Otherwise store in local storage and add after login.
     if (token) {
-      postDevice(key, auth, endpoint, token);
+      postDevice(key, auth, endpoint);
     } else {
       localStorage.setItem("push_key", key);
       localStorage.setItem("push_auth", auth);

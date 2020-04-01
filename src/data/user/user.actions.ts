@@ -74,10 +74,7 @@ export const setVisibility = (visibility?: string) => async (dispatch: React.Dis
   } as const); 
 }
 
-export const setCurrentLocation = (point?: GeoPoint) => {
-  console.log(`setting the current location in starage`);
-  console.log(point);
-  
+export const setCurrentLocation = (point?: GeoPoint) => {  
   return ({
     type: 'set-current-location',
     point
