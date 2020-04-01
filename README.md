@@ -1,19 +1,33 @@
-# Shorts Dating App
+Chat with us on discord: https://discord.gg/dczVsZS
 
-Shorts is a project to create a dating app using ionic and react
+# Shorts
+**The Platform to Stand on**
+
+<p align="center">
+<img src="https://shortss.s3.amazonaws.com/shorts-180.png" />
+</p>
+
+Shorts the first open source dating PWA using ionic and react
 
 ![image](https://user-images.githubusercontent.com/10817537/73545382-3f8fbb00-4409-11ea-9dd8-a29b75ee526b.png)
+
+## PWA
+
+Install right on your mobile device or desktop as a [PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 
 ## Backend API
 
 The backend API was developed by [@mattruddy](https://github.com/mattruddy).
 
-[Service API Documentation](https://selfconnect.dev/swagger-ui.html)
+[OpenAPI Documentation](https://selfconnect.dev/swagger-ui.html)
+
+(to request API's service please join [Discord#api-request](https://discord.gg/vVtzKGu)
 
 ## Development
 
 1. Fork
-2. `ionic serve` (make sure you have the ionic cli)
+2. npm install
+3. `ionic serve` (make sure you have the [ionic cli](https://ionicframework.com/docs/cli))
 
 ### Contributing
 
