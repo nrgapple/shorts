@@ -3,7 +3,7 @@ import { IonHeader, IonToolbar, IonContent, IonPage, IonButtons, IonBackButton, 
 import { connect } from '../data/connect';
 import { withRouter, RouteComponentProps, useLocation, useHistory } from 'react-router';
 import * as selectors from '../data/selectors';
-import { send, person } from 'ionicons/icons';
+import { send, person, arrowBack } from 'ionicons/icons';
 import './ChatDetail.scss';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
@@ -53,6 +53,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   var subs = useRef<StompSubscription[]>([]);
   const location = useLocation();
   const history = useHistory();
+  const [subbedToUnmount, setSubbedToUnmount] = useState(false);
   const [ chatState, chatSend, chatService ] = useMachine(chatMachine, {
     services: {
       loadMessages: async () => {
@@ -253,16 +254,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         }
   }, [chat, client, userProfile, isClientConnected]);
 
-  // Clean up subs.
-  useEffect(() => {
-    console.log('mount')
-    return () => {
-      console.log('unmount')
-      if (client && chat) {
-        onUnsub();
-      }
-    }
-  },[]);
 
   useEffect(() => {
     if (visibility && visibility === "visible") {
@@ -274,6 +265,24 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
       chatSend('LEFT');
     }
   }, [visibility])
+
+  useEffect(() => {
+    if (client && chat && !subbedToUnmount) {
+      setSubbedToUnmount(true);
+    }
+  }, [client, chat])
+
+  useEffect(() => {
+    if (subbedToUnmount) {
+      return () => {
+        console.log('unmount');
+        console.log(`client: ${client}`)
+        if (client && chat) {
+          onUnsub();
+        }
+      }
+    }
+  }, [subbedToUnmount])
 
   // Scroll to the bottom if new massages.
   useEffect(() => {
@@ -287,7 +296,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
           <IonHeader>
             <IonToolbar>
               <IonButtons slot="start">
-                <IonBackButton defaultHref="/tabs/chats"></IonBackButton>
+              <IonBackButton defaultHref="/tabs/chats"></IonBackButton>  
               </IonButtons>
               <IonTitle>{chat&&chat.recipient.firstName}</IonTitle>
               {
