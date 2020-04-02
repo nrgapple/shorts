@@ -159,6 +159,17 @@ export const postLogin = async (
   }
 }
 
+export const postFacebookLogin = async () => {
+  try {
+    const response = await Axios.request({
+      url: `${vars().env.API_URL}/signin/facebook`,
+      method: 'POST',
+    })
+  } catch (e) {
+    throw e.response? e.response : e;
+  }
+}
+
 export const postForgot = async (
   email: string,
 ) => {

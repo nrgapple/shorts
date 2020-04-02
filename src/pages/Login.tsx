@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonInput, IonText } from '@ionic/react';
 import './Login.scss';
 import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions';
 import { connect } from '../data/connect';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, useLocation } from 'react-router';
 import axios from 'axios';
 import { loadNearMe, loadProfile, loadMatches, loadAllInfo } from '../data/sessions/sessions.actions';
-import { postLogin, postDevice } from '../data/dataApi';
+import { postLogin, postDevice, postFacebookLogin } from '../data/dataApi';
+import queryString from 'query-string';
 
 interface OwnProps extends RouteComponentProps {}
 
@@ -14,7 +15,6 @@ interface DispatchProps {
   setIsLoggedIn: typeof setIsLoggedIn;
   setUsername: typeof setUsername;
   setToken: typeof setToken;
-  loadAllInfo: typeof loadAllInfo;
 }
 
 interface LoginProps extends OwnProps,  DispatchProps { }
@@ -24,7 +24,6 @@ const Login: React.FC<LoginProps> = ({
   history, 
   setUsername: setUsernameAction, 
   setToken: setTokenAction,
-  loadAllInfo: loadAllInfoAction,
 }) => {
 
   const [username, setUsername] = useState('');
@@ -34,7 +33,8 @@ const Login: React.FC<LoginProps> = ({
   const [passwordError, setPasswordError] = useState(false);
   const [validationError, setValidationError] = useState(false);
   const [tokenError, setTokenError] = useState(false);
-  const apiURL = 'https://doctornelson.herokuapp.com';
+  const [pageloaded, setPageloaded] = useState(false);
+  const location = useLocation();
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +77,40 @@ const Login: React.FC<LoginProps> = ({
       }
     }
   };
+
+  const loginWithFacebook = async () => {
+    try {
+      await postFacebookLogin();
+    } catch (e) {
+      console.error(`Error logining in with facebook: ${e}`);
+    }
+  }
+
+  useEffect(() => {
+    if (location && pageloaded) {
+      if (queryString.parse(location.search).token) {
+        var setup = async () => {
+          setTokenAction(queryString.parse(location.search).token as string);
+          setIsLoggedIn(true);
+          const key = localStorage.getItem("push_key");
+          const auth = localStorage.getItem("push_auth");
+          const endpoint = localStorage.getItem("push_endpoint");
+          if (key && auth && endpoint) {
+            await postDevice(key, auth, endpoint);
+            localStorage.removeItem("push_key");
+            localStorage.removeItem("push_auth");
+            localStorage.removeItem("push_endpoint");
+          }
+          history.push('/tabs/home', {direction: 'forward'});
+        }
+        setup();
+      }
+    }
+  }, [location, pageloaded])
+
+  useEffect(() => {
+    setPageloaded(true);
+  }, [])
 
   return (
     <IonPage id="login-page">
@@ -138,9 +172,16 @@ const Login: React.FC<LoginProps> = ({
             </IonCol>
           </IonRow>
         </form>
-
+        <form 
+          action="https://shorts.center/api/signin/facebook" 
+          method="POST">
+          <IonRow>
+            <IonCol>
+              <IonButton type="submit"  expand="block" color="facebook">Sign in with Facebook</IonButton>
+            </IonCol>
+          </IonRow>
+        </form>
       </IonContent>
-
     </IonPage>
   );
 };
@@ -150,7 +191,6 @@ export default connect<OwnProps, {}, DispatchProps>({
     setIsLoggedIn,
     setUsername,
     setToken,
-    loadAllInfo,
   },
   component: Login
 })
