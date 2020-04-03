@@ -235,7 +235,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
         client) {
       chatSend('LEFT');
     }
-    else if (location.pathname === `/chat/${chat.chatId}`) {
+    else if (location.pathname === `/chat/${chat.chatId}` && visibility === 'visible') {
       if (chatState.matches('notInView')) {
         chatSend('REENTERED');
       }
