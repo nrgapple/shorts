@@ -7,9 +7,7 @@ import { setClient, setIsClientConnected, setIsLoggedIn } from '../data/user/use
 import { replaceChat, removeChat, removeMatch } from '../data/sessions/sessions.actions';
 import { connect } from '../data/connect';
 import { IonModal, IonButton, IonContent, IonHeader, IonToolbar, IonButtons, IonText, IonTitle, IonProgressBar, IonRow, IonIcon } from '@ionic/react';
-import ImageCard from './ImageCard';
 import InfoCard from './InfoCard';
-import { heart } from 'ionicons/icons';
 import { Chat } from '../models/Chat';
 
 interface StateProps {

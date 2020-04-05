@@ -595,7 +595,6 @@ export const configureClient = async (
   client.configure({
     brokerURL: vars().env.SOCKET_URL,
     connectHeaders: stompHeader,
-    reconnectDelay: 100,
     onConnect: () => {
       onConnect();
     },

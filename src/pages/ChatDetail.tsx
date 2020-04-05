@@ -262,13 +262,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
     if (visibility && visibility === "visible") {
       // we need to fetch the messages and resub
       if (client) {
-        if (!client.connected) {
-          setTimeout(() => {
-            chatSend('REENTERED');
-          }, 300)
-        } else {
           chatSend('REENTERED');
-        }
       }
     } else if (visibility && visibility === "hidden") {
       chatSend('LEFT');

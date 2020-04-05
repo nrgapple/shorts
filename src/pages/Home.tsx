@@ -49,7 +49,6 @@ const Home: React.FC<HomeProps> = ({
   const [homeState, homeSend, homeService] = useMachine(homeMachine, {
     actions: {
       fetchData: () => {
-        console.log(`fetching data`);
         loadNearMe()
 
       },
@@ -111,7 +110,6 @@ const Home: React.FC<HomeProps> = ({
 
   useEffect(() => {
     const subscription = homeService.subscribe(state => {
-      console.log(state);
     });
     
     return subscription.unsubscribe;
