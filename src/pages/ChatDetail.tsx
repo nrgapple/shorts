@@ -330,7 +330,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
                     {
                       chatState.matches({ready: {recipientTyping: 'typing'}}) && 
                       <div slot="start" color="white" className="chat-bubble typing">
-                        <LoaderDots />
+                        <LoaderDots size='small' />
                       </div>
                     }
                 </IonList>

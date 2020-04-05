@@ -78,9 +78,6 @@ const Login: React.FC<LoginProps> = ({
         const endpoint = localStorage.getItem("push_endpoint");
         if (key && auth && endpoint) {
           await postDevice(key, auth, endpoint);
-          localStorage.removeItem("push_key");
-          localStorage.removeItem("push_auth");
-          localStorage.removeItem("push_endpoint");
         }
         history.push('/tabs/home', {direction: 'none'});
       } catch (e) {

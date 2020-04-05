@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonInput, IonText } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonRow, IonCol, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, getPlatforms } from '@ionic/react';
 import './Login.scss';
 import { setIsLoggedIn, setUsername, setToken } from '../data/user/user.actions';
 import { connect } from '../data/connect';
@@ -62,11 +62,10 @@ const Login: React.FC<LoginProps> = ({
         const key = localStorage.getItem("push_key");
         const auth = localStorage.getItem("push_auth");
         const endpoint = localStorage.getItem("push_endpoint");
+        const platform = getPlatforms();
+        console.log(platform);
         if (key && auth && endpoint) {
           await postDevice(key, auth, endpoint);
-          localStorage.removeItem("push_key");
-          localStorage.removeItem("push_auth");
-          localStorage.removeItem("push_endpoint");
         }
         history.push('/tabs/home', {direction: 'back'});
       } catch (e) {
@@ -87,11 +86,10 @@ const Login: React.FC<LoginProps> = ({
           const key = localStorage.getItem("push_key");
           const auth = localStorage.getItem("push_auth");
           const endpoint = localStorage.getItem("push_endpoint");
+          const platform = getPlatforms();
+          console.log(platform);
           if (key && auth && endpoint) {
             await postDevice(key, auth, endpoint);
-            localStorage.removeItem("push_key");
-            localStorage.removeItem("push_auth");
-            localStorage.removeItem("push_endpoint");
           }
           history.push('/tabs/home', {direction: 'back'});
         }
