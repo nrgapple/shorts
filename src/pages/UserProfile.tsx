@@ -144,9 +144,7 @@ const About: React.FC<UserProfileProps> = ({
         // @ts-ignore
         or = data.exif.get('Orientation');
       }
-      (canvas as HTMLCanvasElement).toBlob((blob) => {
-          setSrc(URL.createObjectURL(blob))
-      })
+       setSrc((canvas as HTMLCanvasElement).toDataURL());
     }, { orientation: plat.find(p => p === 'android') ? 6 : 1});
   }
 
@@ -293,34 +291,42 @@ const About: React.FC<UserProfileProps> = ({
                     />
                         {
                           isEditing && (
-                                <Fragment>
+                                <IonList>
                                   {
                                     !src &&
-                                    <ImageUploader
-                                      withIcon={false}
-                                      withLabel={false}
-                                      buttonText="Choose Image"
-                                      onChange={handeChange}
-                                      imgExtension={['.jpg', '.jpeg', '.png']}
-                                      maxFileSize={5242880}
-                                      singleImage={true}
-                                    />
+                                    <IonItem>
+                                      <ImageUploader
+                                        withIcon={false}
+                                        withLabel={false}
+                                        buttonText="Choose Image"
+                                        onChange={handeChange}
+                                        imgExtension={['.jpg', '.jpeg', '.png']}
+                                        maxFileSize={5242880}
+                                        singleImage={true}
+                                        fileContainerStyle={{padding: '0', background: 'inherit', boxShadow: 'none'}}
+                                      />
+                                    </IonItem>
+
                                   }
                                   {
                                     src &&
-                                      <ReactCrop
-                                        src={src}
-                                        crop={crop}
-                                        ruleOfThirds
-                                        onImageLoaded={onImageLoaded}
-                                        onComplete={onCropComplete}
-                                        onChange={handleCropChange}
-                                        keepSelection={true}
-                                      />
+                                      <div style={{display: 'flex', justifyContent: 'center'}}>
+                                        <ReactCrop
+                                          src={src}
+                                          crop={crop}
+                                          ruleOfThirds
+                                          onImageLoaded={onImageLoaded}
+                                          onComplete={onCropComplete}
+                                          onChange={handleCropChange}
+                                          keepSelection={true}
+                                        />
+                                      </div>
                                   }
                                   {
                                     croppedImageUrl &&
-                                    <img alt="Crop" style={{ width: '50%' }} src={croppedImageUrl}></img>
+                                    <div style={{display: 'flex', justifyContent: 'center'}}>
+                                      <img alt="Crop" style={{ width: '50%' }} src={croppedImageUrl}></img>
+                                    </div>
                                   }
                                   {
                                     inputImage && (
@@ -329,7 +335,7 @@ const About: React.FC<UserProfileProps> = ({
                                       </IonButton>
                                     )
                                   }
-                                </Fragment>
+                                </IonList>
                           )
                         }
                       <form noValidate onSubmit={updateProfile}>
