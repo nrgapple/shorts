@@ -92,11 +92,12 @@ const IonicApp: React.FC<IonicAppProps> = ({
   loadUserData, 
   setIsClientConnected,
   setVisibility,
+  visibility,
 }) => {
 
   useEffect(() => {
+    setVisibility('visible');
     document.addEventListener("visibilitychange", loadVisibility);
-
     loadUserData();
     return () => {
       if (client) {
@@ -115,6 +116,13 @@ const IonicApp: React.FC<IonicAppProps> = ({
   useEffect(() => {
     loadAllInfo();
   }, [token])
+
+  useEffect(() => {
+    if (visibility === 'visible' && client && !client.connected) {
+      loadAllInfo();
+
+    }
+  }, [visibility, client])
 
   return (
     <IonApp className={`${darkMode ? 'dark-theme' : ''}`}>
@@ -136,6 +144,8 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/forgot" component={Forgot} />
             <Route path="/reset" component={Reset} />
             <Route path="/download" component={Download} />
+            <Route path="/chat/:id" component={ChatDetail} />
+            <Route path="/more/:id" component={ProfileDetail} />
             <Route path="/logout" render={() => {
               setIsLoggedIn(false);
               setUsername(undefined);
@@ -145,8 +155,7 @@ const IonicApp: React.FC<IonicAppProps> = ({
             <Route path="/" component={HomeOrLogin} exact />
           </IonRouterOutlet>
         </IonSplitPane>
-        <Route path="/chat/:id" component={ChatDetail} />
-          <Route path="/more/:id" component={ProfileDetail} />
+
       </IonReactRouter>
     </IonApp>
   )
@@ -164,6 +173,7 @@ const IonicAppConnected = connect<{}, StateProps, DispatchProps>({
     location: state.user.location,
     client: state.user.client,
     isClientConnected: state.user.isClientConnected,
+    visibility: state.user.visibility,
   }),
   mapDispatchToProps: { 
     loadUserData, 

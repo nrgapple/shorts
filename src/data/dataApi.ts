@@ -457,12 +457,12 @@ export const deleteMatch = async (userId: number) => {
   }
 }
 
-export const getMessages = async (chatId: number) => {
+export const getMessages = async (chatId: number, lastMessageId?: number) => {
   const token = (await Storage.get({key: TOKEN})).value;
   if (token) {
     try {
       const messagesResponse = await Axios.request({
-        url: `${vars().env.API_URL}/secure/messages/${chatId}`,
+        url: `${vars().env.API_URL}/secure/messages/${chatId}${lastMessageId ? `/${lastMessageId}` : ''}`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -595,6 +595,7 @@ export const configureClient = async (
   client.configure({
     brokerURL: vars().env.SOCKET_URL,
     connectHeaders: stompHeader,
+    reconnectDelay: 100,
     onConnect: () => {
       onConnect();
     },

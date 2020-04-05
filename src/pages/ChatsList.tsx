@@ -45,7 +45,6 @@ const ChatsList: React.FC<ChatsListProps> = ({
     if (selectedChat) {
       try {
         setIsDeletingChat(true);
-        console.log(selectedChat);
         await deleteMatch(selectedChat!.recipient.userId);
         removeChat(selectedChat);
         removeMatch(selectedChat.recipient);
