@@ -4,7 +4,7 @@ import { configureClient, subscribeToChatNotifications, subscribeToMatchNotifica
 import { Profile } from '../models/Profile';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { setClient, setIsClientConnected, setIsLoggedIn } from '../data/user/user.actions';
-import { replaceChat, removeChat, removeMatch } from '../data/sessions/sessions.actions';
+import { replaceChat, removeChat, removeMatch, loadChats } from '../data/sessions/sessions.actions';
 import { connect } from '../data/connect';
 import { IonModal, IonButton, IonContent, IonHeader, IonToolbar, IonButtons, IonText, IonTitle, IonProgressBar, IonRow, IonIcon } from '@ionic/react';
 import InfoCard from './InfoCard';
@@ -26,6 +26,7 @@ interface DispatchProps {
   setIsClientConnected: typeof setIsClientConnected,
   removeChat: typeof removeChat,
   removeMatch: typeof removeMatch,
+  loadChats: typeof loadChats,
 }
 
 interface ConnectionProps extends StateProps, DispatchProps { }
@@ -43,6 +44,7 @@ const Connections: React.FC<ConnectionProps> = ({
   chats,
   matches,
   isLoggedIn,
+  loadChats,
 }) => {
   const history = useHistory();
   const [showModal, setShowModal] = useState(false);
@@ -116,6 +118,7 @@ const Connections: React.FC<ConnectionProps> = ({
       try {
         setIsCreatingChat(true);
         const chat = await createChat(match.userId);
+        loadChats()
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -207,6 +210,7 @@ export default connect<{}, StateProps, DispatchProps>({
     setIsClientConnected,
     removeChat,
     removeMatch,
+    loadChats,
   },
   component: Connections,
 });

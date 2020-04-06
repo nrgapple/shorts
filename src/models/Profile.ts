@@ -16,4 +16,5 @@ export interface Profile {
     displayAddress?: string;
     searchMiles?: number;
     distance?: number;
+    isThirdParty?: boolean;
 }

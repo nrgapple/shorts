@@ -116,6 +116,7 @@ export const getUserProfile = async () => {
           }
         }),
         searchMiles: userProfileData.miles,
+        isThirdParty: userProfileData.isThirdParty,
       } as Profile;
       return userProfile;
     } catch (e) {

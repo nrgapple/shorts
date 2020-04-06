@@ -17,6 +17,7 @@ import React, { useState } from 'react';
 import { connect } from '../data/connect';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { setDarkMode } from '../data/user/user.actions';
+import { Profile } from '../models/Profile';
 
 const routes = {
   appPages: [
@@ -44,6 +45,7 @@ interface Pages {
 interface StateProps {
   darkMode: boolean;
   isAuthenticated: boolean;
+  profile?: Profile;
 }
 
 interface DispatchProps {
@@ -52,7 +54,7 @@ interface DispatchProps {
 
 interface MenuProps extends RouteComponentProps, StateProps, DispatchProps { }
 
-const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) => {
+const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode, profile }) => {
   const [disableMenu] = useState(false);
 
   function renderlistItems(list: Pages[]) {
@@ -80,10 +82,12 @@ const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) =
         <IonList>
           {renderlistItems(routes.appPages)}
         </IonList>
-        <IonList>
-          <IonListHeader>Account</IonListHeader>
-          {isAuthenticated ? renderlistItems(routes.loggedInPages) : renderlistItems(routes.loggedOutPages)}
-        </IonList>
+        { profile && !profile.isThirdParty &&
+          <IonList>
+            <IonListHeader>Account</IonListHeader>
+            {isAuthenticated ? renderlistItems(routes.loggedInPages) : renderlistItems(routes.loggedOutPages)}
+          </IonList>
+        } 
         <IonList>
           <IonItem>
             <IonLabel>Dark Theme</IonLabel>
@@ -98,7 +102,8 @@ const Menu: React.FC<MenuProps> = ({ darkMode, isAuthenticated, setDarkMode }) =
 export default connect<{}, StateProps, {}>({
   mapStateToProps: (state) => ({
     darkMode: state.user.darkMode,
-    isAuthenticated: state.user.isLoggedin
+    isAuthenticated: state.user.isLoggedin,
+    profile: state.data.userProfile,
   }),
   mapDispatchToProps: ({
     setDarkMode
