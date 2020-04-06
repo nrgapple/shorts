@@ -310,7 +310,7 @@ const About: React.FC<UserProfileProps> = ({
                                   }
                                   {
                                     src &&
-                                      <div style={{display: 'flex', justifyContent: 'center'}}>
+                                      <div style={{ display: 'flex', justifyContent: 'center'}}>
                                         <ReactCrop
                                           src={src}
                                           crop={crop}
@@ -324,8 +324,9 @@ const About: React.FC<UserProfileProps> = ({
                                   }
                                   {
                                     croppedImageUrl &&
-                                    <div style={{display: 'flex', justifyContent: 'center'}}>
-                                      <img alt="Crop" style={{ width: '50%' }} src={croppedImageUrl}></img>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                      <p>Preview</p>
+                                      <img alt="Crop" style={{ width: '300px', height: '300px' }} src={croppedImageUrl}></img>
                                     </div>
                                   }
                                   {
