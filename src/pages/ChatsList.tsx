@@ -27,6 +27,7 @@ const ChatsList: React.FC<ChatsListProps> = ({
   Chats: chats, 
   removeChat,
   removeMatch,
+  loadChats,
 }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | undefined>(undefined);

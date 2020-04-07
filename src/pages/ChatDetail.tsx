@@ -40,8 +40,6 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   chat, 
   client,
   isClientConnected,
-  loadChats,
-  loadProfile,
   replaceChat,
   visibility,
 }) => {
@@ -261,13 +259,13 @@ const ChatDetail: React.FC<ChatDetailProps> = ({
   useEffect(() => {
     if (visibility && visibility === "visible") {
       // we need to fetch the messages and resub
-      if (client) {
+      if (client && isClientConnected) {
           chatSend('REENTERED');
       }
-    } else if (visibility && visibility === "hidden") {
+    } else if (visibility && visibility === "hidden" && isClientConnected) {
       chatSend('LEFT');
     }
-  }, [visibility, client])
+  }, [visibility, client, isClientConnected])
 
   useEffect(() => {
     if (client && chat && !subbedToUnmount) {

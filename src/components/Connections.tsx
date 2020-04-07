@@ -18,6 +18,7 @@ interface StateProps {
   chats?: Chat[],
   matches?: Profile[],
   isLoggedIn: boolean,
+  visibility?: string,
 }
 
 interface DispatchProps {
@@ -45,6 +46,7 @@ const Connections: React.FC<ConnectionProps> = ({
   matches,
   isLoggedIn,
   loadChats,
+  visibility,
 }) => {
   const history = useHistory();
   const [showModal, setShowModal] = useState(false);
@@ -138,8 +140,10 @@ const Connections: React.FC<ConnectionProps> = ({
 
   useEffect(() => {
     if (!client || isClientConnected || !userProfile) return;
-    configure();
-  }, [client, userProfile, isClientConnected])
+    if (visibility === 'visible') {
+      configure();
+    }
+  }, [client, userProfile, isClientConnected, visibility])
 
   return (
     <>
@@ -203,6 +207,7 @@ export default connect<{}, StateProps, DispatchProps>({
     matches: state.data.matches,
     isLoggedIn: state.user.isLoggedin,
     token: state.user.token,
+    visibility: state.user.visibility,
   }),
   mapDispatchToProps: {
     setClient,

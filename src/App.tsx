@@ -96,15 +96,15 @@ const IonicApp: React.FC<IonicAppProps> = ({
 }) => {
 
   useEffect(() => {
-    if (client && 
-        !client.connected && 
-        client.webSocket && 
-        client.webSocket.readyState !== 0 && 
-        visibility === 'visible') {
-      console.log('activating');
-      client.activate();
+    if (client) {
+      if (visibility === 'visible') {
+        loadAllInfo();
+      } else {
+        client.deactivate();
+        setIsClientConnected(false);
+      }
     }
-  }, [visibility])
+  }, [visibility, client])
 
   useEffect(() => {
     setVisibility('visible');
