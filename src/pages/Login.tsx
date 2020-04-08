@@ -64,11 +64,8 @@ const Login: React.FC<LoginProps> = ({
         const endpoint = localStorage.getItem("push_endpoint");
         if (key && auth && endpoint) {
           await postDevice(key, auth, endpoint);
-          localStorage.removeItem("push_key");
-          localStorage.removeItem("push_auth");
-          localStorage.removeItem("push_endpoint");
         }
-        history.push('/tabs/home', {direction: 'none'});
+        history.push('/tabs/home', {direction: 'back'});
       } catch (e) {
         if (e.message === "Invalid Credentials") {
           setValidationError(true);
@@ -77,14 +74,6 @@ const Login: React.FC<LoginProps> = ({
       }
     }
   };
-
-  const loginWithFacebook = async () => {
-    try {
-      await postFacebookLogin();
-    } catch (e) {
-      console.error(`Error logining in with facebook: ${e}`);
-    }
-  }
 
   useEffect(() => {
     if (location && pageloaded) {
@@ -97,11 +86,8 @@ const Login: React.FC<LoginProps> = ({
           const endpoint = localStorage.getItem("push_endpoint");
           if (key && auth && endpoint) {
             await postDevice(key, auth, endpoint);
-            localStorage.removeItem("push_key");
-            localStorage.removeItem("push_auth");
-            localStorage.removeItem("push_endpoint");
           }
-          history.push('/tabs/home', {direction: 'forward'});
+          history.push('/tabs/home', {direction: 'back'});
         }
         setup();
       }

@@ -45,34 +45,114 @@
 
 .chat-bubble {
     width: auto;
-    max-width: 75%;
-    min-width: 25%;
-    border-radius: 8px;
-    padding: 8px 16px;
-    margin: 10px;
-    display: block;
-    clear: both;
+    max-width: 90%;
+    word-wrap: break-word;
+    margin-bottom: 12px;
+    line-height: 24px;
     position: relative;
-    margin-bottom: 0;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
 
     &.received {
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          height: 20px;
+        }
+        background: #99ffcc;
+        color: black;
+      
+        &:before {
+          left: -7px;
+          border-left: 20px solid var(--ion-color-dark);
+          border-bottom-right-radius: 16px 14px;
+          transform: translate(0, -2px);
+        }
+      
+        &:after {
+          left: 4px;
+          width: 26px;
+          background: white;
+          border-bottom-right-radius: 10px;
+          transform: translate(-30px, -2px);
+        }
         background: var(--ion-color-dark);
         float: left;
         color: var(--ion-color-dark-contrast);
+        margin-left: 10px;
         
     }
 
-    &.send {
+    &.send {      
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          height: 20px;
+        }
+        color: white;
+        background: var(--ion-color-primary);
+        align-self: flex-end;
+      
+        &:before {
+          right: -7px;
+          border-right: 20px solid var(--ion-color-primary);
+          border-bottom-left-radius: 16px 14px;
+          transform: translate(0, -2px);
+        }
+      
+        &:after {
+          right: -56px;
+          width: 26px;
+          background: white;
+          border-bottom-left-radius: 10px;
+          transform: translate(-30px, -2px);
+        }
         background: var(--ion-color-primary);
         float: right;
         text-align: right;
         color: #fff;
+        margin-right: 10px;
     }
     
     &.typing {
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          height: 20px;
+        }
+        background: #99ffcc;
+        color: black;
+      
+        &:before {
+          left: -7px;
+          border-left: 20px solid var(--ion-color-medium);
+          border-bottom-right-radius: 16px 14px;
+          transform: translate(0, -2px);
+        }
+      
+        &:after {
+          left: 4px;
+          width: 26px;
+          background: white;
+          border-bottom-right-radius: 10px;
+          transform: translate(-30px, -2px);
+        }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 40px;
         background: var(--ion-color-medium);
         float: left;
         color: var(--ion-color-medium-contrast);
+        margin-left: 10px;
     }
 
     h6 {

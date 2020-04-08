@@ -27,6 +27,7 @@ const ChatsList: React.FC<ChatsListProps> = ({
   Chats: chats, 
   removeChat,
   removeMatch,
+  loadChats,
 }) => {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | undefined>(undefined);
@@ -45,7 +46,6 @@ const ChatsList: React.FC<ChatsListProps> = ({
     if (selectedChat) {
       try {
         setIsDeletingChat(true);
-        console.log(selectedChat);
         await deleteMatch(selectedChat!.recipient.userId);
         removeChat(selectedChat);
         removeMatch(selectedChat.recipient);
@@ -82,7 +82,7 @@ const ChatsList: React.FC<ChatsListProps> = ({
           <IonRefresherContent>
           </IonRefresherContent>
         </IonRefresher>
-        <IonList lines="inset" inset>
+        <IonList lines="inset" inset style={{ padding: '0', margin: '0'}}>
           {chats ? (
             chats.map((chat) => (
               <ChatItem chat={chat} key={chat.recipient.userId} onAction={onSelectChat}/>

@@ -4,12 +4,10 @@ import { configureClient, subscribeToChatNotifications, subscribeToMatchNotifica
 import { Profile } from '../models/Profile';
 import { Client, StompSubscription } from '@stomp/stompjs';
 import { setClient, setIsClientConnected, setIsLoggedIn } from '../data/user/user.actions';
-import { replaceChat, removeChat, removeMatch } from '../data/sessions/sessions.actions';
+import { replaceChat, removeChat, removeMatch, loadChats } from '../data/sessions/sessions.actions';
 import { connect } from '../data/connect';
 import { IonModal, IonButton, IonContent, IonHeader, IonToolbar, IonButtons, IonText, IonTitle, IonProgressBar, IonRow, IonIcon } from '@ionic/react';
-import ImageCard from './ImageCard';
 import InfoCard from './InfoCard';
-import { heart } from 'ionicons/icons';
 import { Chat } from '../models/Chat';
 
 interface StateProps {
@@ -20,6 +18,7 @@ interface StateProps {
   chats?: Chat[],
   matches?: Profile[],
   isLoggedIn: boolean,
+  visibility?: string,
 }
 
 interface DispatchProps {
@@ -28,6 +27,7 @@ interface DispatchProps {
   setIsClientConnected: typeof setIsClientConnected,
   removeChat: typeof removeChat,
   removeMatch: typeof removeMatch,
+  loadChats: typeof loadChats,
 }
 
 interface ConnectionProps extends StateProps, DispatchProps { }
@@ -45,6 +45,8 @@ const Connections: React.FC<ConnectionProps> = ({
   chats,
   matches,
   isLoggedIn,
+  loadChats,
+  visibility,
 }) => {
   const history = useHistory();
   const [showModal, setShowModal] = useState(false);
@@ -118,6 +120,7 @@ const Connections: React.FC<ConnectionProps> = ({
       try {
         setIsCreatingChat(true);
         const chat = await createChat(match.userId);
+        loadChats()
         history.push(`/chat/${chat.chatId}`, {direction: 'none'});
       } catch (e) {
         console.log(`Could not create a chat: ${e}`);
@@ -137,8 +140,10 @@ const Connections: React.FC<ConnectionProps> = ({
 
   useEffect(() => {
     if (!client || isClientConnected || !userProfile) return;
-    configure();
-  }, [client, userProfile, isClientConnected])
+    if (visibility === 'visible') {
+      configure();
+    }
+  }, [client, userProfile, isClientConnected, visibility])
 
   return (
     <>
@@ -202,6 +207,7 @@ export default connect<{}, StateProps, DispatchProps>({
     matches: state.data.matches,
     isLoggedIn: state.user.isLoggedin,
     token: state.user.token,
+    visibility: state.user.visibility,
   }),
   mapDispatchToProps: {
     setClient,
@@ -209,6 +215,7 @@ export default connect<{}, StateProps, DispatchProps>({
     setIsClientConnected,
     removeChat,
     removeMatch,
+    loadChats,
   },
   component: Connections,
 });

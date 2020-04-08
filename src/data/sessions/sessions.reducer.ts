@@ -23,7 +23,7 @@ export const sessionsReducer = (state: SessionsState, action: SessionsActions): 
       return { ...state, chats: state.chats?[...(state.chats).filter(x => x.chatId !== action.chat.chatId)]:undefined };
     }
     case 'replace-chat': {
-      return { ...state, chats: state.chats?[...(state.chats).filter(x => x.chatId !== action.chat.chatId), action.chat]:undefined };
+      return { ...state, chats: state.chats?[action.chat, ...(state.chats).filter(x => x.chatId !== action.chat.chatId)]:undefined };
     }
     case 'add-match': {
       return { ...state, matches: [...(state.matches), action.match] };

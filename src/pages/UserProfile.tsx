@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider, IonFabList } from '@ionic/react';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonPage, IonButtons, IonMenuButton, IonButton, IonIcon, IonSelectOption, IonList, IonItem, IonLabel, IonSelect, IonPopover, IonProgressBar, IonText, IonInput, IonRow, IonCol, IonTextarea, IonToast, IonFab, IonFabButton, IonCard, IonRange, IonCardContent, IonChip, IonCardHeader, IonCardTitle, IonItemDivider, IonFabList, getPlatforms } from '@ionic/react';
 import './UserProfile.scss';
 import { calendar, pin, body, male, female, options, close, checkmark, locate, colorWand } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import { Image } from "../models/Image";
 import { connect } from '../data/connect';
-import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile, setLoading } from '../data/sessions/sessions.actions';
+import { setUserProfile, loadProfile, loadNearMe, setHasValidProfile, setLoading, setSearchText } from '../data/sessions/sessions.actions';
 import { defineCustomElements } from '@ionic/pwa-elements/loader'
 import { postImage, postProfileInfo, deleteImage, getCurrentLocation, postUserLocation } from '../data/dataApi';
 import ImageCard from '../components/ImageCard';
@@ -14,7 +14,7 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { blobToFile, findHeightString } from '../util/util';
 import HeightSelect from '../components/HeightSelect';
-let fixRotation = require('fix-image-rotation')
+import loadImage from 'blueimp-load-image';
 
 interface OwnProps {
   userProfile?: Profile;
@@ -94,10 +94,6 @@ const About: React.FC<UserProfileProps> = ({
     }
   }
 
-  useEffect(() => {
-    console.log(userProfile)
-  }, [userProfile])
-
   const uploadImage = async () => {
     if (inputImage) {
       try {
@@ -138,11 +134,18 @@ const About: React.FC<UserProfileProps> = ({
   }
 
   const handeChange = (files: File[]) => {
+    const plat = getPlatforms();
+    console.log(plat);
     const file = files[0];
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.addEventListener('load', () => setSrc(reader.result as string))
-    reader.readAsDataURL(file);
+    let or;
+    loadImage(file, (canvas, data) => {
+      if (data && data.exif) {
+        // @ts-ignore
+        or = data.exif.get('Orientation');
+      }
+       setSrc((canvas as HTMLCanvasElement).toDataURL());
+    }, { orientation: plat.find(p => p === 'android') ? 6 : 1});
   }
 
   const handleCropChange = (crop: Crop) => {
@@ -196,10 +199,9 @@ const About: React.FC<UserProfileProps> = ({
           return '';
         }
 
-        const orientedImage = await fixRotation.fixRotation(blob) as Blob;
-        setInputImage(blobToFile(orientedImage, fileName));
+        setInputImage(blobToFile(blob, fileName));
         window.URL.revokeObjectURL(croppedImageUrl as string);
-        const fileUrl = window.URL.createObjectURL(orientedImage);
+        const fileUrl = window.URL.createObjectURL(blob);
         setCroppedImageUrl(fileUrl);
       }, 'image/png');
   }
@@ -289,34 +291,43 @@ const About: React.FC<UserProfileProps> = ({
                     />
                         {
                           isEditing && (
-                                <Fragment>
+                                <IonList>
                                   {
                                     !src &&
-                                    <ImageUploader
-                                      withIcon={false}
-                                      withLabel={false}
-                                      buttonText="Choose Image"
-                                      onChange={handeChange}
-                                      imgExtension={['.jpg', '.jpeg', '.png']}
-                                      maxFileSize={5242880}
-                                      singleImage={true}
-                                    />
+                                    <IonItem>
+                                      <ImageUploader
+                                        withIcon={false}
+                                        withLabel={false}
+                                        buttonText="Choose Image"
+                                        onChange={handeChange}
+                                        imgExtension={['.jpg', '.jpeg', '.png']}
+                                        maxFileSize={5242880}
+                                        singleImage={true}
+                                        fileContainerStyle={{padding: '0', background: 'inherit', boxShadow: 'none'}}
+                                      />
+                                    </IonItem>
+
                                   }
                                   {
                                     src &&
-                                      <ReactCrop
-                                        src={src}
-                                        crop={crop}
-                                        ruleOfThirds
-                                        onImageLoaded={onImageLoaded}
-                                        onComplete={onCropComplete}
-                                        onChange={handleCropChange}
-                                        keepSelection={true}
-                                      />
+                                      <div style={{ display: 'flex', justifyContent: 'center'}}>
+                                        <ReactCrop
+                                          src={src}
+                                          crop={crop}
+                                          ruleOfThirds
+                                          onImageLoaded={onImageLoaded}
+                                          onComplete={onCropComplete}
+                                          onChange={handleCropChange}
+                                          keepSelection={true}
+                                        />
+                                      </div>
                                   }
                                   {
                                     croppedImageUrl &&
-                                    <img alt="Crop" style={{ width: '50%' }} src={croppedImageUrl}></img>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                      <p>Preview</p>
+                                      <img alt="Crop" style={{ width: '300px', height: '300px' }} src={croppedImageUrl}></img>
+                                    </div>
                                   }
                                   {
                                     inputImage && (
@@ -325,7 +336,7 @@ const About: React.FC<UserProfileProps> = ({
                                       </IonButton>
                                     )
                                   }
-                                </Fragment>
+                                </IonList>
                           )
                         }
                       <form noValidate onSubmit={updateProfile}>

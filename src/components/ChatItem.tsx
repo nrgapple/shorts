@@ -19,7 +19,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ chat, onAction }) => {
       chat? (
       <>
       <IonItemSliding>
-        <IonItem detail={false} lines="none" routerLink={`/chat/${chat.chatId}`}>
+        <IonItem detail={false} lines="none" routerLink={`/chat/${chat.chatId}`} routerDirection='forward'>
           {chat.recipient.images.length > 0? (
             <IonAvatar slot="start">
               <img src={chat.recipient.images[0].imageUrl} alt="Pic" />
