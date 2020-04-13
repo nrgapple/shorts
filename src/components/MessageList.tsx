@@ -1,7 +1,7 @@
 import React from 'react';
 import { Message } from '../models/Message';
 import { Profile } from '../models/Profile';
-import { IonText } from '@ionic/react';
+import { IonText, IonItem } from '@ionic/react';
 import { getTimestamp } from '../util/util';
 
 interface MessageListProps {
@@ -13,7 +13,7 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ message, lastRead, userProfile  }) => {
     const timestamp = getTimestamp(message.createdAt);
     return (
-        <div>
+        <IonItem lines="none">
             {
             message.fromUserId === userProfile!.userId? (
                 <div className="chat-bubble send" slot="end">
@@ -40,7 +40,7 @@ const MessageList: React.FC<MessageListProps> = ({ message, lastRead, userProfil
                     </p>
                 </div>
             )}
-            </div>
+            </IonItem>
   );
 };
 
