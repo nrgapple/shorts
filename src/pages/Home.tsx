@@ -163,18 +163,18 @@ const Home: React.FC<HomeProps> = ({
           <IonTitle><span><img src="/assets/icon/shorts-24.ico" alt="Logo"></img></span></IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="">
-        <IonRefresher slot="fixed"
-          onIonRefresh={(event: any) => {
-            homeSend('RESET');
-            setTimeout(() => {
-              event.detail.complete();
-            }, 1000);
-          }}
-        >
-          <IonRefresherContent>
-          </IonRefresherContent>
-        </IonRefresher>
+      <IonContent>
+          <IonRefresher slot="fixed"
+            onIonRefresh={(event: any) => {
+              homeSend('RESET');
+              setTimeout(() => {
+                event.detail.complete();
+              }, 1000);
+            }}
+          >
+            <IonRefresherContent>
+            </IonRefresherContent>
+          </IonRefresher>
         <IonRow>
           {
             homeState.matches('unFinishedProfile') ? (
@@ -192,7 +192,9 @@ const Home: React.FC<HomeProps> = ({
               {
                 swipeState.matches('idle') && 
                   <Swipeable onSwipe={(choice: direction) => swipeSend(choice === direction.RIGHT?'SWIPED_RIGHT':'SWIPED_LEFT')}>
-                    <ProfileCard profile={profile} swiped={(choice: boolean) => swipeSend(choice?'SWIPED_RIGHT':'SWIPED_LEFT')} />
+                    <IonRow>
+                      <ProfileCard profile={profile} swiped={(choice: boolean) => swipeSend(choice?'SWIPED_RIGHT':'SWIPED_LEFT')} />
+                    </IonRow>
                   </Swipeable>
                 }
               </>

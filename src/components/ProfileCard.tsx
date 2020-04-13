@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IonCard, IonCardHeader, IonItem, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonSkeletonText, IonCardTitle, IonChip, IonSlides, IonSlide, IonText } from '@ionic/react';
+import { IonCard, IonCardHeader, IonItem, IonCardContent, IonList, IonRow, IonCol, IonButton, IonIcon, IonLabel, IonSkeletonText, IonCardTitle, IonChip, IonSlides, IonSlide, IonText, IonButtons } from '@ionic/react';
 import { calendar, body, close, heart, pin, paperPlane, closeCircle } from 'ionicons/icons';
 import { Profile } from '../models/Profile';
 import Lightbox from 'react-image-lightbox';
@@ -12,6 +12,11 @@ import { direction } from 'react-deck-swiper';
 interface ProfileCardProps {
   profile?: Profile;
   swiped: (liked: boolean) => void;
+}
+
+const cardStyle = {
+  marginTop: '5px',
+  marginBottom: '5px',
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
@@ -46,7 +51,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
       {
         profile ?
           <>
-              <IonCard>
+            <IonCol size="12" sizeMd="6">
+              <IonCard style={cardStyle}>
                 <IonCardHeader>
                   <IonCardTitle>{profile.firstName}</IonCardTitle>
                 </IonCardHeader>
@@ -65,57 +71,64 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, swiped }) => {
                         }
                       />
                   </div>
-
-                    <IonChip color="secondary" outline>
-                      <IonIcon icon={calendar} />
-                      <IonLabel>
-                        {calculateAge(profile.dob)}
-                      </IonLabel>
-                    </IonChip>
-                    <IonChip color="secondary" outline>
-                      <IonIcon icon={body} />
-                      <IonLabel>
-                        {findHeightString(profile.height!)}
-                      </IonLabel>
-                    </IonChip>
-                    <IonChip color="secondary" outline>
-                      <IonIcon icon={pin} />
-                      <IonLabel>
-                        {profile.displayAddress}
-                      </IonLabel>
-                    </IonChip> 
-                    <IonChip color="secondary" outline>
-                      <IonIcon icon={paperPlane} />
-                      <IonLabel>
-                      {profile.distance! <= 0 ? '< 1 mile' : `${profile.distance} ${profile.distance! === 1 ? 'mile' : 'miles'}`}
-                      </IonLabel>
-                    </IonChip>
-                    <div style={{
-                      display: 'flex', 
-                      justifyContent: 'space-around',
-                      height: '60px',
-                      alignItems: 'center'
-                    }}>
-                      <IonButton
-                        fill="solid"
-                        color="success"
-                        onClick={() => swiped(true)}
-                        >
-                          Yes
-                      </IonButton>
-                      <IonButton
-                        fill="solid"
-                        color="danger"
-                        onClick={() => swiped(false)}
-                          >
-                          No
-                      </IonButton>
-                    </div>                 
-                  <p className="ion-padding-start ion-padding-end">
-                    {profile.about ? profile.about : ''}
-                  </p>
-                </IonCardContent>
+              </IonCardContent>
               </IonCard>
+            </IonCol>
+            < IonCol size="12" sizeMd="6">
+              <IonCard style={cardStyle}>
+                <IonChip color="secondary" outline>
+                  <IonIcon icon={calendar} />
+                  <IonLabel>
+                    {calculateAge(profile.dob)}
+                  </IonLabel>
+                </IonChip>
+                <IonChip color="secondary" outline>
+                  <IonIcon icon={body} />
+                  <IonLabel>
+                    {findHeightString(profile.height!)}
+                  </IonLabel>
+                </IonChip>
+                <IonChip color="secondary" outline>
+                  <IonIcon icon={pin} />
+                  <IonLabel>
+                    {profile.displayAddress}
+                  </IonLabel>
+                </IonChip> 
+                <IonChip color="secondary" outline>
+                  <IonIcon icon={paperPlane} />
+                  <IonLabel>
+                  {profile.distance! <= 0 ? '< 1 mile' : `${profile.distance} ${profile.distance! === 1 ? 'mile' : 'miles'}`}
+                  </IonLabel>
+                </IonChip>
+                <IonRow justify-content-center>
+                  <IonCol text-center size="6">
+                    <IonButton
+                      fill="outline"
+                      color="danger"
+                      expand="block"
+                      onClick={() => swiped(false)}
+                    >
+                      <IonIcon slot="start" icon={close} />
+                    Pass
+                    </IonButton>
+                  </IonCol>
+                  <IonCol text-center size="6">
+                    <IonButton
+                      fill="outline"
+                      color="success"
+                      expand="block"
+                      onClick={() => swiped(true)}>
+                      <IonIcon slot="start" icon={heart} />
+                    Like
+                  </IonButton>
+                  </IonCol>
+                </IonRow>
+              <p className="ion-padding-start ion-padding-end">
+                {profile.about ? profile.about : ''}
+              </p>
+            </IonCard>
+         
+            </IonCol>
           </>
           :
             <IonCard className="speaker-card">
