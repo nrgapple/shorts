@@ -52,6 +52,15 @@ const Home: React.FC<HomeProps> = ({
         loadNearMe()
 
       },
+      reset: () => {
+        if (!isLoggedin) {
+          homeSend('NOT_LOGGED_IN');
+          return;
+        }
+        if (userProfile && homeSend) {
+          homeSend('LOAD');
+        }
+      }
     }
   });
   const [swipeState, swipeSend] = useMachine(swipeMachine, {
@@ -108,12 +117,18 @@ const Home: React.FC<HomeProps> = ({
     }
   }, [nearMeCount, profile, loading, profile])
 
-  useEffect(() => {
-    const subscription = homeService.subscribe(state => {
-    });
-    
-    return subscription.unsubscribe;
-  }, [homeService]); // note: service should never change
+  /**
+   * DEBUGGING STATE MACHINE. Prints states. 
+   * Comment out effect for production.
+   */
+  // useEffect(() => {
+  //   const subscription = homeService.subscribe(state => {
+  //     // simple state logging
+  //     console.log(state);
+  //   });
+  
+  //   return subscription.unsubscribe;
+  // }, [homeService]); // note: service should never change
 
   const swipe = async (liked: boolean) => {
     if (!profile) {

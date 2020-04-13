@@ -17,6 +17,7 @@ export const homeMachine = Machine({
       },
     },
     resetting: {
+      entry: ['reset'],
       on: {
         LOAD: {
           target: 'loading',
